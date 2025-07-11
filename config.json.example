@@ -1,0 +1,25 @@
+{
+  // 是否是剪映国际版，默认为true
+  "is_capcut_env": true,
+  // API 路由
+  "draft_domain": "https://www.install-ai-guider.top",
+  // 预览路由
+  "preview_router": "/draft/downloader",
+  // 是否上传草稿文件
+  "is_upload_draft": false,
+  // 上传草稿文件到阿里云OSS的配置
+  "oss_config": {
+    "bucket_name": "your-bucket-name",
+    "access_key_id": "your-access-key-id",
+    "access_key_secret": "your-access-key-secret",
+    "endpoint": "https://your-endpoint.aliyuncs.com"
+  },
+  // 上传渲染的MP4文件到阿里云OSS的配置
+  "mp4_oss_config": {
+    "bucket_name": "your-mp4-bucket-name",
+    "access_key_id": "your-access-key-id",
+    "access_key_secret": "your-access-key-secret",
+    "region": "your-region",
+    "endpoint": "http://your-custom-domain"
+  }
+}
