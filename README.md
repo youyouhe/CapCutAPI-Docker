@@ -2,6 +2,8 @@
 
 Open source CapCut API tool.
 
+[中文说明](https://github.com/sun-guannan/CapCutAPI/blob/main/README-zh.md)
+
 ## Project Features
 
 This project is a Python-based CapCut processing tool that offers the following core functionalities:
