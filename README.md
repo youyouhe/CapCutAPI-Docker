@@ -43,6 +43,10 @@ cp config.json.example config.json
 
 ### Environment Configuration
 
+#### ffmpeg
+
+This project depends on ffmpeg. You need to ensure that ffmpeg is installed on your system and added to the system's environment variables.
+
 #### Python Environment
 
 This project requires Python version 3.8.20. Please ensure that the correct version of Python is installed on your system.
@@ -99,6 +103,27 @@ response = requests.post("http://localhost:9000/add_text", json={
 
 print(response.json())
 ```
+
+### Saving a Draft
+
+```python
+import requests
+
+response = requests.post("http://localhost:9000/save_draft", json={
+    "draft_id": "123456",
+    "draft_folder": "your capcut draft folder"
+})
+
+print(response.json())
+```
+
+### Copying the Draft to CapCut Draft Path
+
+Calling `save_draft` will generate a folder starting with `dfd_` in the current directory of the server. Copy this folder to the CapCut draft directory, and you will be able to see the generated draft.
+
+### More Examples
+
+Please refer to the `example.py` file in the project, which contains more usage examples such as adding audio and effects.
 
 ## Project Features
 
