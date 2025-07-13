@@ -2,6 +2,19 @@ import requests
 from flask import Flask, request, jsonify, Response
 from datetime import datetime
 import pyJianYingDraft as draft
+from pyJianYingDraft.metadata.animation_meta import Intro_type, Outro_type, Group_animation_type
+from pyJianYingDraft.metadata.capcut_animation_meta import CapCut_Intro_type, CapCut_Outro_type, CapCut_Group_animation_type
+from pyJianYingDraft.metadata.transition_meta import Transition_type
+from pyJianYingDraft.metadata.capcut_transition_meta import CapCut_Transition_type
+from pyJianYingDraft.metadata.mask_meta import Mask_type
+from pyJianYingDraft.metadata.capcut_mask_meta import CapCut_Mask_type
+from pyJianYingDraft.metadata.audio_effect_meta import Tone_effect_type, Audio_scene_effect_type, Speech_to_song_type
+from pyJianYingDraft.metadata.capcut_audio_effect_meta import CapCut_Voice_filters_effect_type, CapCut_Voice_characters_effect_type, CapCut_Speech_to_song_effect_type
+from pyJianYingDraft.metadata.font_meta import Font_type
+from pyJianYingDraft.metadata.animation_meta import Text_intro, Text_outro, Text_loop_anim
+from pyJianYingDraft.metadata.capcut_text_animation_meta import CapCut_Text_intro, CapCut_Text_outro, CapCut_Text_loop_anim
+from pyJianYingDraft.metadata.video_effect_meta import Video_scene_effect_type, Video_character_effect_type
+from pyJianYingDraft.metadata.capcut_effect_meta import CapCut_Video_scene_effect_type, CapCut_Video_character_effect_type
 import random
 import uuid
 import json
@@ -25,7 +38,7 @@ app = Flask(__name__)
 @app.route('/add_video', methods=['POST'])
 def add_video():
     data = request.get_json()
-    # 获取必要参数
+    # Get required parameters
     draft_folder = data.get('draft_folder')
     video_url = data.get('video_url')
     start = data.get('start', 0)
@@ -37,25 +50,25 @@ def add_video():
     scale_x = data.get('scale_x', 1)
     scale_y = data.get('scale_y', 1)
     transform_x = data.get('transform_x', 0)
-    speed = data.get('speed', 1.0)  # 新增速度参数
-    target_start = data.get('target_start', 0)  # 新增目标开始时间参数
-    track_name = data.get('track_name', "video_main")  # 新增轨道名称参数
-    relative_index = data.get('relative_index', 0)  # 新增相对索引参数
-    duration = data.get('duration')  # 新增时长参数
-    transition = data.get('transition')  # 新增转场类型参数
-    transition_duration = data.get('transition_duration', 0.5)  # 新增转场持续时间参数，默认0.5秒
-    volume = data.get('volume', 1.0)  # 新增音量参数，默认1.0 
+    speed = data.get('speed', 1.0)  # New speed parameter
+    target_start = data.get('target_start', 0)  # New target start time parameter
+    track_name = data.get('track_name', "video_main")  # New track name parameter
+    relative_index = data.get('relative_index', 0)  # New relative index parameter
+    duration = data.get('duration')  # New duration parameter
+    transition = data.get('transition')  # New transition type parameter
+    transition_duration = data.get('transition_duration', 0.5)  # New transition duration parameter, default 0.5 seconds
+    volume = data.get('volume', 1.0)  # New volume parameter, default 1.0 
     
-    # 获取蒙版相关参数
-    mask_type = data.get('mask_type')  # 蒙版类型
-    mask_center_x = data.get('mask_center_x', 0.5)  # 蒙版中心X坐标
-    mask_center_y = data.get('mask_center_y', 0.5)  # 蒙版中心Y坐标
-    mask_size = data.get('mask_size', 1.0)  # 蒙版大小，相对屏幕高度的大小
-    mask_rotation = data.get('mask_rotation', 0.0)  # 蒙版旋转角度
-    mask_feather = data.get('mask_feather', 0.0)  # 蒙版羽化程度
-    mask_invert = data.get('mask_invert', False)  # 是否反转蒙版
-    mask_rect_width = data.get('mask_rect_width')  # 矩形蒙版宽度
-    mask_round_corner = data.get('mask_round_corner')  # 矩形蒙版圆角
+    # Get mask related parameters
+    mask_type = data.get('mask_type')  # Mask type
+    mask_center_x = data.get('mask_center_x', 0.5)  # Mask center X coordinate
+    mask_center_y = data.get('mask_center_y', 0.5)  # Mask center Y coordinate
+    mask_size = data.get('mask_size', 1.0)  # Mask size, relative to screen height
+    mask_rotation = data.get('mask_rotation', 0.0)  # Mask rotation angle
+    mask_feather = data.get('mask_feather', 0.0)  # Mask feather degree
+    mask_invert = data.get('mask_invert', False)  # Whether to invert mask
+    mask_rect_width = data.get('mask_rect_width')  # Rectangle mask width
+    mask_round_corner = data.get('mask_round_corner')  # Rectangle mask rounded corner
 
     result = {
         "success": False,
@@ -63,7 +76,7 @@ def add_video():
         "error": ""
     }
 
-    # 验证必要参数
+    # Validate required parameters
     if not video_url:
         error_message = "Hi, the required parameters 'video_url' are missing."
         result["error"] = error_message
@@ -87,10 +100,10 @@ def add_video():
             track_name=track_name,
             relative_index=relative_index,
             duration=duration,
-            transition=transition,  # 传入转场类型参数
-            transition_duration=transition_duration,  # 传入转场持续时间参数
-            volume=volume,  # 传入音量参数
-            # 传入蒙版相关参数
+            transition=transition,  # Pass transition type parameter
+            transition_duration=transition_duration,  # Pass transition duration parameter
+            volume=volume,  # Pass volume parameter
+            # Pass mask related parameters
             mask_type=mask_type,
             mask_center_x=mask_center_x,
             mask_center_y=mask_center_y,
@@ -115,24 +128,24 @@ def add_video():
 def add_audio():
     data = request.get_json()
     
-    # 获取必要参数
+    # Get required parameters
     draft_folder = data.get('draft_folder')
     audio_url = data.get('audio_url')
     start = data.get('start', 0)
     end = data.get('end', None)
     draft_id = data.get('draft_id')
-    volume = data.get('volume', 1.0)  # 默认音量1.0
-    target_start = data.get('target_start', 0)  # 新增目标开始时间参数
-    speed = data.get('speed', 1.0)  # 新增速度参数
-    track_name = data.get('track_name', 'audio_main')  # 新增轨道名称参数
-    duration = data.get('duration', None)  # 新增 duration 参数
-    # 音效参数分开获取
-    effect_type = data.get('effect_type', None)  # 音效类型名称
-    effect_params = data.get('effect_params', None)  # 音效参数列表
+    volume = data.get('volume', 1.0)  # Default volume 1.0
+    target_start = data.get('target_start', 0)  # New target start time parameter
+    speed = data.get('speed', 1.0)  # New speed parameter
+    track_name = data.get('track_name', 'audio_main')  # New track name parameter
+    duration = data.get('duration', None)  # New duration parameter
+    # Get audio effect parameters separately
+    effect_type = data.get('effect_type', None)  # Audio effect type name
+    effect_params = data.get('effect_params', None)  # Audio effect parameter list
     width = data.get('width', 1080)
     height = data.get('height', 1920)
     
-    # # 如果有音效参数，将其组合成sound_effects格式
+    # # If there are audio effect parameters, combine them into sound_effects format
     sound_effects = None
     if effect_type is not None:
         sound_effects = [(effect_type, effect_params)]
@@ -143,14 +156,14 @@ def add_audio():
         "error": ""
     }
 
-    # 验证必要参数
+    # Validate required parameters
     if not audio_url:
         error_message = "Hi, the required parameters 'audio_url' are missing."
         result["error"] = error_message
         return jsonify(result)
 
     try:
-        # 调用修改后的 add_audio_track 方法
+        # Call the modified add_audio_track method
         draft_result = add_audio_track(
             draft_folder=draft_folder,
             audio_url=audio_url,
@@ -161,10 +174,10 @@ def add_audio():
             volume=volume,
             track_name=track_name,
             speed=speed,
-            sound_effects=sound_effects,  # 添加音效参数
+            sound_effects=sound_effects,  # Add audio effect parameters
             width=width,
             height=height,
-            duration=duration  # 添加 duration 参数
+            duration=duration  # Add duration parameter
         )
         
         result["success"] = True
@@ -180,7 +193,7 @@ def add_audio():
 def create_draft_service():
     data = request.get_json()
     
-    # 获取参数
+    # Get parameters
     width = data.get('width', 1080)
     height = data.get('height', 1920)
     
@@ -191,7 +204,7 @@ def create_draft_service():
     }
     
     try:
-        # 创建新草稿
+        # Create new draft
         script, draft_id = create_draft(width=width, height=height)
         
         result["success"] = True
@@ -210,36 +223,36 @@ def create_draft_service():
 def add_subtitle():
     data = request.get_json()
     
-    # 获取必要参数
-    srt = data.get('srt')  # 字幕内容或URL
+    # Get required parameters
+    srt = data.get('srt')  # Subtitle content or URL
     draft_id = data.get('draft_id')
-    time_offset = data.get('time_offset', 0.0)  # 默认0秒
+    time_offset = data.get('time_offset', 0.0)  # Default 0 seconds
     
-    # 字体样式参数
-    font_size = data.get('font_size', 5.0)  # 默认大小5.0
-    bold = data.get('bold', False)  # 默认不加粗
-    italic = data.get('italic', False)  # 默认不斜体
-    underline = data.get('underline', False)  # 默认不下划线
-    font_color = data.get('font_color', '#FFFFFF')  # 默认白色
-    vertical = data.get('vertical', False)  # 新增：是否垂直显示，默认False
-    alpha = data.get('alpha', 1)  # 新增：透明度，默认1
-    # 边框参数
+    # Font style parameters
+    font_size = data.get('font_size', 5.0)  # Default size 5.0
+    bold = data.get('bold', False)  # Default not bold
+    italic = data.get('italic', False)  # Default not italic
+    underline = data.get('underline', False)  # Default no underline
+    font_color = data.get('font_color', '#FFFFFF')  # Default white
+    vertical = data.get('vertical', False)  # New: whether to display vertically, default False
+    alpha = data.get('alpha', 1)  # New: transparency, default 1
+    # Border parameters
     border_alpha = data.get('border_alpha', 1.0)
     border_color = data.get('border_color', '#000000')
     border_width = data.get('border_width', 0.0)
     
-    # 背景参数
+    # Background parameters
     background_color = data.get('background_color', '#000000')
     background_style = data.get('background_style', 0)
     background_alpha = data.get('background_alpha', 0.0)
         
-    # 图像调节参数
-    transform_x = data.get('transform_x', 0.0)  # 默认0
-    transform_y = data.get('transform_y', -0.8)  # 默认-0.8
-    scale_x = data.get('scale_x', 1.0)  # 默认1.0
-    scale_y = data.get('scale_y', 1.0)  # 默认1.0
-    rotation = data.get('rotation', 0.0)  # 默认0.0
-    track_name = data.get('track_name', 'subtitle')  # 默认轨道名称为'subtitle'
+    # Image adjustment parameters
+    transform_x = data.get('transform_x', 0.0)  # Default 0
+    transform_y = data.get('transform_y', -0.8)  # Default -0.8
+    scale_x = data.get('scale_x', 1.0)  # Default 1.0
+    scale_y = data.get('scale_y', 1.0)  # Default 1.0
+    rotation = data.get('rotation', 0.0)  # Default 0.0
+    track_name = data.get('track_name', 'subtitle')  # Default track name is 'subtitle'
     width = data.get('width', 1080)
     height = data.get('height', 1920)
 
@@ -249,34 +262,34 @@ def add_subtitle():
         "error": ""
     }
 
-    # 验证必要参数
+    # Validate required parameters
     if not srt:
         error_message = "Hi, the required parameters 'srt' are missing."
         result["error"] = error_message
         return jsonify(result)
 
     try:
-        # 调用 add_subtitle_impl 方法
+        # Call add_subtitle_impl method
         draft_result = add_subtitle_impl(
             srt_path=srt,
             draft_id=draft_id,
             track_name=track_name,
             time_offset=time_offset,
-            # 字体样式参数
+            # Font style parameters
             font_size=font_size,
             bold=bold,
             italic=italic,
             underline=underline,
             font_color=font_color,
-            vertical=vertical,  # 新增：传递vertical参数
-            alpha=alpha,  # 新增：传递alpha参数
+            vertical=vertical,  # New: pass vertical parameter
+            alpha=alpha,  # New: pass alpha parameter
             border_alpha=border_alpha,
             border_color=border_color,
             border_width=border_width,
             background_color=background_color,
             background_style=background_style,
             background_alpha=background_alpha,
-            # 图像调节参数
+            # Image adjustment parameters
             transform_x=transform_x,
             transform_y=transform_y,
             scale_x=scale_x,
@@ -299,7 +312,7 @@ def add_subtitle():
 def add_text():
     data = request.get_json()
     
-    # 获取必要参数
+    # Get required parameters
     text = data.get('text')
     start = data.get('start', 0)
     end = data.get('end', 5)
@@ -318,30 +331,30 @@ def add_text():
     width = data.get('width', 1080)
     height = data.get('height', 1920)
     
-    # 新增固定宽高参数 
+    # New fixed width and height parameters 
     fixed_width = data.get('fixed_width', -1)
     fixed_height = data.get('fixed_height', -1)
     
-    # 描边参数
+    # Border parameters
     border_alpha = data.get('border_alpha', 1.0)
     border_color = data.get('border_color', "#000000")
     border_width = data.get('border_width', 0.0)
     
-    # 背景参数
+    # Background parameters
     background_color = data.get('background_color', "#000000")
     background_style = data.get('background_style', 0)
     background_alpha = data.get('background_alpha', 0.0)
     
-    # 气泡和花字效果
+    # Bubble and decorative text effects
     bubble_effect_id = data.get('bubble_effect_id')
     bubble_resource_id = data.get('bubble_resource_id')
     effect_effect_id = data.get('effect_effect_id')
     
-    # 入场动画
+    # Entrance animation
     intro_animation = data.get('intro_animation')
     intro_duration = data.get('intro_duration', 0.5)
     
-    # 出场动画
+    # Exit animation
     outro_animation = data.get('outro_animation')
     outro_duration = data.get('outro_duration', 0.5)
 
@@ -351,7 +364,7 @@ def add_text():
         "error": ""
     }
 
-    # 验证必要参数
+    # Validate required parameters
     if not text or start is None or end is None:
         error_message = "Hi, the required parameters 'text', 'start' or 'end' are missing. "
         result["error"] = error_message
@@ -359,7 +372,7 @@ def add_text():
 
     try:
         
-        # 调用 add_text_impl 方法
+        # Call add_text_impl method
         draft_result = add_text_impl(
             text=text,
             start=start,
@@ -398,7 +411,7 @@ def add_text():
 
     except Exception as e:
         if is_chinese:
-            error_message = f"处理文本时出错啦：{str(e)}。您可以点击下面的链接寻求帮助："
+            error_message = f"Error occurred while processing text: {str(e)}. You can click the link below for help: "
         else:
             error_message = f"Error occurred while processing text: {str(e)}. You can click the link below for help: "
         result["error"] = error_message + purchase_link
@@ -408,41 +421,41 @@ def add_text():
 def add_image():
     data = request.get_json()
     
-    # 获取必要参数
+    # Get required parameters
     draft_folder = data.get('draft_folder')
     image_url = data.get('image_url')
     width = data.get('width', 1080)
     height = data.get('height', 1920)
     start = data.get('start', 0)
-    end = data.get('end', 3.0)  # 默认显示3秒
+    end = data.get('end', 3.0)  # Default display 3 seconds
     draft_id = data.get('draft_id')
     transform_y = data.get('transform_y', 0)
     scale_x = data.get('scale_x', 1)
     scale_y = data.get('scale_y', 1)
     transform_x = data.get('transform_x', 0)
-    track_name = data.get('track_name', "image_main")  # 默认轨道名称
-    relative_index = data.get('relative_index', 0)  # 新增轨道渲染顺序索引参数 
-    animation = data.get('animation')  # 入场动画参数（向后兼容）
-    animation_duration = data.get('animation_duration', 0.5)  # 入场动画持续时间
-    intro_animation = data.get('intro_animation')  # 新增入场动画参数，优先级高于animation
+    track_name = data.get('track_name', "image_main")  # Default track name
+    relative_index = data.get('relative_index', 0)  # New track rendering order index parameter 
+    animation = data.get('animation')  # Entrance animation parameter (backward compatibility)
+    animation_duration = data.get('animation_duration', 0.5)  # Entrance animation duration
+    intro_animation = data.get('intro_animation')  # New entrance animation parameter, higher priority than animation
     intro_animation_duration = data.get('intro_animation_duration', 0.5)
-    outro_animation = data.get('outro_animation')  # 新增出场动画参数
-    outro_animation_duration = data.get('outro_animation_duration', 0.5)  # 新增出场动画持续时间
-    combo_animation = data.get('combo_animation')  # 新增组合动画参数
-    combo_animation_duration = data.get('combo_animation_duration', 0.5)  # 新增组合动画持续时间
-    transition = data.get('transition')  # 转场类型参数
-    transition_duration = data.get('transition_duration', 0.5)  # 转场持续时间参数，默认0.5秒
+    outro_animation = data.get('outro_animation')  # New exit animation parameter
+    outro_animation_duration = data.get('outro_animation_duration', 0.5)  # New exit animation duration
+    combo_animation = data.get('combo_animation')  # New combo animation parameter
+    combo_animation_duration = data.get('combo_animation_duration', 0.5)  # New combo animation duration
+    transition = data.get('transition')  # Transition type parameter
+    transition_duration = data.get('transition_duration', 0.5)  # Transition duration parameter, default 0.5 seconds
     
-    # 新增蒙版相关参数 
-    mask_type = data.get('mask_type')  # 蒙版类型
-    mask_center_x = data.get('mask_center_x', 0.0)  # 蒙版中心点X坐标
-    mask_center_y = data.get('mask_center_y', 0.0)  # 蒙版中心点Y坐标
-    mask_size = data.get('mask_size', 0.5)  # 蒙版主要尺寸，相对画布高度
-    mask_rotation = data.get('mask_rotation', 0.0)  # 蒙版旋转角度
-    mask_feather = data.get('mask_feather', 0.0)  # 蒙版羽化参数
-    mask_invert = data.get('mask_invert', False)  # 是否反转蒙版
-    mask_rect_width = data.get('mask_rect_width')  # 矩形蒙版宽度
-    mask_round_corner = data.get('mask_round_corner')  # 矩形蒙版圆角
+    # New mask related parameters 
+    mask_type = data.get('mask_type')  # Mask type
+    mask_center_x = data.get('mask_center_x', 0.0)  # Mask center X coordinate
+    mask_center_y = data.get('mask_center_y', 0.0)  # Mask center Y coordinate
+    mask_size = data.get('mask_size', 0.5)  # Mask main size, relative to canvas height
+    mask_rotation = data.get('mask_rotation', 0.0)  # Mask rotation angle
+    mask_feather = data.get('mask_feather', 0.0)  # Mask feather parameter
+    mask_invert = data.get('mask_invert', False)  # Whether to invert mask
+    mask_rect_width = data.get('mask_rect_width')  # Rectangle mask width
+    mask_round_corner = data.get('mask_round_corner')  # Rectangle mask rounded corner
 
     result = {
         "success": False,
@@ -450,7 +463,7 @@ def add_image():
         "error": ""
     }
 
-    # 验证必要参数
+    # Validate required parameters
     if not image_url:
         error_message = "Hi, the required parameters 'image_url' are missing."
         result["error"] = error_message
@@ -470,18 +483,18 @@ def add_image():
             scale_y=scale_y,
             transform_x=transform_x,
             track_name=track_name,
-            relative_index=relative_index,  # 传入轨道渲染顺序索引参数
-            animation=animation,  # 传入入场动画参数（向后兼容）
-            animation_duration=animation_duration,  # 传入入场动画持续时间
-            intro_animation=intro_animation,  # 传入新的入场动画参数
+            relative_index=relative_index,  # Pass track rendering order index parameter
+            animation=animation,  # Pass entrance animation parameter (backward compatibility)
+            animation_duration=animation_duration,  # Pass entrance animation duration
+            intro_animation=intro_animation,  # Pass new entrance animation parameter
             intro_animation_duration=intro_animation_duration,
-            outro_animation=outro_animation,  # 传入出场动画参数
-            outro_animation_duration=outro_animation_duration,  # 传入出场动画持续时间
-            combo_animation=combo_animation,  # 传入组合动画参数
-            combo_animation_duration=combo_animation_duration,  # 传入组合动画持续时间
-            transition=transition,  # 传入转场类型参数
-            transition_duration=transition_duration,  # 传入转场持续时间参数（秒）
-            # 传入蒙版相关参数
+            outro_animation=outro_animation,  # Pass exit animation parameter
+            outro_animation_duration=outro_animation_duration,  # Pass exit animation duration
+            combo_animation=combo_animation,  # Pass combo animation parameter
+            combo_animation_duration=combo_animation_duration,  # Pass combo animation duration
+            transition=transition,  # Pass transition type parameter
+            transition_duration=transition_duration,  # Pass transition duration parameter (seconds)
+            # Pass mask related parameters
             mask_type=mask_type,
             mask_center_x=mask_center_x,
             mask_center_y=mask_center_y,
@@ -506,19 +519,19 @@ def add_image():
 def add_video_keyframe():
     data = request.get_json()
     
-    # 获取必要参数
+    # Get required parameters
     draft_id = data.get('draft_id')
-    track_name = data.get('track_name', 'video_main')  # 默认主轨道
+    track_name = data.get('track_name', 'video_main')  # Default main track
     
-    # 单个关键帧参数（向后兼容）
-    property_type = data.get('property_type', 'alpha')  # 默认不透明度
-    time = data.get('time', 0.0)  # 默认0秒
-    value = data.get('value', '1.0')  # 默认值1.0
+    # Single keyframe parameters (backward compatibility)
+    property_type = data.get('property_type', 'alpha')  # Default opacity
+    time = data.get('time', 0.0)  # Default 0 seconds
+    value = data.get('value', '1.0')  # Default value 1.0
     
-    # 批量关键帧参数（新增）
-    property_types = data.get('property_types')  # 属性类型列表
-    times = data.get('times')  # 时间列表
-    values = data.get('values')  # 值列表
+    # Batch keyframe parameters (new)
+    property_types = data.get('property_types')  # Property type list
+    times = data.get('times')  # Time list
+    values = data.get('values')  # Value list
 
     result = {
         "success": False,
@@ -527,7 +540,7 @@ def add_video_keyframe():
     }
 
     try:
-        # 调用 add_video_keyframe_impl 方法
+        # Call add_video_keyframe_impl method
         draft_result = add_video_keyframe_impl(
             draft_id=draft_id,
             track_name=track_name,
@@ -552,13 +565,13 @@ def add_video_keyframe():
 def add_effect():
     data = request.get_json()
     
-    # 获取必要参数
-    effect_type = data.get('effect_type')  # 特效类型名称，将从Video_scene_effect_type或Video_character_effect_type中匹配
-    start = data.get('start', 0)  # 开始时间（秒），默认0
-    end = data.get('end', 3.0)  # 结束时间（秒），默认3秒
-    draft_id = data.get('draft_id')  # 草稿ID，如果为None或找不到对应的zip文件，则创建新草稿
-    track_name = data.get('track_name', "effect_01")  # 轨道名称，当特效轨道仅有一条时可省略
-    params = data.get('params')  # 特效参数列表，参数列表中未提供或为None的项使用默认值
+    # Get required parameters
+    effect_type = data.get('effect_type')  # Effect type name, will match from Video_scene_effect_type or Video_character_effect_type
+    start = data.get('start', 0)  # Start time (seconds), default 0
+    end = data.get('end', 3.0)  # End time (seconds), default 3 seconds
+    draft_id = data.get('draft_id')  # Draft ID, if None or corresponding zip file not found, create new draft
+    track_name = data.get('track_name', "effect_01")  # Track name, can be omitted when there is only one effect track
+    params = data.get('params')  # Effect parameter list, items not provided or None in parameter list use default values
     width = data.get('width', 1080)
     height = data.get('height', 1920)
 
@@ -568,14 +581,14 @@ def add_effect():
         "error": ""
     }
 
-    # 验证必要参数
+    # Validate required parameters
     if not effect_type:
         error_message = "Hi, the required parameters 'effect_type' are missing. Please add them and try again."
         result["error"] = error_message
         return jsonify(result)
 
     try:
-        # 调用 add_effect_impl 方法
+        # Call add_effect_impl method
         draft_result = add_effect_impl(
             effect_type=effect_type,
             start=start,
@@ -600,7 +613,7 @@ def add_effect():
 def query_script():
     data = request.get_json()
 
-    # 获取必要参数
+    # Get required parameters
     draft_id = data.get('draft_id')
     force_update = data.get('force_update', True)
     
@@ -610,14 +623,14 @@ def query_script():
         "error": ""
     }
 
-    # 验证必要参数
+    # Validate required parameters
     if not draft_id:
         error_message = "Hi, the required parameter 'draft_id' is missing. Please add it and try again."
         result["error"] = error_message
         return jsonify(result)
 
     try:
-        # 调用 query_script_impl 方法
+        # Call query_script_impl method
         script = query_script_impl(draft_id=draft_id, force_update=force_update)
         
         if script is None:
@@ -625,7 +638,7 @@ def query_script():
             result["error"] = error_message
             return jsonify(result)
         
-        # 将脚本对象转换为JSON可序列化的字典
+        # Convert script object to JSON serializable dictionary
         script_str = script.dumps()
         
         result["success"] = True
@@ -641,9 +654,9 @@ def query_script():
 def save_draft():
     data = request.get_json()
     
-    # 获取必要参数
+    # Get required parameters
     draft_id = data.get('draft_id')
-    draft_folder = data.get('draft_folder')  # 草稿文件夹参数
+    draft_folder = data.get('draft_folder')  # Draft folder parameter
     
     result = {
         "success": False,
@@ -651,14 +664,14 @@ def save_draft():
         "error": ""
     }
     
-    # 验证必要参数
+    # Validate required parameters
     if not draft_id:
         error_message = "Hi, the required parameter 'draft_id' is missing. Please add it and try again."
         result["error"] = error_message
         return jsonify(result)
     
     try:
-        # 调用 save_draft_impl 方法，启动后台任务
+        # Call save_draft_impl method, start background task
         draft_result = save_draft_impl(draft_id, draft_folder)
         
         result["success"] = True
@@ -670,12 +683,12 @@ def save_draft():
         result["error"] = error_message
         return jsonify(result)
 
-# 添加新的查询状态接口
+# Add new query status interface
 @app.route('/query_draft_status', methods=['POST'])
 def query_draft_status():
     data = request.get_json()
     
-    # 获取必要参数
+    # Get required parameters
     task_id = data.get('task_id')
     
     result = {
@@ -684,14 +697,14 @@ def query_draft_status():
         "error": ""
     }
     
-    # 验证必要参数
+    # Validate required parameters
     if not task_id:
         error_message = "Hi, the required parameter 'task_id' is missing. Please add it and try again."
         result["error"] = error_message
         return jsonify(result)
     
     try:
-        # 获取任务状态
+        # Get task status
         task_status = query_task_status(task_id)
         
         if task_status["status"] == "not_found":
@@ -712,9 +725,9 @@ def query_draft_status():
 def generate_draft_url():
     data = request.get_json()
     
-    # 获取必要参数
+    # Get required parameters
     draft_id = data.get('draft_id')
-    draft_folder = data.get('draft_folder')  # 新增draft_folder参数
+    draft_folder = data.get('draft_folder')  # New draft_folder parameter
     
     result = {
         "success": False,
@@ -722,7 +735,7 @@ def generate_draft_url():
         "error": ""
     }
     
-    # 验证必要参数
+    # Validate required parameters
     if not draft_id:
         error_message = "Hi, the required parameter 'draft_id' is missing. Please add it and try again."
         result["error"] = error_message
@@ -743,10 +756,10 @@ def generate_draft_url():
 @app.route('/add_sticker', methods=['POST'])
 def add_sticker():
     data = request.get_json()
-    # 获取必要参数
+    # Get required parameters
     resource_id = data.get('sticker_id')
     start = data.get('start', 0)
-    end = data.get('end', 5.0)  # 默认显示5秒
+    end = data.get('end', 5.0)  # Default display 5 seconds
     draft_id = data.get('draft_id')
     transform_y = data.get('transform_y', 0)
     transform_x = data.get('transform_x', 0)
@@ -767,14 +780,14 @@ def add_sticker():
         "error": ""
     }
 
-    # 验证必要参数
+    # Validate required parameters
     if not resource_id:
         error_message = "Hi, the required parameter 'sticker_id' is missing. Please add it and try again. "
         result["error"] = error_message
         return jsonify(result)
 
     try:
-        # 调用 add_sticker_impl 方法
+        # Call add_sticker_impl method
         draft_result = add_sticker_impl(
             resource_id=resource_id,
             start=start,
@@ -802,6 +815,545 @@ def add_sticker():
         error_message = f"Error occurred while adding sticker: {str(e)}. "
         result["error"] = error_message
         return jsonify(result)
+
+@app.route('/get_intro_animation_types', methods=['GET'])
+def get_intro_animation_types():
+    """Return supported entrance animation type list
+    
+    If IS_CAPCUT_ENV is True, return entrance animation types in CapCut environment
+    Otherwise return entrance animation types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        animation_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return entrance animation types in CapCut environment
+            for name, member in CapCut_Intro_type.__members__.items():
+                animation_types.append({
+                    "name": name
+                })
+        else:
+            # Return entrance animation types in JianYing environment
+            for name, member in Intro_type.__members__.items():
+                animation_types.append({
+                    "name": name
+                })
+        
+        result["output"] = animation_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting entrance animation types: {str(e)}"
+        return jsonify(result)
+        
+@app.route('/get_outro_animation_types', methods=['GET'])
+def get_outro_animation_types():
+    """Return supported exit animation type list
+    
+    If IS_CAPCUT_ENV is True, return exit animation types in CapCut environment
+    Otherwise return exit animation types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        animation_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return exit animation types in CapCut environment
+            for name, member in CapCut_Outro_type.__members__.items():
+                animation_types.append({
+                    "name": name
+                })
+        else:
+            # Return exit animation types in JianYing environment
+            for name, member in Outro_type.__members__.items():
+                animation_types.append({
+                    "name": name
+                })
+        
+        result["output"] = animation_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting exit animation types: {str(e)}"
+        return jsonify(result)
+
+
+@app.route('/get_combo_animation_types', methods=['GET'])
+def get_combo_animation_types():
+    """Return supported combo animation type list
+    
+    If IS_CAPCUT_ENV is True, return combo animation types in CapCut environment
+    Otherwise return combo animation types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        animation_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return combo animation types in CapCut environment
+            for name, member in CapCut_Group_animation_type.__members__.items():
+                animation_types.append({
+                    "name": name
+                })
+        else:
+            # Return combo animation types in JianYing environment
+            for name, member in Group_animation_type.__members__.items():
+                animation_types.append({
+                    "name": name
+                })
+        
+        result["output"] = animation_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting combo animation types: {str(e)}"
+        return jsonify(result)
+
+
+@app.route('/get_transition_types', methods=['GET'])
+def get_transition_types():
+    """Return supported transition animation type list
+    
+    If IS_CAPCUT_ENV is True, return transition animation types in CapCut environment
+    Otherwise return transition animation types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        transition_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return transition animation types in CapCut environment
+            for name, member in CapCut_Transition_type.__members__.items():
+                transition_types.append({
+                    "name": name
+                })
+        else:
+            # Return transition animation types in JianYing environment
+            for name, member in Transition_type.__members__.items():
+                transition_types.append({
+                    "name": name
+                })
+        
+        result["output"] = transition_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting transition animation types: {str(e)}"
+        return jsonify(result)
+
+
+@app.route('/get_mask_types', methods=['GET'])
+def get_mask_types():
+    """Return supported mask type list
+    
+    If IS_CAPCUT_ENV is True, return mask types in CapCut environment
+    Otherwise return mask types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        mask_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return mask types in CapCut environment
+            for name, member in CapCut_Mask_type.__members__.items():
+                mask_types.append({
+                    "name": name
+                })
+        else:
+            # Return mask types in JianYing environment
+            for name, member in Mask_type.__members__.items():
+                mask_types.append({
+                    "name": name
+                })
+        
+        result["output"] = mask_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting mask types: {str(e)}"
+        return jsonify(result)
+
+
+@app.route('/get_audio_effect_types', methods=['GET'])
+def get_audio_effect_types():
+    """Return supported audio effect type list
+    
+    If IS_CAPCUT_ENV is True, return audio effect types in CapCut environment
+    Otherwise return audio effect types in JianYing environment
+    
+    The returned structure includes name, type and Effect_param information
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        audio_effect_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return audio effect types in CapCut environment
+            # 1. Voice filters effect types
+            for name, member in CapCut_Voice_filters_effect_type.__members__.items():
+                params_info = []
+                for param in member.value.params:
+                    params_info.append({
+                        "name": param.name,
+                        "default_value": param.default_value * 100,
+                        "min_value": param.min_value * 100,
+                        "max_value": param.max_value * 100
+                    })
+                
+                audio_effect_types.append({
+                    "name": name,
+                    "type": "Voice_filters",
+                    "params": params_info
+                })
+            
+            # 2. Voice characters effect types
+            for name, member in CapCut_Voice_characters_effect_type.__members__.items():
+                params_info = []
+                for param in member.value.params:
+                    params_info.append({
+                        "name": param.name,
+                        "default_value": param.default_value * 100,
+                        "min_value": param.min_value * 100,
+                        "max_value": param.max_value * 100
+                    })
+                
+                audio_effect_types.append({
+                    "name": name,
+                    "type": "Voice_characters",
+                    "params": params_info
+                })
+            
+            # 3. Speech to song effect types
+            for name, member in CapCut_Speech_to_song_effect_type.__members__.items():
+                params_info = []
+                for param in member.value.params:
+                    params_info.append({
+                        "name": param.name,
+                        "default_value": param.default_value * 100,
+                        "min_value": param.min_value * 100,
+                        "max_value": param.max_value * 100
+                    })
+                
+                audio_effect_types.append({
+                    "name": name,
+                    "type": "Speech_to_song",
+                    "params": params_info
+                })
+        else:
+            # Return audio effect types in JianYing environment
+            # 1. Tone effect types
+            for name, member in Tone_effect_type.__members__.items():
+                params_info = []
+                for param in member.value.params:
+                    params_info.append({
+                        "name": param.name,
+                        "default_value": param.default_value * 100,
+                        "min_value": param.min_value * 100,
+                        "max_value": param.max_value * 100
+                    })
+                
+                audio_effect_types.append({
+                    "name": name,
+                    "type": "Tone",
+                    "params": params_info
+                })
+            
+            # 2. Audio scene effect types
+            for name, member in Audio_scene_effect_type.__members__.items():
+                params_info = []
+                for param in member.value.params:
+                    params_info.append({
+                        "name": param.name,
+                        "default_value": param.default_value * 100,
+                        "min_value": param.min_value * 100,
+                        "max_value": param.max_value * 100
+                    })
+                
+                audio_effect_types.append({
+                    "name": name,
+                    "type": "Audio_scene",
+                    "params": params_info
+                })
+            
+            # 3. Speech to song effect types
+            for name, member in Speech_to_song_type.__members__.items():
+                params_info = []
+                for param in member.value.params:
+                    params_info.append({
+                        "name": param.name,
+                        "default_value": param.default_value * 100,
+                        "min_value": param.min_value * 100,
+                        "max_value": param.max_value * 100
+                    })
+                
+                audio_effect_types.append({
+                    "name": name,
+                    "type": "Speech_to_song",
+                    "params": params_info
+                })
+        
+        result["output"] = audio_effect_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting audio effect types: {str(e)}"
+        return jsonify(result)
+
+
+@app.route('/get_font_types', methods=['GET'])
+def get_font_types():
+    """Return supported font type list
+    
+    Return font types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        font_types = []
+        
+        # Return font types in JianYing environment
+        for name, member in Font_type.__members__.items():
+            font_types.append({
+                "name": name
+            })
+        
+        result["output"] = font_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting font types: {str(e)}"
+        return jsonify(result)
+
+
+@app.route('/get_text_intro_types', methods=['GET'])
+def get_text_intro_types():
+    """Return supported text entrance animation type list
+    
+    If IS_CAPCUT_ENV is True, return text entrance animation types in CapCut environment
+    Otherwise return text entrance animation types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        text_intro_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return text entrance animation types in CapCut environment
+            for name, member in CapCut_Text_intro.__members__.items():
+                text_intro_types.append({
+                    "name": name
+                })
+        else:
+            # Return text entrance animation types in JianYing environment
+            for name, member in Text_intro.__members__.items():
+                text_intro_types.append({
+                    "name": name
+                })
+        
+        result["output"] = text_intro_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting text entrance animation types: {str(e)}"
+        return jsonify(result)
+
+@app.route('/get_text_outro_types', methods=['GET'])
+def get_text_outro_types():
+    """Return supported text exit animation type list
+    
+    If IS_CAPCUT_ENV is True, return text exit animation types in CapCut environment
+    Otherwise return text exit animation types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        text_outro_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return text exit animation types in CapCut environment
+            for name, member in CapCut_Text_outro.__members__.items():
+                text_outro_types.append({
+                    "name": name
+                })
+        else:
+            # Return text exit animation types in JianYing environment
+            for name, member in Text_outro.__members__.items():
+                text_outro_types.append({
+                    "name": name
+                })
+        
+        result["output"] = text_outro_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting text exit animation types: {str(e)}"
+        return jsonify(result)
+
+@app.route('/get_text_loop_anim_types', methods=['GET'])
+def get_text_loop_anim_types():
+    """Return supported text loop animation type list
+    
+    If IS_CAPCUT_ENV is True, return text loop animation types in CapCut environment
+    Otherwise return text loop animation types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        text_loop_anim_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return text loop animation types in CapCut environment
+            for name, member in CapCut_Text_loop_anim.__members__.items():
+                text_loop_anim_types.append({
+                    "name": name
+                })
+        else:
+            # Return text loop animation types in JianYing environment
+            for name, member in Text_loop_anim.__members__.items():
+                text_loop_anim_types.append({
+                    "name": name
+                })
+        
+        result["output"] = text_loop_anim_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting text loop animation types: {str(e)}"
+        return jsonify(result)
+
+
+@app.route('/get_video_scene_effect_types', methods=['GET'])
+def get_video_scene_effect_types():
+    """Return supported scene effect type list
+    
+    If IS_CAPCUT_ENV is True, return scene effect types in CapCut environment
+    Otherwise return scene effect types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        effect_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return scene effect types in CapCut environment
+            for name, member in CapCut_Video_scene_effect_type.__members__.items():
+                effect_types.append({
+                    "name": name
+                })
+        else:
+            # Return scene effect types in JianYing environment
+            for name, member in Video_scene_effect_type.__members__.items():
+                effect_types.append({
+                    "name": name
+                })
+        
+        result["output"] = effect_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting scene effect types: {str(e)}"
+        return jsonify(result)
+
+
+@app.route('/get_video_character_effect_types', methods=['GET'])
+def get_video_character_effect_types():
+    """Return supported character effect type list
+    
+    If IS_CAPCUT_ENV is True, return character effect types in CapCut environment
+    Otherwise return character effect types in JianYing environment
+    """
+    result = {
+        "success": True,
+        "output": "",
+        "error": ""
+    }
+    
+    try:
+        effect_types = []
+        
+        if IS_CAPCUT_ENV:
+            # Return character effect types in CapCut environment
+            for name, member in CapCut_Video_character_effect_type.__members__.items():
+                effect_types.append({
+                    "name": name
+                })
+        else:
+            # Return character effect types in JianYing environment
+            for name, member in Video_character_effect_type.__members__.items():
+                effect_types.append({
+                    "name": name
+                })
+        
+        result["output"] = effect_types
+        return jsonify(result)
+    
+    except Exception as e:
+        result["success"] = False
+        result["error"] = f"Error occurred while getting character effect types: {str(e)}"
+        return jsonify(result)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=9000)
