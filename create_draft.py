@@ -5,43 +5,43 @@ from draft_cache import DRAFT_CACHE, update_cache
 
 def create_draft(width=1080, height=1920):
     """
-    创建新的剪映草稿
-    :param width: 视频宽度，默认1080
-    :param height: 视频高度，默认1920
+    Create new CapCut draft
+    :param width: Video width, default 1080
+    :param height: Video height, default 1920
     :return: (draft_name, draft_path, draft_id, draft_url)
     """
-    # 生成时间戳和draft_id
+    # Generate timestamp and draft_id
     unix_time = int(time.time())
-    unique_id = uuid.uuid4().hex[:8]  # 取UUID的前8位即可
-    draft_id = f"dfd_cat_{unix_time}_{unique_id}"  # 使用Unix时间戳和UUID组合
+    unique_id = uuid.uuid4().hex[:8]  # Take the first 8 digits of UUID
+    draft_id = f"dfd_cat_{unix_time}_{unique_id}"  # Use Unix timestamp and UUID combination
     
-    # 创建指定分辨率的剪映草稿
+    # Create CapCut draft with specified resolution
     script = draft.Script_file(width, height)
     
-    # 存入全局缓存
+    # Store in global cache
     update_cache(draft_id, script)
     
     return script, draft_id
 
 def get_or_create_draft(draft_id=None, width=1080, height=1920):
     """
-    获取或创建剪映草稿
-    :param draft_id: 草稿ID，如果为None或找不到对应的zip文件，则创建新草稿
-    :param width: 视频宽度，默认1080
-    :param height: 视频高度，默认1920
+    Get or create CapCut draft
+    :param draft_id: Draft ID, if None or corresponding zip file not found, create new draft
+    :param width: Video width, default 1080
+    :param height: Video height, default 1920
     :return: (draft_name, draft_path, draft_id, draft_dir, script)
     """
-    global DRAFT_CACHE  # 声明使用全局变量
+    global DRAFT_CACHE  # Declare use of global variable
     
     if draft_id is not None and draft_id in DRAFT_CACHE:
-        # 从缓存中获取已存在的草稿信息
-        print(f"从缓存中获取草稿: {draft_id}")
-        # 更新最近访问时间
+        # Get existing draft information from cache
+        print(f"Getting draft from cache: {draft_id}")
+        # Update last access time
         update_cache(draft_id, DRAFT_CACHE[draft_id])
         return draft_id, DRAFT_CACHE[draft_id]
 
-    # 创建新草稿逻辑
-    print("创建新草稿")
+    # Create new draft logic
+    print("Creating new draft")
     script, generate_draft_id = create_draft(
         width=width,
         height=height,
