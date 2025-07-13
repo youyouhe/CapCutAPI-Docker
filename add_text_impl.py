@@ -14,108 +14,108 @@ def add_text_impl(
     draft_id: str = None,
     transform_y: float = -0.8,
     transform_x: float = 0,
-    font: str = "文轩体",
+    font: str = "文轩体",  # Wenxuan Font
     font_color: str = "#ffffff",
     font_size: float = 8.0,
     track_name: str = "text_main",
-    vertical: bool = False,  # 是否竖排显示
-    font_alpha: float = 1.0,  # 透明度，范围0.0-1.0
-    # 描边参数
+    vertical: bool = False,  # Whether to display vertically
+    font_alpha: float = 1.0,  # Transparency, range 0.0-1.0
+    # Border parameters
     border_alpha: float = 1.0,
     border_color: str = "#000000",
-    border_width: float = 0.0,  # 默认不显示描边
-    # 背景参数
+    border_width: float = 0.0,  # Default no border display
+    # Background parameters
     background_color: str = "#000000",
     background_style: int = 1,
-    background_alpha: float = 0.0,  # 默认不显示背景
-    # 气泡效果
+    background_alpha: float = 0.0,  # Default no background display
+    # Bubble effect
     bubble_effect_id: Optional[str] = None,
     bubble_resource_id: Optional[str] = None,
-    # 文本花字
+    # Text effect
     effect_effect_id: Optional[str] = None,
-    intro_animation: Optional[str] = None,  # 入场动画类型
-    intro_duration: float = 0.5,  # 入场动画持续时间（秒），默认0.5秒
-    outro_animation: Optional[str] = None,  # 出场动画类型
-    outro_duration: float = 0.5,  # 出场动画持续时间（秒），默认0.5秒
+    intro_animation: Optional[str] = None,  # Intro animation type
+    intro_duration: float = 0.5,  # Intro animation duration (seconds), default 0.5 seconds
+    outro_animation: Optional[str] = None,  # Outro animation type
+    outro_duration: float = 0.5,  # Outro animation duration (seconds), default 0.5 seconds
     width: int = 1080,
     height: int = 1920,
-    fixed_width: float = -1,  # 文本固定宽度比例，默认-1表示不固定
-    fixed_height: float = -1,  # 文本固定高度比例，默认-1表示不固定
+    fixed_width: float = -1,  # Text fixed width ratio, default -1 means not fixed
+    fixed_height: float = -1,  # Text fixed height ratio, default -1 means not fixed
 ):
     """
-    向指定草稿添加文本字幕（参数可配置版本）
-    :param text: 文本内容
-    :param start: 开始时间（秒）
-    :param end: 结束时间（秒）
-    :param draft_id: 草稿ID（可选，默认None则创建新草稿）
-    :param transform_y: Y轴位置（默认-0.8，屏幕下方）
-    :param transform_x: X轴位置（默认0，屏幕中间）
-    :param font: 字体名称（支持Font_type中的所有字体）
-    :param font_color: 字体颜色 #FFF0FF
-    :param font_size: 字体大小（浮点值，默认8.0）
-    :param track_name: 轨道名称
-    :param vertical: 是否竖排显示（默认False）
-    :param font_alpha: 文字透明度，范围0.0-1.0（默认1.0，完全不透明）
-    :param border_alpha: 描边透明度，范围0.0-1.0（默认1.0）
-    :param border_color: 描边颜色（默认黑色）
-    :param border_width: 描边宽度（默认0.0，不显示描边）
-    :param background_color: 背景颜色（默认黑色）
-    :param background_style: 背景样式（默认1）
-    :param background_alpha: 背景透明度（默认0.0，不显示背景）
-    :param bubble_effect_id: 气泡效果ID
-    :param bubble_resource_id: 气泡资源ID
-    :param effect_effect_id: 花字效果ID
-    :param intro_animation: 入场动画类型
-    :param intro_duration: 入场动画持续时间（秒），默认0.5秒
-    :param outro_animation: 出场动画类型
-    :param outro_duration: 出场动画持续时间（秒），默认0.5秒
-    :param width: 视频宽度（像素）
-    :param height: 视频高度（像素）
-    :param fixed_width: 文本固定宽度比例，范围0.0-1.0，默认-1表示不固定
-    :param fixed_height: 文本固定高度比例，范围0.0-1.0，默认-1表示不固定
-    :return: 更新后的草稿信息
+    Add text subtitle to the specified draft (configurable parameter version)
+    :param text: Text content
+    :param start: Start time (seconds)
+    :param end: End time (seconds)
+    :param draft_id: Draft ID (optional, default None creates a new draft)
+    :param transform_y: Y-axis position (default -0.8, bottom of screen)
+    :param transform_x: X-axis position (default 0, center of screen)
+    :param font: Font name (supports all fonts in Font_type)
+    :param font_color: Font color #FFF0FF
+    :param font_size: Font size (float value, default 8.0)
+    :param track_name: Track name
+    :param vertical: Whether to display vertically (default False)
+    :param font_alpha: Text transparency, range 0.0-1.0 (default 1.0, completely opaque)
+    :param border_alpha: Border transparency, range 0.0-1.0 (default 1.0)
+    :param border_color: Border color (default black)
+    :param border_width: Border width (default 0.0, no border display)
+    :param background_color: Background color (default black)
+    :param background_style: Background style (default 1)
+    :param background_alpha: Background transparency (default 0.0, no background display)
+    :param bubble_effect_id: Bubble effect ID
+    :param bubble_resource_id: Bubble resource ID
+    :param effect_effect_id: Text effect ID
+    :param intro_animation: Intro animation type
+    :param intro_duration: Intro animation duration (seconds), default 0.5 seconds
+    :param outro_animation: Outro animation type
+    :param outro_duration: Outro animation duration (seconds), default 0.5 seconds
+    :param width: Video width (pixels)
+    :param height: Video height (pixels)
+    :param fixed_width: Text fixed width ratio, range 0.0-1.0, default -1 means not fixed
+    :param fixed_height: Text fixed height ratio, range 0.0-1.0, default -1 means not fixed
+    :return: Updated draft information
     """
-    # 校验字体是否在Font_type中
+    # Validate if font is in Font_type
     try:
         font_type = getattr(Font_type, font)
     except:
         available_fonts = [attr for attr in dir(Font_type) if not attr.startswith('_')]
-        raise ValueError(f"不支持的字体：{font}，请使用Font_type中的字体之一：{available_fonts}")
+        raise ValueError(f"Unsupported font: {font}, please use one of the fonts in Font_type: {available_fonts}")
     
-    # 校验alpha值范围
+    # Validate alpha value range
     if not 0.0 <= font_alpha <= 1.0:
-        raise ValueError("alpha值必须在0.0到1.0之间")
+        raise ValueError("alpha value must be between 0.0 and 1.0")
     if not 0.0 <= border_alpha <= 1.0:
-        raise ValueError("border_alpha值必须在0.0到1.0之间")
+        raise ValueError("border_alpha value must be between 0.0 and 1.0")
     if not 0.0 <= background_alpha <= 1.0:
-        raise ValueError("background_alpha值必须在0.0到1.0之间")
+        raise ValueError("background_alpha value must be between 0.0 and 1.0")
     
-    # 获取或创建草稿
+    # Get or create draft
     draft_id, script = get_or_create_draft(
         draft_id=draft_id,
         width=width,
         height=height
     )
 
-    # 添加文本轨道
+    # Add text track
     if track_name is not None:
         try:
             imported_track = script.get_imported_track(draft.Track_type.text, name=track_name)
-            # 如果没有抛出异常，说明轨道已存在
+            # If no exception is thrown, the track already exists
         except exceptions.TrackNotFound:
-            # 轨道不存在，创建新轨道
+            # Track doesn't exist, create a new track
             script.add_track(draft.Track_type.text, track_name=track_name)
     else:
         script.add_track(draft.Track_type.audio)
 
-    # 转换十六进制颜色为 RGB 元组
+    # Convert hexadecimal color to RGB tuple
     try:
         rgb_color = hex_to_rgb(font_color)
         rgb_border_color = hex_to_rgb(border_color)
     except ValueError as e:
-        raise ValueError(f"颜色参数错误: {str(e)}")
+        raise ValueError(f"Color parameter error: {str(e)}")
     
-    # 创建text_border (描边)
+    # Create text_border
     text_border = None
     if border_width > 0:
         text_border = draft.Text_border(
@@ -124,7 +124,7 @@ def add_text_impl(
             width=border_width
         )
     
-    # 创建text_background (背景)
+    # Create text_background
     text_background = None
     if background_alpha > 0:
         text_background = draft.Text_background(
@@ -133,7 +133,7 @@ def add_text_impl(
             alpha=background_alpha
         )
     
-    # 创建气泡效果
+    # Create bubble effect
     text_bubble = None
     if bubble_effect_id and bubble_resource_id:
         text_bubble = TextBubble(
@@ -141,14 +141,14 @@ def add_text_impl(
             resource_id=bubble_resource_id
         )
     
-    # 创建花字效果
+    # Create text effect
     text_effect = None
     if effect_effect_id:
         text_effect = TextEffect(
             effect_id=effect_effect_id
         )
     
-    # 将比例转换为像素值
+    # Convert ratio to pixel value
     pixel_fixed_width = -1
     pixel_fixed_height = -1
     if fixed_width > 0:
@@ -156,17 +156,17 @@ def add_text_impl(
     if fixed_height > 0:
         pixel_fixed_height = int(fixed_height * script.height)
     
-    # 创建文本片段（使用可配置参数）
+    # Create text segment (using configurable parameters)
     text_segment = draft.Text_segment(
         text,
         trange(f"{start}s", f"{end-start}s"),
-        font=font_type,  # 使用Font_type中的字体
+        font=font_type,  # Use font from Font_type
         style=draft.Text_style(
             color=rgb_color,
             size=font_size,
             align=1,
-            vertical=vertical,  # 设置是否竖排
-            alpha=font_alpha  # 设置透明度
+            vertical=vertical,  # Set whether to display vertically
+            alpha=font_alpha  # Set transparency
         ),
         clip_settings=draft.Clip_settings(transform_y=transform_y, transform_x=transform_x),
         border=text_border,
@@ -180,33 +180,33 @@ def add_text_impl(
     if text_effect:
         text_segment.add_effect(text_effect.effect_id)
 
-    # 添加入场动画
+    # Add intro animation
     if intro_animation:
         try:
             if IS_CAPCUT_ENV:
                 animation_type = getattr(draft.CapCut_Text_intro, intro_animation)
             else:
                 animation_type = getattr(draft.Text_intro, intro_animation)
-            # 将秒转换为微秒
+            # Convert seconds to microseconds
             duration_microseconds = int(intro_duration * 1000000)
-            text_segment.add_animation(animation_type, duration_microseconds)  # 添加入场动画，设置持续时间
+            text_segment.add_animation(animation_type, duration_microseconds)  # Add intro animation, set duration
         except:
-            print(f"警告：不支持的入场动画类型 {intro_animation}，将忽略此参数")
+            print(f"Warning: Unsupported intro animation type {intro_animation}, this parameter will be ignored")
 
-    # 添加出场动画
+    # Add outro animation
     if outro_animation:
         try:
             if IS_CAPCUT_ENV:
                 animation_type = getattr(draft.CapCut_Text_outro, outro_animation)
             else:
                 animation_type = getattr(draft.Text_outro, outro_animation)
-            # 将秒转换为微秒
+            # Convert seconds to microseconds
             duration_microseconds = int(outro_duration * 1000000)
-            text_segment.add_animation(animation_type, duration_microseconds)  # 添加出场动画，设置持续时间
+            text_segment.add_animation(animation_type, duration_microseconds)  # Add outro animation, set duration
         except:
-            print(f"警告：不支持的出场动画类型 {outro_animation}，将忽略此参数")
+            print(f"Warning: Unsupported outro animation type {outro_animation}, this parameter will be ignored")
 
-    # 添加文本片段到轨道
+    # Add text segment to track
     script.add_segment(text_segment, track_name=track_name)
 
     return {
