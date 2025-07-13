@@ -7,12 +7,12 @@ import functools
 import threading
 
 
-# 服务的基础URL，请根据实际情况修改
+# Base URL of the service, please modify according to actual situation
 BASE_URL = "http://localhost:9000"
-LICENSE_KEY = "539C3FEB-74AE48D4-A964D52B-C520F801"  # 使用体验版license key'
+LICENSE_KEY = "539C3FEB-74AE48D4-A964D52B-C520F801"  # Using trial version license key
 
 def make_request(endpoint, data, method='POST'):
-    """发送HTTP请求到服务端并处理响应"""
+    """Send HTTP request to the server and handle the response"""
     url = f"{BASE_URL}/{endpoint}"
     headers = {'Content-Type': 'application/json'}
     
@@ -22,22 +22,22 @@ def make_request(endpoint, data, method='POST'):
         elif method == 'GET':
             response = requests.get(url, params=data, headers=headers)
         else:
-            raise ValueError(f"不支持的HTTP方法: {method}")
+            raise ValueError(f"Unsupported HTTP method: {method}")
             
-        response.raise_for_status()  # 如果请求失败，抛出异常
+        response.raise_for_status()  # Raise an exception if the request fails
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"请求错误: {e}")
+        print(f"Request error: {e}")
         sys.exit(1)
     except json.JSONDecodeError:
-        print("无法解析服务器响应")
+        print("Unable to parse server response")
         sys.exit(1)
 
 def add_audio_track(audio_url, start, end, target_start, volume=1.0, 
                     speed=1.0, track_name="main_audio", effect_type=None, effect_params=None, draft_id=None):
-    """添加音频轨道的API调用"""
+    """API call to add audio track"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "audio_url": audio_url,
         "start": start,
         "end": end,
@@ -60,9 +60,9 @@ def add_text_impl(text, start, end, font, font_color, font_size, track_name,draf
                   background_color=None, background_alpha=1.0, background_style=None,
                   bubble_effect_id=None, bubble_resource_id=None,
                   effect_effect_id=None, outro_animation=None):
-    """添加文本的API调用"""
+    """API call to add text"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "draft_folder": draft_folder,
         "text": text,
         "start": start,
@@ -77,26 +77,26 @@ def add_text_impl(text, start, end, font, font_color, font_size, track_name,draf
         "transform_y": transform_y
     }
     
-    # 添加描边参数
+    # Add border parameters
     if border_color:
         data["border_color"] = border_color
         data["border_width"] = border_width
         data["border_alpha"] = border_alpha
     
-    # 添加背景参数
+    # Add background parameters
     if background_color:
         data["background_color"] = background_color
         data["background_alpha"] = background_alpha
         if background_style:
             data["background_style"] = background_style
     
-    # 添加气泡效果参数
+    # Add bubble effect parameters
     if bubble_effect_id:
         data["bubble_effect_id"] = bubble_effect_id
         if bubble_resource_id:
             data["bubble_resource_id"] = bubble_resource_id
     
-    # 添加花字效果参数
+    # Add text effect parameters
     if effect_effect_id:
         data["effect_effect_id"] = effect_effect_id
     
@@ -110,13 +110,13 @@ def add_text_impl(text, start, end, font, font_color, font_size, track_name,draf
 
 def add_image_impl(image_url, width, height, start, end, track_name, draft_id=None,
                   transform_x=0, transform_y=0, scale_x=1.0, scale_y=1.0, transition=None, transition_duration=None,
-                  # 新增蒙版相关参数
+                  # New mask-related parameters
                   mask_type=None, mask_center_x=0.0, mask_center_y=0.0, mask_size=0.5,
                   mask_rotation=0.0, mask_feather=0.0, mask_invert=False,
                   mask_rect_width=None, mask_round_corner=None):
-    """添加图片的API调用"""
+    """API call to add image"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "image_url": image_url,
         "width": width,
         "height": height,
@@ -128,8 +128,8 @@ def add_image_impl(image_url, width, height, start, end, track_name, draft_id=No
         "scale_x": scale_x,
         "scale_y": scale_y,
         "transition": transition,
-        "transition_duration": transition_duration or 0.5,  # 默认转场持续时间为0.5秒
-        # 添加蒙版相关参数
+        "transition_duration": transition_duration or 0.5,  # Default transition duration is 0.5 seconds
+        # Add mask-related parameters
         "mask_type": mask_type,
         "mask_center_x": mask_center_x,
         "mask_center_y": mask_center_y,
@@ -148,9 +148,9 @@ def add_image_impl(image_url, width, height, start, end, track_name, draft_id=No
 
 def generate_image_impl(prompt, width, height, start, end, track_name, draft_id=None,
                   transform_x=0, transform_y=0, scale_x=1.0, scale_y=1.0, transition=None, transition_duration=None):
-    """添加图片的API调用"""
+    """API call to add image"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "prompt": prompt,
         "width": width,
         "height": height,
@@ -162,7 +162,7 @@ def generate_image_impl(prompt, width, height, start, end, track_name, draft_id=
         "scale_x": scale_x,
         "scale_y": scale_y,
         "transition": transition,
-        "transition_duration": transition_duration or 0.5  # 默认转场持续时间为0.5秒
+        "transition_duration": transition_duration or 0.5  # Default transition duration is 0.5 seconds
     }
     
     if draft_id:
@@ -174,9 +174,9 @@ def add_sticker_impl(resource_id, start, end, draft_id=None, transform_x=0, tran
                     alpha=1.0, flip_horizontal=False, flip_vertical=False, rotation=0.0,
                     scale_x=1.0, scale_y=1.0, track_name="sticker_main", relative_index=0,
                     width=1080, height=1920):
-    """添加贴纸的API调用"""
+    """API call to add sticker"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "sticker_id": resource_id,
         "start": start,
         "end": end,
@@ -201,19 +201,19 @@ def add_sticker_impl(resource_id, start, end, draft_id=None, transform_x=0, tran
 
 def add_video_keyframe_impl(draft_id, track_name, property_type=None, time=None, value=None, 
                            property_types=None, times=None, values=None):
-    """添加视频关键帧的API调用
+    """API call to add video keyframe
     
-    支持两种模式：
-    1. 单个关键帧：使用 property_type, time, value 参数
-    2. 批量关键帧：使用 property_types, times, values 参数（列表形式）
+    Supports two modes:
+    1. Single keyframe: using property_type, time, value parameters
+    2. Batch keyframes: using property_types, times, values parameters (in list form)
     """
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "draft_id": draft_id,
         "track_name": track_name
     }
     
-    # 添加单个关键帧参数（如果提供）
+    # Add single keyframe parameters (if provided)
     if property_type is not None:
         data["property_type"] = property_type
     if time is not None:
@@ -221,7 +221,7 @@ def add_video_keyframe_impl(draft_id, track_name, property_type=None, time=None,
     if value is not None:
         data["value"] = value
     
-    # 添加批量关键帧参数（如果提供）
+    # Add batch keyframe parameters (if provided)
     if property_types is not None:
         data["property_types"] = property_types
     if times is not None:
@@ -234,13 +234,13 @@ def add_video_keyframe_impl(draft_id, track_name, property_type=None, time=None,
 def add_video_impl(video_url, start=None, end=None, width=None, height=None, track_name="main",
                    draft_id=None, transform_y=0, scale_x=1, scale_y=1, transform_x=0,
                    speed=1.0, target_start=0, relative_index=0, transition=None, transition_duration=None,
-                   # 蒙版相关参数
+                   # Mask-related parameters
                    mask_type=None, mask_center_x=0.5, mask_center_y=0.5, mask_size=1.0,
                    mask_rotation=0.0, mask_feather=0.0, mask_invert=False,
                    mask_rect_width=None, mask_round_corner=None):
-    """添加视频轨道的API调用"""
+    """API call to add video track"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "video_url": video_url,
         "height": height,
         "track_name": track_name,
@@ -252,8 +252,8 @@ def add_video_impl(video_url, start=None, end=None, width=None, height=None, tra
         "target_start": target_start,
         "relative_index": relative_index,
         "transition": transition,
-        "transition_duration": transition_duration or 0.5,  # 默认转场持续时间为0.5秒
-        # 蒙版相关参数
+        "transition_duration": transition_duration or 0.5,  # Default transition duration is 0.5 seconds
+        # Mask-related parameters
         "mask_type": mask_type,
         "mask_center_x": mask_center_x,
         "mask_center_y": mask_center_y,
@@ -276,9 +276,9 @@ def add_video_impl(video_url, start=None, end=None, width=None, height=None, tra
 
 def add_effect(effect_type, start, end, draft_id=None, track_name="effect_01",
               params=None, width=1080, height=1920):
-    """添加特效的API调用"""
+    """API call to add effect"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "effect_type": effect_type,
         "start": start,
         "end": end,
@@ -294,99 +294,99 @@ def add_effect(effect_type, start, end, draft_id=None, track_name="effect_01",
     return make_request("add_effect", data)
 
 def test_effect_01():
-    """测试添加特效的服务"""
+    """Test adding effect service"""
     # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
     
-    print("\n测试：添加特效")
+    print("\nTest: Adding effect")
     effect_result = add_effect(
         start=0,
         end=5,
         track_name="effect_01",
-        # effect_type="金粉闪闪",  # 示例使用发光特效
+        # effect_type="金粉闪闪",  # Example using glow effect
         effect_type="Gold_Sparkles",
-        params=[100, 50, 34]  # 示例参数，根据具体特效类型而定
+        params=[100, 50, 34]  # Example parameters, depending on the specific effect type
     )
-    print(f"特效添加结果: {effect_result}")
+    print(f"Effect adding result: {effect_result}")
     print(save_draft_impl(effect_result['output']['draft_id'], draft_folder))
     
-    # 如果需要可以在这里继续添加其他测试案例
+    # If needed, you can add other test cases here
     
-    # 返回第一个测试结果用于后续操作（如果有的话）
+    # Return the first test result for subsequent operations (if any)
     return effect_result
 
 
 def test_text():
-    """测试添加文本"""
+    """Test adding text"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    # 测试用例1：基本文本添加
-    print("\n测试：添加基本文本")
+    # Test case 1: Basic text addition
+    print("\nTest: Adding basic text")
     text_result = add_text_impl(
-        text="你好，我是剪映助手",
+        text="Hello, I am CapCut Assistant",
         start=0,
         end=3,
         font="思源中宋",
-        font_color="#FF0000",  # 红色
+        font_color="#FF0000",  # Red
         track_name="main_text",
         transform_y=0.8,
         transform_x=0.5,
         font_size=30.0
     )
-    print("测试用例1（基本文本）成功:", text_result)
+    print("Test case 1 (Basic text) successful:", text_result)
 
-    # 测试用例2：竖排文本
+    # Test case 2: Vertical text
     result2 = add_text_impl(
         draft_id=text_result['output']['draft_id'],
-        text="竖排文本演示",
+        text="Vertical text demo",
         start=3,
         end=6,
         font="云书法三行魏碑体",
-        font_color="#00FF00",  # 绿色
+        font_color="#00FF00",  # Green
         font_size=8.0,
         track_name="main_text",
-        vertical=True,  # 启用竖排
+        vertical=True,  # Enable vertical text
         transform_y=-0.5,
-        outro_animation='晕开'
+        outro_animation='Blur'
     )
-    print("测试用例2（竖排文本）成功:", result2)
+    print("Test case 2 (Vertical text) successful:", result2)
 
-    # 测试用例3：带描边和背景的文本
+    # Test case 3: Text with border and background
     result3 = add_text_impl(
         draft_id=result2['output']['draft_id'],
-        text="描边和背景测试",
+        text="Border and background test",
         start=6,
         end=9,
         font="思源中宋",
-        font_color="#FFFFFF",  # 白色文字
+        font_color="#FFFFFF",  # White text
         font_size=24.0,
         track_name="main_text",
         transform_y=0.0,
         transform_x=0.5,
-        border_color="#FF0000",  # 黑色描边
+        border_color="#FF0000",  # Black border
         border_width=20.0,
         border_alpha=1.0,
-        background_color="#0000FF",  # 蓝色背景
-        background_alpha=0.5,  # 半透明背景
-        background_style=0  # 气泡样式背景
+        background_color="#0000FF",  # Blue background
+        background_alpha=0.5,  # Semi-transparent background
+        background_style=0  # Bubble style background
     )
-    print("测试用例3（描边和背景）成功:", result3)
+    print("Test case 3 (Border and background) successful:", result3)
     
-    # 最后保存并上传草稿
+    # Finally save and upload the draft
     if result3.get('success') and result3.get('output'):
         save_result = save_draft_impl(result3['output']['draft_id'],draft_folder)
-        print(f"草稿保存结果: {save_result}")
+        print(f"Draft save result: {save_result}")
     
-    # 返回最后一个测试结果用于后续操作（如果有的话）
+    # Return the last test result for subsequent operations (if any)
     return result3
 
 
 def test_image01():
-    """测试添加图片"""
+    """Test adding image"""
     # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加图片1")
+    print("\nTest: Adding image 1")
     image_result = add_image_impl(
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
         width=480,
@@ -399,15 +399,15 @@ def test_image01():
         transform_x=0,
         track_name="main"
     )
-    print(f"添加图片成功！{image_result['output']['draft_id']}")
+    print(f"Image added successfully! {image_result['output']['draft_id']}")
     print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
 
 
 def test_image02():
-    """测试添加多个图片"""
+    """Test adding multiple images"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加图片1")
+    print("\nTest: Adding image 1")
     image_result = add_image_impl(
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
         width=480,
@@ -420,9 +420,9 @@ def test_image02():
         transform_x=0,
         track_name="main"
     )
-    print(f"添加图片成功1！{image_result['output']['draft_id']}")
+    print(f"Image 1 added successfully! {image_result['output']['draft_id']}")
     
-    print("\n测试：添加图片2")
+    print("\nTest: Adding image 2")
     image_result = add_image_impl(
         draft_id=image_result['output']['draft_id'],
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
@@ -436,15 +436,15 @@ def test_image02():
         transform_x=0,
         track_name="main"
     )
-    print(f"添加图片成功2！{image_result['output']['draft_id']}")
+    print(f"Image 2 added successfully! {image_result['output']['draft_id']}")
     print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
 
 
 def test_image03():
-    """测试在不同轨道添加图片"""
+    """Test adding images to different tracks"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加图片1")
+    print("\nTest: Adding image 1")
     image_result = add_image_impl(
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
         width=480,
@@ -457,9 +457,9 @@ def test_image03():
         transform_x=0,
         track_name="main"
     )
-    print(f"添加图片成功1！{image_result['output']['draft_id']}")
+    print(f"Image 1 added successfully! {image_result['output']['draft_id']}")
     
-    print("\n测试：添加图片2")
+    print("\nTest: Adding image 2")
     image_result = add_image_impl(
         draft_id=image_result['output']['draft_id'],
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
@@ -473,9 +473,9 @@ def test_image03():
         transform_x=0,
         track_name="main"
     )
-    print(f"添加图片成功2！{image_result['output']['draft_id']}")
+    print(f"Image 2 added successfully! {image_result['output']['draft_id']}")
 
-    print("\n测试：添加图片3")
+    print("\nTest: Adding image 3")
     image_result = add_image_impl(
         draft_id=image_result['output']['draft_id'],
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
@@ -487,17 +487,17 @@ def test_image03():
         scale_x=2.0,
         scale_y=1.0,
         transform_x=0,
-        track_name="main_2"  # 使用不同的轨道名称
+        track_name="main_2"  # Use different track name
     )
-    print(f"添加图片成功3！{image_result['output']['draft_id']}")
+    print(f"Image 3 added successfully! {image_result['output']['draft_id']}")
     query_draft_status_impl_polling(image_result['output']['draft_id'])
     save_draft_impl(image_result['output']['draft_id'], draft_folder)
 
 def test_image04():
-    """测试添加图片"""
+    """Test adding image"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加图片1")
+    print("\nTest: Adding image 1")
     image_result = add_image_impl(
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
         width=480,
@@ -510,15 +510,15 @@ def test_image04():
         transform_x=0,
         track_name="image_main"
     )
-    print(f"添加图片成功！{image_result['output']['draft_id']}")
+    print(f"Image added successfully! {image_result['output']['draft_id']}")
     print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
 
 
 def test_mask_01():
-    """测试在不同轨道添加图片"""
+    """Test adding images to different tracks"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加图片1")
+    print("\nTest: Adding image 1")
     image_result = add_image_impl(
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
         width=480,
@@ -531,9 +531,9 @@ def test_mask_01():
         transform_x=0,
         track_name="main"
     )
-    print(f"添加图片成功1！{image_result['output']['draft_id']}")
+    print(f"Image 1 added successfully! {image_result['output']['draft_id']}")
     
-    print("\n测试：添加图片2")
+    print("\nTest: Adding image 2")
     image_result = add_image_impl(
         draft_id=image_result['output']['draft_id'],
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
@@ -547,9 +547,9 @@ def test_mask_01():
         transform_x=0,
         track_name="main"
     )
-    print(f"添加图片成功2！{image_result['output']['draft_id']}")
+    print(f"Image 2 added successfully! {image_result['output']['draft_id']}")
 
-    print("\n测试：添加图片3")
+    print("\nTest: Adding image 3")
     image_result = add_image_impl(
         draft_id=image_result['output']['draft_id'],
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
@@ -561,86 +561,86 @@ def test_mask_01():
         scale_x=2.0,
         scale_y=1.0,
         transform_x=0,
-        track_name="main_2",  # 使用不同的轨道名称
-        mask_type="圆形",  # 添加圆形蒙版
-        mask_center_x=0.5,  # 蒙版中心X坐标（0.5表示居中）
-        mask_center_y=0.5,  # 蒙版中心Y坐标（0.5表示居中）
-        mask_size=0.8,  # 蒙版大小（0.8表示80%）
-        mask_feather=0.1  # 蒙版羽化程度（0.1表示10%）
+        track_name="main_2",  # Use different track name
+        mask_type="Circle",  # Add circular mask
+        mask_center_x=0.5,  # Mask center X coordinate (0.5 means centered)
+        mask_center_y=0.5,  # Mask center Y coordinate (0.5 means centered)
+        mask_size=0.8,  # Mask size (0.8 means 80%)
+        mask_feather=0.1  # Mask feathering (0.1 means 10%)
     )
-    print(f"添加图片成功3！{image_result['output']['draft_id']}")
+    print(f"Image 3 added successfully! {image_result['output']['draft_id']}")
     print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
 
 def test_mask_02():
-    """测试在不同轨道添加视频"""
+    """Test adding videos to different tracks"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # 替换为实际视频URL
-    draft_id = None  # 初始化draft_id
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
+    draft_id = None  # Initialize draft_id
     
-    # 在第一个轨道添加视频
+    # Add video to first track
     video_result = add_video_impl(
-        draft_id=draft_id,  # 传入draft_id
+        draft_id=draft_id,  # Pass in draft_id
         video_url=video_url,
         width=1920,
         height=1080,
         start=0,
-        end=5.0, # 截取视频前5秒
+        end=5.0, # Use first 5 seconds of video
         target_start=0,
         track_name="main_video_track"
     )
-    draft_id = video_result['output']['draft_id']  # 更新draft_id
-    print(f"第一次视频添加结果: {video_result}")
+    draft_id = video_result['output']['draft_id']  # Update draft_id
+    print(f"First video addition result: {video_result}")
     
-    # 在第二个轨道添加视频
+    # Add video to second track
     video_result = add_video_impl(
-        draft_id=draft_id,  # 使用上一次的draft_id
+        draft_id=draft_id,  # Use previous draft_id
         video_url=video_url,
         width=1920,
         height=1080,
         start=0,
-        end=5.0, # 截取视频前5秒
+        end=5.0, # Use first 5 seconds of video
         target_start=0,
-        track_name="main_video_track_2",  # 使用不同的轨道名称
-        speed=1.0,  # 改变播放速度
-        scale_x=0.5,  # 缩小视频宽度
-        transform_y=0.5  # 将视频放在屏幕下方
+        track_name="main_video_track_2",  # Use different track name
+        speed=1.0,  # Change playback speed
+        scale_x=0.5,  # Reduce video width
+        transform_y=0.5  # Place video at bottom of screen
     )
-    draft_id = video_result['output']['draft_id']  # 更新draft_id
-    print(f"第二次视频添加结果: {video_result}")
+    draft_id = video_result['output']['draft_id']  # Update draft_id
+    print(f"Second video addition result: {video_result}")
     
-    # 第三次在另一个轨道添加视频，并添加圆形蒙版
+    # Third time add video to another track with circular mask
     video_result = add_video_impl(
-        draft_id=draft_id,  # 使用上一次的draft_id
+        draft_id=draft_id,  # Use previous draft_id
         video_url=video_url,
         width=1920,
         height=1080,
         start=0,
-        end=5.0, # 截取视频前5秒
+        end=5.0, # Use first 5 seconds of video
         target_start=0,
-        track_name="main_video_track_3",  # 使用第三个轨道
-        speed=1.5,  # 更快的播放速度
-        scale_x=0.3,  # 更小的视频宽度
-        transform_y=-0.5,  # 将视频放在屏幕上方
-        mask_type="圆形",  # 添加圆形蒙版
-        mask_center_x=0.5,  # 蒙版中心X坐标
-        mask_center_y=0.5,  # 蒙版中心Y坐标
-        mask_size=0.8,  # 蒙版大小
-        mask_feather=0.1  # 蒙版羽化
+        track_name="main_video_track_3",  # Use third track
+        speed=1.5,  # Faster playback speed
+        scale_x=0.3,  # Smaller video width
+        transform_y=-0.5,  # Place video at top of screen
+        mask_type="Circle",  # Add circular mask
+        mask_center_x=0.5,  # Mask center X coordinate
+        mask_center_y=0.5,  # Mask center Y coordinate
+        mask_size=0.8,  # Mask size
+        mask_feather=0.1  # Mask feathering
     )
-    draft_id = video_result['output']['draft_id']  # 更新draft_id
-    print(f"第三次视频添加结果: {video_result}")
+    draft_id = video_result['output']['draft_id']  # Update draft_id
+    print(f"Third video addition result: {video_result}")
     
-    # 最后保存并上传草稿
+    # Finally save and upload draft
     save_result = save_draft_impl(draft_id, draft_folder)
-    print(f"草稿保存结果: {save_result}")
+    print(f"Draft save result: {save_result}")
 
 
 def test_audio01():
-    """测试添加音频"""
+    """Test adding audio"""
     # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加音频")
+    print("\nTest: Adding audio")
     audio_result = add_audio_track(
         audio_url="https://lf3-lv-music-tos.faceu.com/obj/tos-cn-ve-2774/oYACBQRCMlWBIrZipvQZhI5LAlUFYii0RwEPh",
         start=4,
@@ -653,16 +653,16 @@ def test_audio01():
         effect_type="Tremble",
         effect_params=[90.0, 50.0]
     )
-    print(f"音频添加结果: {audio_result}")
+    print(f"Audio addition result: {audio_result}")
     print(save_draft_impl(audio_result['output']['draft_id'], draft_folder))
 
 
 def test_audio02():
-    """测试添加多个音频片段"""
+    """Test adding multiple audio segments"""
     # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加音频1")
+    print("\nTest: Adding audio 1")
     audio_result = add_audio_track(
         audio_url="https://lf3-lv-music-tos.faceu.com/obj/tos-cn-ve-2774/oYACBQRCMlWBIrZipvQZhI5LAlUFYii0RwEPh",
         start=4,
@@ -675,9 +675,9 @@ def test_audio02():
         effect_type="Tremble",
         effect_params=[90.0, 50.0]
     )
-    print(f"音频添加结果1: {audio_result}")
+    print(f"Audio addition result 1: {audio_result}")
 
-    print("\n测试：添加音频2")
+    print("\nTest: Adding audio 2")
     audio_result = add_audio_track(
         draft_id=audio_result['output']['draft_id'],
         audio_url="https://lf3-lv-music-tos.faceu.com/obj/tos-cn-ve-2774/oYACBQRCMlWBIrZipvQZhI5LAlUFYii0RwEPh",
@@ -691,19 +691,19 @@ def test_audio02():
         effect_type="Tremble",
         effect_params=[90.0, 50.0]
     )
-    print(f"音频添加结果2: {audio_result}")
+    print(f"Audio addition result 2: {audio_result}")
     print(save_draft_impl(audio_result['output']['draft_id'], draft_folder))
 
 
 def test_audio03():
-    """测试循环添加音频"""
+    """Test adding audio in a loop"""
     # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
 
-    draft_id = None  # 初始化draft_id
+    draft_id = None  # Initialize draft_id
     
     for i in range(10):
-        target_start = i * 1.5  # 每次递增1.5秒
+        target_start = i * 1.5  # Increment by 1.5 seconds each time
         
         audio_result = add_audio_track(
             audio_url="https://lf3-lv-music-tos.faceu.com/obj/tos-cn-ve-2774/oYACBQRCMlWBIrZipvQZhI5LAlUFYii0RwEPh",
@@ -716,23 +716,23 @@ def test_audio03():
             # effect_type="麦霸",
             effect_type="Tremble",
             effect_params=[90.0, 50.0],
-            draft_id=draft_id  # 传递上一次的draft_id（第一次为None）
+            draft_id=draft_id  # Pass the previous draft_id (None for the first time)
         )
         
-        draft_id = audio_result['output']['draft_id']  # 更新draft_id
-        print(f"第 {i+1} 次音频添加结果: {audio_result}")
+        draft_id = audio_result['output']['draft_id']  # Update draft_id
+        print(f"Audio addition result {i+1}: {audio_result}")
     
-    # 最后保存并上传草稿
+    # Finally save and upload draft
     save_result = save_draft_impl(draft_id, draft_folder)
-    print(f"草稿保存结果: {save_result}")
+    print(f"Draft save result: {save_result}")
 
 
 def test_audio04():
-    """测试在不同轨道添加音频"""
+    """Test adding audio to different tracks"""
     # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加音频1")
+    print("\nTest: Adding audio 1")
     audio_result = add_audio_track(
         audio_url="https://lf3-lv-music-tos.faceu.com/obj/tos-cn-ve-2774/oYACBQRCMlWBIrZipvQZhI5LAlUFYii0RwEPh",
         start=4,
@@ -745,9 +745,9 @@ def test_audio04():
         effect_type="Tremble",
         effect_params=[90.0, 50.0]
     )
-    print(f"音频添加结果1: {audio_result}")
+    print(f"Audio addition result 1: {audio_result}")
 
-    print("\n测试：添加音频2")
+    print("\nTest: Adding audio 2")
     audio_result = add_audio_track(
         draft_id=audio_result['output']['draft_id'],
         audio_url="https://lf3-lv-music-tos.faceu.com/obj/tos-cn-ve-2774/oYACBQRCMlWBIrZipvQZhI5LAlUFYii0RwEPh",
@@ -756,12 +756,12 @@ def test_audio04():
         target_start=1.5,
         volume=0.8,
         speed=1.0,
-        track_name="main_audio102",  # 使用不同的轨道名称
+        track_name="main_audio102",  # Use different track name
         # effect_type="麦霸",
         effect_type="Tremble",
         effect_params=[90.0, 50.0]
     )
-    print(f"音频添加结果2: {audio_result}")
+    print(f"Audio addition result 2: {audio_result}")
     query_draft_status_impl_polling(audio_result['output']['draft_id'])
     save_draft_impl(audio_result['output']['draft_id'], draft_folder)
 
@@ -772,10 +772,10 @@ def add_subtitle_impl(srt, draft_id=None, time_offset=0.0, font_size=5.0,
                     border_alpha=1.0, border_color="#000000", border_width=0.0,
                     background_color="#000000", background_style=1, background_alpha=0.0,
                     rotation=0.0, width=1080, height=1920):
-    """调用add_subtitle服务的API封装"""
+    """API wrapper for add_subtitle service"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
-        "srt": srt,  # 修改参数名称以匹配服务端
+        "license_key": LICENSE_KEY,  # Using trial version license key
+        "srt": srt,  # Modified parameter name to match server side
         "draft_id": draft_id,
         "time_offset": time_offset,
         "font_size": font_size,
@@ -803,108 +803,108 @@ def add_subtitle_impl(srt, draft_id=None, time_offset=0.0, font_size=5.0,
     return make_request("add_subtitle", data)
 
 def save_draft_impl(draft_id, draft_folder):
-    """调用save_draft服务的API封装"""
+    """API wrapper for save_draft service"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "draft_id": draft_id,
         "draft_folder": draft_folder
     }
     return make_request("save_draft", data)
 
 def query_script_impl(draft_id):
-    """调用query_script服务的API封装"""
+    """API wrapper for query_script service"""
     data = {
         "draft_id": draft_id
     }
     return make_request("query_script", data)
 
 def query_draft_status_impl(task_id):
-    """调用query_draft_status服务的API封装"""
+    """API wrapper for query_draft_status service"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "task_id": task_id
     }
     return make_request("query_draft_status", data)
     
 def query_draft_status_impl_polling(task_id, timeout=300, callback=None):
     """
-    轮询查询草稿下载状态，使用异步线程实现，避免阻塞主线程
+    Poll for draft download status, implemented with async thread to avoid blocking the main thread
     
-    :param task_id: save_draft_impl 返回的任务ID
-    :param timeout: 超时时间（秒），默认5分钟
-    :param callback: 可选的回调函数，当任务完成、失败或超时时调用，参数为最终状态
-    :return: 线程对象和结果容器的元组，可用于后续获取结果
+    :param task_id: task ID returned by save_draft_impl
+    :param timeout: timeout in seconds, default 5 minutes
+    :param callback: optional callback function called when task completes, fails or times out, with final status as parameter
+    :return: tuple of thread object and result container, can be used to get results later
     """
-    # 创建结果容器，用于存储最终结果
+    # Create result container to store final result
     result_container = {"result": None}
     
     def _polling_thread():
         start_time = time.time()
-        print(f"开始查询任务 {task_id} 的状态...")
+        print(f"Starting to query status for task {task_id}...")
         
         while True:
             try:
-                # 获取当前任务状态
+                # Get current task status
                 task_status = query_draft_status_impl(task_id).get("output", {})
                 
-                # 打印当前状态
+                # Print current status
                 status = task_status.get("status", "unknown")
                 message = task_status.get("message", "")
                 progress = task_status.get("progress", 0)
-                print(f"当前状态: {status}, 进度: {progress}%, 消息: {message}")
+                print(f"Current status: {status}, progress: {progress}%, message: {message}")
                 
-                # 检查是否完成或失败
+                # Check if completed or failed
                 if status == "completed":
-                    print(f"任务完成! 草稿URL: {task_status.get('draft_url', '未提供')}")
-                    result_container["result"] = task_status.get('draft_url', '未提供')
+                    print(f"Task completed! Draft URL: {task_status.get('draft_url', 'Not provided')}")
+                    result_container["result"] = task_status.get('draft_url', 'Not provided')
                     if callback:
-                        callback(task_status.get('draft_url', '未提供'))
+                        callback(task_status.get('draft_url', 'Not provided'))
                     break
                 elif status == "failed":
-                    print(f"任务失败: {message}")
+                    print(f"Task failed: {message}")
                     result_container["result"] = task_status
                     if callback:
                         callback(task_status)
                     break
                 elif status == "not_found":
-                    print(f"任务不存在: {task_id}")
+                    print(f"Task does not exist: {task_id}")
                     result_container["result"] = task_status
                     if callback:
                         callback(task_status)
                     break
                 
-                # 检查是否超时
+                # Check if timed out
                 elapsed_time = time.time() - start_time
                 if elapsed_time > timeout:
-                    print(f"查询超时，已经等待 {timeout} 秒")
+                    print(f"Query timed out, waited {timeout} seconds")
                     result_container["result"] = task_status
                     if callback:
                         callback(task_status)
                     break
             except Exception as e:
-                # 捕获所有异常，防止线程崩溃
-                print(f"查询过程中出现异常: {e}")
-                time.sleep(1)  # 出错后等待一秒再重试
+                # Catch all exceptions to prevent thread crash
+                print(f"Exception occurred during query: {e}")
+                time.sleep(1)  # Wait 1 second before retrying after error
                 continue
             
-            # 等待1秒后再次查询
+            # Wait 1 second before querying again
             time.sleep(1)
     
-    # 创建并启动线程
+    # Create and start thread
     thread = threading.Thread(target=_polling_thread)
-    # thread.daemon = True  # 设置为守护线程，主线程结束时自动终止
+    # thread.daemon = True  # Set as daemon thread, automatically terminates when main thread ends
     thread.start()
     
-    # 返回线程对象和结果容器，方便外部代码获取结果
+    # Return thread object and result container for external code to get results
     return thread, result_container
 
 def test_subtitle():
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    # 测试用例：添加文本字幕
-    print("\n测试：添加文本字幕")
+    # Test case: Add text subtitles
+    print("\nTest: Adding text subtitles")
     text_result = add_subtitle_impl(
-        srt="1\n00:00:00,000 --> 00:00:04,433\n你333好，我是孙关南开发的剪映草稿助手。\n\n2\n00:00:04,433 --> 00:00:11,360\n我擅长将音频、视频、图片素材拼接在一起剪辑输出剪映草稿。\n",
+        srt="1\n00:00:00,000 --> 00:00:04,433\nHello, I am the CapCut draft assistant developed by Sun Guannan.\n\n2\n00:00:04,433 --> 00:00:11,360\nI specialize in combining audio, video, and image materials to create CapCut drafts.\n",
         font_size=8.0,
         bold=True,
         italic=True,
@@ -916,28 +916,28 @@ def test_subtitle():
         scale_x=1.0,
         scale_y=2.0,
         vertical=True,
-        # 添加背景颜色参数
-        background_color="#FFFF00",  # 黄色背景
-        background_style=1,  # 样式1表示矩形背景
-        background_alpha=0.7,  # 70%不透明度
-        # 添加描边参数
-        border_color="#0000FF",  # 蓝色描边
-        border_width=20.0,  # 描边宽度为2
-        border_alpha=1.0  # 完全不透明
+        # Add background color parameters
+        background_color="#FFFF00",  # Yellow background
+        background_style=1,  # Style 1 means rectangular background
+        background_alpha=0.7,  # 70% opacity
+        # Add border parameters
+        border_color="#0000FF",  # Blue border
+        border_width=20.0,  # Border width 2
+        border_alpha=1.0  # Fully opaque
     )
-    print(f"文本添加结果: {text_result}")
+    print(f"Text addition result: {text_result}")
     
-    # 保存草稿
+    # Save draft
     if text_result.get('success') and text_result.get('output'):
         save_result = save_draft_impl(text_result['output']['draft_id'], draft_folder)
-        print(f"保存草稿结果: {save_result}")
+        print(f"Draft save result: {save_result}")
 
 def test01():
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     # draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
 
-    # 组合测试
-    print("\n测试2：添加音频")
+    # Combined test
+    print("\nTest 2: Add audio")
     audio_result = add_audio_track(
         audio_url = "https://lf3-lv-music-tos.faceu.com/obj/tos-cn-ve-2774/oYACBQRCMlWBIrZipvQZhI5LAlUFYii0RwEPh",
         start=4,
@@ -946,10 +946,10 @@ def test01():
         volume=0.8,
         speed=1.0,
         track_name="main_audio100",
-        effect_type="麦霸",
+        effect_type="Tremble",
         effect_params=[90.0, 50.0]
     )
-    print(f"音频添加结果1: {audio_result}")
+    print(f"Audio addition result 1: {audio_result}")
 
     audio_result = add_audio_track(
         draft_id=audio_result['output']['draft_id'],
@@ -960,10 +960,10 @@ def test01():
         volume=0.8,
         speed=1.0,
         track_name="main_audio100",
-        effect_type="麦霸",
+        effect_type="Tremble",
         effect_params=[90.0, 50.0]
     )
-    print(f"音频添加结果2: {audio_result}")
+    print(f"Audio addition result 2: {audio_result}")
 
     audio_result = add_audio_track(
         draft_id=audio_result['output']['draft_id'],
@@ -974,112 +974,112 @@ def test01():
         volume=0.8,
         speed=1.0,
         track_name="main_audio101",
-        effect_type="麦霸",
+        effect_type="Tremble",
         effect_params=[90.0, 50.0]
     )
-    print(f"音频添加结果3: {audio_result}")
+    print(f"Audio addition result 3: {audio_result}")
 
-    # 测试用例1：基本文本添加
+    # Test case 1: Basic text addition
     text_result = add_text_impl(
         draft_folder=draft_folder,
-        text="测试文本1",
+        text="Test Text 1",
         draft_id=audio_result['output']['draft_id'],
         start=0,
         end=3,
-        font="思源中宋",  # 使用思源黑体
-        font_color="#FF0000",  # 红色
+        font="思源中宋",  # Use Source Han Serif font
+        font_color="#FF0000",  # Red
         track_name="main_text",
         transform_y=0.8,
         transform_x=0.5,
         font_size=30.0
     )
-    print("测试用例1（基本文本）成功:", text_result)
+    print("Test case 1 (Basic text) successful:", text_result)
 
-    # 测试用例2：竖排文本
+    # Test case 2: Vertical text
     result2 = add_text_impl(
         draft_id=text_result['output']['draft_id'],
-        text="竖排文本测试",
+        text="Vertical Text Test",
         start=3,
         end=6,
         font="云书法三行魏碑体",
-        font_color="#00FF00",  # 绿色
+        font_color="#00FF00",  # Green
         font_size=8.0,
         track_name="main_text",
-        vertical=True,  # 启用竖排
+        vertical=True,  # Enable vertical text
         transform_y=-0.5,
-        outro_animation='晕开'
+        outro_animation='Fade_Out'
     )
-    print("测试用例2（竖排文本）成功:", result2)
+    print("Test case 2 (Vertical text) successful:", result2)
 
-    print("测试完成")
-    # 测试添加图片
+    print("Test completed")
+    # Test adding image
     image_result = add_image_impl(
-        draft_id=result2['output']['draft_id'],  # 替换为实际的草稿ID
-        image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",  # 替换为实际的图片URL
+        draft_id=result2['output']['draft_id'],  # Replace with actual draft ID
+        image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",  # Replace with actual image URL
         width=480,
         height=480,
         start = 0,
-        end=5.0,  # 显示5秒
+        end=5.0,  # Display for 5 seconds
         transform_y=0.7,
         scale_x=2.0,
         scale_y=1.0,
         transform_x=0,
         track_name="main"
     )
-    print("添加图片成功！")
+    print("Image added successfully!")
 
 
-    # 测试添加图片
+    # Test adding image
     image_result = add_image_impl(
-        draft_id=result2['output']['draft_id'],  # 替换为实际的草稿ID
-        image_url="http://gips0.baidu.com/it/u=3602773692,1512483864&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280",  # 替换为实际的图片URL
+        draft_id=result2['output']['draft_id'],  # Replace with actual draft ID
+        image_url="http://gips0.baidu.com/it/u=3602773692,1512483864&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280",  # Replace with actual image URL
         width=480,
         height=480,
         start = 0,
-        end=5.0,  # 显示5秒
+        end=5.0,  # Display for 5 seconds
         transform_y=0.7,
         scale_x=2.0,
         scale_y=1.0,
         transform_x=0,
         track_name="main_2"
     )
-    print("添加图片成功！")
+    print("Image added successfully!")
 
     image_result = add_image_impl(
-        draft_id=image_result['output']['draft_id'],  # 替换为实际的草稿ID
-        image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",  # 替换为实际的图片URL
+        draft_id=image_result['output']['draft_id'],  # Replace with actual draft ID
+        image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",  # Replace with actual image URL
         width=480,
         height=480,
         start = 5,
-        end=10.0,  # 显示5秒
+        end=10.0,  # Display for 5 seconds
         transform_y=0.7,
         scale_x=2.0,
         scale_y=1.0,
         transform_x=0,
         track_name="main"
     )
-    print("添加图片2成功！")
+    print("Image 2 added successfully!")
 
-    # 测试添加视频关键帧
-    print("\n测试：添加视频关键帧")
+    # Test adding video keyframe
+    print("\nTest: Add video keyframe")
     keyframe_result = add_video_keyframe_impl(
-        draft_id=image_result['output']['draft_id'],  # 使用已存在的草稿ID
+        draft_id=image_result['output']['draft_id'],  # Use existing draft ID
         track_name="main",
-        property_type="position_y",  # 测试不透明度
-        time=1.5,  # 在3.5秒处添加关键帧
-        value="0.2"  # 移动300px
+        property_type="position_y",  # Test opacity
+        time=1.5,  # Add keyframe at 3.5 seconds
+        value="0.2"  # Move 300px
     )
-    print(f"关键帧添加结果: {keyframe_result}")
+    print(f"Keyframe addition result: {keyframe_result}")
 
-    print("\n测试：添加视频关键帧")
+    print("\nTest: Add video keyframe")
     keyframe_result = add_video_keyframe_impl(
-        draft_id=image_result['output']['draft_id'],  # 使用已存在的草稿ID
+        draft_id=image_result['output']['draft_id'],  # Use existing draft ID
         track_name="main",
-        property_type="position_y",  # 测试不透明度
-        time=3.5,  # 在3.5秒处添加关键帧
-        value="0.4"  # 移动300px
+        property_type="position_y",  # Test opacity
+        time=3.5,  # Add keyframe at 3.5 seconds
+        value="0.4"  # Move 300px
     )
-    print(f"关键帧添加结果: {keyframe_result}")
+    print(f"Keyframe addition result: {keyframe_result}")
     
     query_draft_status_impl_polling(keyframe_result['output']['draft_id'])
     save_draft_impl(keyframe_result['output']['draft_id'], draft_folder)
@@ -1088,8 +1088,8 @@ def test02():
     # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
 
-    # 组合测试
-    print("\n测试2：添加音频")
+    # Combined test
+    print("\nTest 2: Add audio")
     audio_result = add_audio_track(
         audio_url = "https://lf3-lv-music-tos.faceu.com/obj/tos-cn-ve-2774/oYACBQRCMlWBIrZipvQZhI5LAlUFYii0RwEPh",
         start=4,
@@ -1101,7 +1101,7 @@ def test02():
         effect_type = "Big_House",
         effect_params = [50.0]
     )
-    print(f"音频添加结果1: {audio_result}")
+    print(f"Audio addition result 1: {audio_result}")
 
     audio_result = add_audio_track(
         draft_id=audio_result['output']['draft_id'],
@@ -1115,7 +1115,7 @@ def test02():
         effect_type = "Big_House",
         effect_params = [50.0]
     )
-    print(f"音频添加结果2: {audio_result}")
+    print(f"Audio addition result 2: {audio_result}")
 
     audio_result = add_audio_track(
         draft_id=audio_result['output']['draft_id'],
@@ -1129,252 +1129,252 @@ def test02():
         effect_type = "Big_House",
         effect_params = [50.0]
     )
-    print(f"音频添加结果3: {audio_result}")
+    print(f"Audio addition result 3: {audio_result}")
 
-    # 测试用例1：基本文本添加
+    # Test case 1: Basic text addition
     text_result = add_text_impl(
         draft_folder=draft_folder,
-        text="测试文本1",
+        text="Test Text 1",
         draft_id=audio_result['output']['draft_id'],
         start=0,
         end=3,
-        font="思源中宋",  # 使用思源黑体
-        font_color="#FF0000",  # 红色
+        font="思源中宋",  # Use Source Han Serif font
+        font_color="#FF0000",  # Red
         track_name="main_text",
         transform_y=0.8,
         transform_x=0.5,
         font_size=30.0
     )
-    print("测试用例1（基本文本）成功:", text_result)
+    print("Test case 1 (Basic text) successful:", text_result)
 
-    # 测试用例2：竖排文本
+    # Test case 2: Vertical text
     result2 = add_text_impl(
         draft_id=text_result['output']['draft_id'],
-        text="竖排文本测试",
+        text="Vertical Text Test",
         start=3,
         end=6,
         font="云书法三行魏碑体",
-        font_color="#00FF00",  # 绿色
+        font_color="#00FF00",  # Green
         font_size=8.0,
         track_name="main_text",
-        vertical=True,  # 启用竖排
+        vertical=True,  # Enable vertical text
         transform_y=-0.5,
         outro_animation='Throw_Back'
     )
-    print("测试用例2（竖排文本）成功:", result2)
+    print("Test case 2 (Vertical text) successful:", result2)
 
-    print("测试完成")
-    # 测试添加图片
+    print("Test completed")
+    # Test adding image
     image_result = add_image_impl(
-        draft_id=result2['output']['draft_id'],  # 替换为实际的草稿ID
-        image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",  # 替换为实际的图片URL
+        draft_id=result2['output']['draft_id'],  # Replace with actual draft ID
+        image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",  # Replace with actual image URL
         width=480,
         height=480,
         start = 0,
-        end=5.0,  # 显示5秒
+        end=5.0,  # Display for 5 seconds
         transform_y=0.7,
         scale_x=2.0,
         scale_y=1.0,
         transform_x=0,
         track_name="main"
     )
-    print("添加图片成功！")
+    print("Image added successfully!")
 
 
-    # 测试添加图片
+    # Test adding image
     image_result = add_image_impl(
-        draft_id=result2['output']['draft_id'],  # 替换为实际的草稿ID
-        image_url="http://gips0.baidu.com/it/u=3602773692,1512483864&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280",  # 替换为实际的图片URL
+        draft_id=result2['output']['draft_id'],  # Replace with actual draft ID
+        image_url="http://gips0.baidu.com/it/u=3602773692,1512483864&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280",  # Replace with actual image URL
         width=480,
         height=480,
         start = 0,
-        end=5.0,  # 显示5秒
+        end=5.0,  # Display for 5 seconds
         transform_y=0.7,
         scale_x=2.0,
         scale_y=1.0,
         transform_x=0,
         track_name="main_2"
     )
-    print("添加图片成功！")
+    print("Image added successfully!")
 
     image_result = add_image_impl(
-        draft_id=image_result['output']['draft_id'],  # 替换为实际的草稿ID
-        image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",  # 替换为实际的图片URL
+        draft_id=image_result['output']['draft_id'],  # Replace with actual draft ID
+        image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",  # Replace with actual image URL
         width=480,
         height=480,
         start = 5,
-        end=10.0,  # 显示5秒
+        end=10.0,  # Display for 5 seconds
         transform_y=0.7,
         scale_x=2.0,
         scale_y=1.0,
         transform_x=0,
         track_name="main"
     )
-    print("添加图片2成功！")
+    print("Image 2 added successfully!")
 
-    # 测试添加视频关键帧
-    print("\n测试：添加视频关键帧")
+    # Test adding video keyframe
+    print("\nTest: Add video keyframe")
     keyframe_result = add_video_keyframe_impl(
-        draft_id=image_result['output']['draft_id'],  # 使用已存在的草稿ID
+        draft_id=image_result['output']['draft_id'],  # Use existing draft ID
         track_name="main",
-        property_type="position_y",  # 测试不透明度
-        time=1.5,  # 在3.5秒处添加关键帧
-        value="0.2"  # 移动300px
+        property_type="position_y",  # Test opacity
+        time=1.5,  # Add keyframe at 3.5 seconds
+        value="0.2"  # Move 300px
     )
-    print(f"关键帧添加结果: {keyframe_result}")
+    print(f"Keyframe addition result: {keyframe_result}")
 
-    print("\n测试：添加视频关键帧")
+    print("\nTest: Add video keyframe")
     keyframe_result = add_video_keyframe_impl(
-        draft_id=image_result['output']['draft_id'],  # 使用已存在的草稿ID
+        draft_id=image_result['output']['draft_id'],  # Use existing draft ID
         track_name="main",
-        property_type="position_y",  # 测试不透明度
-        time=3.5,  # 在3.5秒处添加关键帧
-        value="0.4"  # 移动300px
+        property_type="position_y",  # Test opacity
+        time=3.5,  # Add keyframe at 3.5 seconds
+        value="0.4"  # Move 300px
     )
-    print(f"关键帧添加结果: {keyframe_result}")
+    print(f"Keyframe addition result: {keyframe_result}")
     
     query_draft_status_impl_polling(keyframe_result['output']['draft_id'])
     save_draft_impl(keyframe_result['output']['draft_id'], draft_folder)
 
 def test_video_track01():
-    """测试添加视频轨道"""
+    """Test adding video track"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # 替换为实际视频URL
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
 
-    print("\n测试：添加视频轨道")
+    print("\nTest: Add video track")
     video_result = add_video_impl(
         video_url=video_url,
         width=1920,
         height=1080,
         start=0,
-        end=5.0, # 截取视频前5秒
+        end=5.0, # Cut the first 5 seconds of the video
         target_start=0,
         track_name="main_video_track"
     )
-    print(f"视频轨道添加结果: {video_result}")
+    print(f"Video track addition result: {video_result}")
 
     if video_result and 'output' in video_result and 'draft_id' in video_result['output']:
         draft_id = video_result['output']['draft_id']
-        print(f"保存草稿: {save_draft_impl(draft_id, draft_folder)}")
+        print(f"Save draft: {save_draft_impl(draft_id, draft_folder)}")
     else:
-        print("无法获取草稿ID，跳过保存操作。")
+        print("Unable to get draft ID, skipping save operation.")
 
 
 def test_video_track02():
-    """测试循环添加视频轨道"""
+    """Test adding video tracks in a loop"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # 替换为实际视频URL
-    draft_id = None  # 初始化draft_id
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
+    draft_id = None  # Initialize draft_id
     
     for i in range(5):
-        target_start = i * 5  # 每次递增5秒
+        target_start = i * 5  # Increment by 5 seconds each time
         
         video_result = add_video_impl(
-            draft_id=draft_id,  # 传入draft_id
+            draft_id=draft_id,  # Pass in draft_id
             video_url=video_url,
             width=1920,
             height=1080,
             start=0,
-            end=5.0, # 截取视频前5秒
+            end=5.0, # Cut the first 5 seconds of the video
             target_start=target_start,
             track_name="main_video_track"
         )
-        draft_id = video_result['output']['draft_id']  # 更新draft_id
-        print(f"第 {i+1} 次视频添加结果: {video_result}")
+        draft_id = video_result['output']['draft_id']  # Update draft_id
+        print(f"Video addition result {i+1}: {video_result}")
     
-    # 最后保存并上传草稿
+    # Finally save and upload the draft
     save_result = save_draft_impl(draft_id, draft_folder)
-    print(f"草稿保存结果: {save_result}")
+    print(f"Draft save result: {save_result}")
 
 
 def test_video_track03():
-    """测试在不同轨道添加视频"""
+    """Test adding videos to different tracks"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # 替换为实际视频URL
-    draft_id = None  # 初始化draft_id
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
+    draft_id = None  # Initialize draft_id
     
-    # 在第一个轨道添加视频
+    # Add video to the first track
     video_result = add_video_impl(
-        draft_id=draft_id,  # 传入draft_id
+        draft_id=draft_id,  # Pass in draft_id
         video_url=video_url,
         width=1920,
         height=1080,
         start=0,
-        end=5.0, # 截取视频前5秒
+        end=5.0, # Cut the first 5 seconds of the video
         target_start=0,
         track_name="main_video_track"
     )
-    draft_id = video_result['output']['draft_id']  # 更新draft_id
-    print(f"第一次视频添加结果: {video_result}")
+    draft_id = video_result['output']['draft_id']  # Update draft_id
+    print(f"First video addition result: {video_result}")
     
-    # 在第二个轨道添加视频
+    # Add video to the second track
     video_result = add_video_impl(
-        draft_id=draft_id,  # 使用上一次的draft_id
+        draft_id=draft_id,  # Use previous draft_id
         video_url=video_url,
         width=1920,
         height=1080,
         start=0,
-        end=5.0, # 截取视频前5秒
+        end=5.0, # Cut the first 5 seconds of the video
         target_start=0,
-        track_name="main_video_track_2",  # 使用不同的轨道名称
-        speed=1.0,  # 改变播放速度
-        scale_x=0.5,  # 缩小视频宽度
-        transform_y=0.5  # 将视频放在屏幕下方
+        track_name="main_video_track_2",  # Use different track name
+        speed=1.0,  # Change playback speed
+        scale_x=0.5,  # Reduce video width
+        transform_y=0.5  # Position video at bottom of screen
     )
-    draft_id = video_result['output']['draft_id']  # 更新draft_id
-    print(f"第二次视频添加结果: {video_result}")
+    draft_id = video_result['output']['draft_id']  # Update draft_id
+    print(f"Second video addition result: {video_result}")
     
-    # 第三次在另一个轨道添加视频
+    # Third time add video to another track
     video_result = add_video_impl(
-        draft_id=draft_id,  # 使用上一次的draft_id
+        draft_id=draft_id,  # Use previous draft_id
         video_url=video_url,
         width=1920,
         height=1080,
         start=0,
-        end=5.0, # 截取视频前5秒
+        end=5.0, # Cut the first 5 seconds of the video
         target_start=0,
-        track_name="main_video_track_3",  # 使用第三个轨道
-        speed=1.5,  # 更快的播放速度
-        scale_x=0.3,  # 更小的视频宽度
-        transform_y=-0.5  # 将视频放在屏幕上方
+        track_name="main_video_track_3",  # Use third track
+        speed=1.5,  # Faster playback speed
+        scale_x=0.3,  # Smaller video width
+        transform_y=-0.5  # Position video at top of screen
     )
-    draft_id = video_result['output']['draft_id']  # 更新draft_id
-    print(f"第三次视频添加结果: {video_result}")
+    draft_id = video_result['output']['draft_id']  # Update draft_id
+    print(f"Third video addition result: {video_result}")
     
-    # 最后保存并上传草稿
+    # Finally save and upload the draft
     save_result = save_draft_impl(draft_id, draft_folder)
-    print(f"草稿保存结果: {save_result}")
+    print(f"Draft save result: {save_result}")
 
 def test_video_track04():
-    """测试添加视频轨道"""
+    """Test adding video track"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # 替换为实际视频URL
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
 
-    print("\n测试：添加视频轨道")
+    print("\nTest: Add video track")
     video_result = add_video_impl(
         video_url='https://p26-bot-workflow-sign.byteimg.com/tos-cn-i-mdko3gqilj/07bf6797a1834d75beb05c63293af204.mp4~tplv-mdko3gqilj-image.image?rk3s=81d4c505&x-expires=1782141919&x-signature=2ETX83Swh%2FwKzHeWB%2F9oGq9vqt4%3D&x-wf-file_name=output-997160b5.mp4'
     )
-    print(f"视频轨道添加结果: {video_result}")
+    print(f"Video track addition result: {video_result}")
 
-    print("\n测试：添加视频轨道")
+    print("\nTest: Add video track")
     video_result = add_video_impl(
         video_url='https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4',
-        draft_id=video_result['output']['draft_id'],  # 使用已存在的草稿ID
+        draft_id=video_result['output']['draft_id'],  # Use existing draft ID
         target_start=19.84
     )
-    print(f"视频轨道添加结果: {video_result}")
+    print(f"Video track addition result: {video_result}")
     if video_result and 'output' in video_result and 'draft_id' in video_result['output']:
         draft_id = video_result['output']['draft_id']
-        print(f"保存草稿: {save_draft_impl(draft_id, draft_folder)}")
+        print(f"Save draft: {save_draft_impl(draft_id, draft_folder)}")
     else:
-        print("无法获取草稿ID，跳过保存操作。")
+        print("Unable to get draft ID, skipping save operation.")
 
 def test_keyframe():
-    """测试添加关键帧"""
+    """Test adding keyframes"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_id = None  # 初始化draft_id
+    draft_id = None  # Initialize draft_id
     
-    print("\n测试：添加基本视频轨道")
+    print("\nTest: Add basic video track")
     video_result = add_video_impl(
         video_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4",
         width=1920,
@@ -1384,16 +1384,16 @@ def test_keyframe():
         target_start=0,
         track_name="main_video_track"
     )
-    print("视频添加结果:", video_result)
+    print("Video addition result:", video_result)
     
     if video_result.get('success') and video_result.get('output'):
         draft_id = video_result['output']['draft_id']
-        print("使用现有draft_id:", draft_id)
+        print("Using existing draft_id:", draft_id)
     else:
-        print("无法获取草稿ID，终止测试。")
+        print("Unable to get draft ID, terminating test.")
         return
 
-    print("\n测试：添加不透明度关键帧")
+    print("\nTest: Add opacity keyframe")
     keyframe_result = add_video_keyframe_impl(
         draft_id=draft_id,
         track_name="main_video_track",
@@ -1401,9 +1401,9 @@ def test_keyframe():
         time=2.0,
         value="1.0"
     )
-    print("不透明度关键帧添加结果:", keyframe_result)
+    print("Opacity keyframe addition result:", keyframe_result)
 
-    print("\n测试：添加位置Y关键帧")
+    print("\nTest: Add position Y keyframe")
     keyframe_result = add_video_keyframe_impl(
         draft_id=draft_id,
         track_name="main_video_track",
@@ -1411,9 +1411,9 @@ def test_keyframe():
         time=2.0,
         value="0.5"
     )
-    print("位置Y关键帧添加结果:", keyframe_result)
+    print("Position Y keyframe addition result:", keyframe_result)
 
-    print("\n测试：添加缩放X关键帧")
+    print("\nTest: Add scale X keyframe")
     keyframe_result = add_video_keyframe_impl(
         draft_id=draft_id,
         track_name="main_video_track",
@@ -1421,19 +1421,18 @@ def test_keyframe():
         time=4.0,
         value="-0.5"
     )
-    print("缩放X关键帧添加结果:", keyframe_result)
+    print("Scale X keyframe addition result:", keyframe_result)
 
-    print("\n最终保存草稿")
+    print("\nFinal draft save")
     save_result = save_draft_impl(draft_id, draft_folder)
-    print(f"草稿保存结果: {save_result}")
-
+    print(f"Draft save result: {save_result}")
 
 def test_keyframe_02():
-    """测试添加关键帧 - 批量添加实现淡入和放大回弹效果"""
+    """Test adding keyframes - Batch adding to implement fade-in and zoom bounce effects"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_id = None  # 初始化draft_id
+    draft_id = None  # Initialize draft_id
     
-    print("\n测试：添加基本视频轨道")
+    print("\nTest: Adding basic video track")
     video_result = add_video_impl(
         video_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4",
         width=1920,
@@ -1443,17 +1442,17 @@ def test_keyframe_02():
         target_start=0,
         track_name="main_video_track"
     )
-    print("视频添加结果:", video_result)
+    print("Video adding result:", video_result)
     
     if video_result.get('success') and video_result.get('output'):
         draft_id = video_result['output']['draft_id']
-        print("使用现有draft_id:", draft_id)
+        print("Using existing draft_id:", draft_id)
     else:
-        print("无法获取草稿ID，终止测试。")
+        print("Unable to get draft ID, terminating test.")
         return
 
-    print("\n测试：批量添加不透明度关键帧 - 实现淡入效果")
-    # 添加不透明度关键帧，实现从不可见到可见的淡入效果
+    print("\nTest: Batch adding opacity keyframes - Implementing fade-in effect")
+    # Add opacity keyframes to implement fade-in effect from invisible to visible
     alpha_keyframe_result = add_video_keyframe_impl(
         draft_id=draft_id,
         track_name="main_video_track",
@@ -1461,10 +1460,10 @@ def test_keyframe_02():
         times=[0.0, 1.0, 2.0, 3.0],
         values=["0.0", "0.3", "0.7", "1.0"]
     )
-    print("不透明度关键帧批量添加结果:", alpha_keyframe_result)
+    print("Opacity keyframe batch adding result:", alpha_keyframe_result)
 
-    print("\n测试：批量添加缩放关键帧 - 实现放大回弹效果")
-    # 添加统一缩放关键帧，实现放大回弹效果
+    print("\nTest: Batch adding scale keyframes - Implementing zoom bounce effect")
+    # Add uniform scale keyframes to implement zoom bounce effect
     scale_keyframe_result = add_video_keyframe_impl(
         draft_id=draft_id,
         track_name="main_video_track",
@@ -1472,10 +1471,10 @@ def test_keyframe_02():
         times=[0.0, 1.5, 3.0, 4.5, 6.0],
         values=["0.8", "1.3", "1.0", "1.2", "1.0"]
     )
-    print("缩放关键帧批量添加结果:", scale_keyframe_result)
+    print("Scale keyframe batch adding result:", scale_keyframe_result)
 
-    print("\n测试：批量添加位置Y关键帧 - 实现上下浮动效果")
-    # 添加位置Y关键帧，实现上下浮动效果
+    print("\nTest: Batch adding position Y keyframes - Implementing up and down floating effect")
+    # Add position Y keyframes to implement up and down floating effect
     position_y_keyframe_result = add_video_keyframe_impl(
         draft_id=draft_id,
         track_name="main_video_track",
@@ -1483,17 +1482,17 @@ def test_keyframe_02():
         times=[2.0, 3.5, 5.0, 6.5],
         values=["0.0", "0.2", "-0.2", "0.0"]
     )
-    print("位置Y关键帧批量添加结果:", position_y_keyframe_result)
+    print("Position Y keyframe batch adding result:", position_y_keyframe_result)
 
-    print("\n最终保存草稿")
+    print("\nFinal draft saving")
     save_result = save_draft_impl(draft_id, draft_folder)
-    print(f"草稿保存结果: {save_result}")
+    print(f"Draft saving result: {save_result}")
 
 def test_subtitle_01():
-    """测试添加文本字幕"""
+    """Test adding text subtitles"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     
-    print("\n测试3：添加文本字幕")
+    print("\nTest 3: Adding text subtitles")
     text_result = add_subtitle_impl(
         srt="1\n00:00:00,000 --> 00:00:04,433\n你333好，我是孙关南开发的剪映草稿助手。\n\n2\n00:00:04,433 --> 00:00:11,360\n我擅长将音频、视频、图片素材拼接在一起剪辑输出剪映草稿。\n",
         font_size=8.0,
@@ -1508,20 +1507,20 @@ def test_subtitle_01():
         scale_y=2.0,
         vertical=True
     )
-    print(f"文本添加结果: {text_result}")
+    print(f"Text adding result: {text_result}")
     
     if text_result.get('success') and text_result.get('output'):
         save_result = save_draft_impl(text_result['output']['draft_id'], draft_folder)
-        print(f"保存草稿结果: {save_result}")
+        print(f"Draft saving result: {save_result}")
     
     return text_result
 
 
 def test_subtitle_02():
-    """测试通过SRT URL添加文本字幕"""
+    """Test adding text subtitles via SRT URL"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     
-    print("\n测试3：添加文本字幕（从URL）")
+    print("\nTest 3: Adding text subtitles (from URL)")
     text_result = add_subtitle_impl(
         srt="https://oss-oversea-bucket.oss-cn-hongkong.aliyuncs.com/dfd_srt_1748575460_kmtu56iu.srt?Expires=1748707452&OSSAccessKeyId=TMP.3Km5TL5giRLgDkc3CamKPcWZTmSrLVeRxPWxEisNB2CTymvUxrpX8VXzy5r99F6bJkwjwFM5d1RsiV3cF18iaMriAPtA1y&Signature=4JzB4YGiChsxcTFuvUyZ0v3MjMI%3D",
         font_size=8.0,
@@ -1536,11 +1535,11 @@ def test_subtitle_02():
         scale_y=2.0,
         vertical=True
     )
-    print(f"文本添加结果: {text_result}")
+    print(f"Text adding result: {text_result}")
     
     if text_result.get('success') and text_result.get('output'):
         save_result = save_draft_impl(text_result['output']['draft_id'], draft_folder)
-        print(f"保存草稿结果: {save_result}")
+        print(f"Draft saving result: {save_result}")
     
     return text_result
 
@@ -1548,9 +1547,9 @@ def test_subtitle_02():
 def test_video():
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加视频")
+    print("\nTest: Adding video")
     video_result = add_video_impl(
-        video_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4", # 替换为实际的视频URL
+        video_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4", # Replace with actual video URL
         start=0,
         end=5,
         width=1920,
@@ -1564,9 +1563,9 @@ def test_video():
         target_start=0,
         relative_index=0
     )
-    print(f"视频添加结果: {video_result}")
+    print(f"Video adding result: {video_result}")
 
-    # 保存草稿
+    # Save draft
     if video_result.get('success') and video_result.get('output'):
         query_draft_status_impl_polling(video_result['output']['draft_id'])
         save_draft_impl(video_result['output']['draft_id'], draft_folder)
@@ -1574,9 +1573,9 @@ def test_video():
 def test_video_02():
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加视频")
+    print("\nTest: Adding video")
     video_result = add_video_impl(
-        video_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4", # 替换为实际的视频URL
+        video_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4", # Replace with actual video URL
         start=0,
         end=5,
         width=1920,
@@ -1590,10 +1589,10 @@ def test_video_02():
         target_start=0,
         relative_index=0
     )
-    print(f"视频添加结果: {video_result}")
+    print(f"Video adding result: {video_result}")
 
     video_result = add_video_impl(
-        video_url="https://videos.pexels.com/video-files/3129769/3129769-hd_1280_720_30fps.mp4", # 替换为实际的视频URL
+        video_url="https://videos.pexels.com/video-files/3129769/3129769-hd_1280_720_30fps.mp4", # Replace with actual video URL
         draft_id=video_result['output']['draft_id'],
         start=0,
         end=5,
@@ -1673,75 +1672,74 @@ def test_video_02():
         relative_index=0
     )
 
-    # 保存草稿
     if video_result.get('success') and video_result.get('output'):
         print(json.loads(query_script_impl(video_result['output']['draft_id'])['output']))
         # query_draft_status_impl_polling(video_result['output']['draft_id'])
         # save_draft_impl(video_result['output']['draft_id'], draft_folder)
    
 def test_stiker_01():
-    """测试添加贴纸"""
-    # 添加贴纸，测试各种参数
+    """Test adding stickers"""
+    # Add stickers, test various parameters
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         start=1.0,
         end=4.0,
-        transform_y=0.3,      # 向上移动
-        transform_x=-0.2,     # 向左移动
-        alpha=0.8,            # 设置透明度
-        rotation=45.0,        # 旋转45度
-        scale_x=1.5,          # 水平放大1.5倍
-        scale_y=1.5,          # 垂直放大1.5倍
-        flip_horizontal=True  # 水平翻转
+        transform_y=0.3,      # Move up
+        transform_x=-0.2,     # Move left
+        alpha=0.8,            # Set transparency
+        rotation=45.0,        # Rotate 45 degrees
+        scale_x=1.5,          # Horizontal scale 1.5x
+        scale_y=1.5,          # Vertical scale 1.5x
+        flip_horizontal=True  # Horizontal flip
     )
-    print(f"添加贴纸结果: {save_draft_impl(result['output']['draft_id'], draft_folder)}")
+    print(f"Sticker adding result: {save_draft_impl(result['output']['draft_id'], draft_folder)}")
 
 def test_stiker_02():
-    """测试添加贴纸"""
-    # 添加贴纸，测试各种参数
+    """Test adding stickers"""
+    # Add stickers, test various parameters
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         start=1.0,
         end=4.0,
-        transform_y=0.3,      # 向上移动
-        transform_x=-0.2,     # 向左移动
-        alpha=0.8,            # 设置透明度
-        rotation=45.0,        # 旋转45度
-        scale_x=1.5,          # 水平放大1.5倍
-        scale_y=1.5,          # 垂直放大1.5倍
-        flip_horizontal=True  # 水平翻转
+        transform_y=0.3,      # Move up
+        transform_x=-0.2,     # Move left
+        alpha=0.8,            # Set transparency
+        rotation=45.0,        # Rotate 45 degrees
+        scale_x=1.5,          # Horizontal scale 1.5x
+        scale_y=1.5,          # Vertical scale 1.5x
+        flip_horizontal=True  # Horizontal flip
     )
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         draft_id=result['output']['draft_id'],
         start=5.0,
         end=10.0,
-        transform_y=-0.3,      # 向上移动
-        transform_x=0.5,     # 向左移动
-        alpha=0.1,            # 设置透明度
-        rotation=30.0,        # 旋转45度
-        scale_x=1.5,          # 水平放大1.5倍
-        scale_y=1.2,          # 垂直放大1.5倍
+        transform_y=-0.3,     # Move up
+        transform_x=0.5,      # Move left
+        alpha=0.1,            # Set transparency
+        rotation=30.0,        # Rotate 30 degrees
+        scale_x=1.5,          # Horizontal scale 1.5x
+        scale_y=1.2,          # Vertical scale 1.2x
     )
-    print(f"添加贴纸结果: {save_draft_impl(result['output']['draft_id'], draft_folder)}")
+    print(f"Sticker adding result: {save_draft_impl(result['output']['draft_id'], draft_folder)}")
 
 def test_stiker_03():
-    """测试添加贴纸"""
-    # 添加贴纸，测试各种参数
+    """Test adding stickers"""
+    # Add stickers, test various parameters
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         start=1.0,
         end=4.0,
-        transform_y=0.3,      # 向上移动
-        transform_x=-0.2,     # 向左移动
-        alpha=0.8,            # 设置透明度
-        rotation=45.0,        # 旋转45度
-        scale_x=1.5,          # 水平放大1.5倍
-        scale_y=1.5,          # 垂直放大1.5倍
-        flip_horizontal=True,  # 水平翻转
+        transform_y=0.3,      # Move up
+        transform_x=-0.2,     # Move left
+        alpha=0.8,            # Set transparency
+        rotation=45.0,        # Rotate 45 degrees
+        scale_x=1.5,          # Horizontal scale 1.5x
+        scale_y=1.5,          # Vertical scale 1.5x
+        flip_horizontal=True, # Horizontal flip
         track_name="stiker_main",
         relative_index=999
     )
@@ -1750,23 +1748,23 @@ def test_stiker_03():
         draft_id=result['output']['draft_id'],
         start=5.0,
         end=10.0,
-        transform_y=-0.3,      # 向上移动
-        transform_x=0.5,     # 向左移动
-        alpha=0.1,            # 设置透明度
-        rotation=30.0,        # 旋转45度
-        scale_x=1.5,          # 水平放大1.5倍
-        scale_y=1.2,          # 垂直放大1.5倍
+        transform_y=-0.3,     # Move up
+        transform_x=0.5,      # Move left
+        alpha=0.1,            # Set transparency
+        rotation=30.0,        # Rotate 30 degrees
+        scale_x=1.5,          # Horizontal scale 1.5x
+        scale_y=1.2,          # Vertical scale 1.2x
         track_name="stiker_main_2",
         relative_index=0
     )
-    print(f"添加贴纸结果: {save_draft_impl(result['output']['draft_id'], draft_folder)}")
+    print(f"Sticker adding result: {save_draft_impl(result['output']['draft_id'], draft_folder)}")
 
 
 def test_transition_01():
-    """测试添加多个图片"""
+    """Test adding multiple images"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加图片1")
+    print("\nTest: Adding image 1")
     image_result = add_image_impl(
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
         width=480,
@@ -1778,12 +1776,12 @@ def test_transition_01():
         scale_y=1.0,
         transform_x=0,
         track_name="main",
-        transition="动漫漩涡",
+        transition="Dissolve",
         transition_duration=1.0
     )
-    print(f"添加图片成功1！{image_result['output']['draft_id']}")
+    print(f"Image 1 added successfully! {image_result['output']['draft_id']}")
     
-    print("\n测试：添加图片2")
+    print("\nTest: Adding image 2")
     image_result = add_image_impl(
         draft_id=image_result['output']['draft_id'],
         image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
@@ -1797,53 +1795,53 @@ def test_transition_01():
         transform_x=0,
         track_name="main"
     )
-    print(f"添加图片成功2！{image_result['output']['draft_id']}")
+    print(f"Image 2 added successfully! {image_result['output']['draft_id']}")
     print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
 
 
 def test_transition_02():
-    """测试添加视频轨道"""
+    """Test adding video tracks"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # 替换为实际视频URL
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
 
-    print("\n测试：添加视频轨道")
+    print("\nTest: Adding video track")
     video_result = add_video_impl(
         video_url=video_url,
         width=1920,
         height=1080,
         start=0,
-        end=5.0, # 截取视频前5秒
+        end=5.0, # Trim first 5 seconds of video
         target_start=0,
         track_name="main_video_track",
-        transition="动漫漩涡",
+        transition="Dissolve",
         transition_duration=1.0
     )
-    print(f"视频轨道添加结果: {video_result}")
+    print(f"Video track adding result: {video_result}")
 
-    print("\n测试：添加视频轨道")
+    print("\nTest: Adding video track")
     video_result = add_video_impl(
         video_url=video_url,
         draft_id=video_result['output']['draft_id'],
         width=1920,
         height=1080,
         start=0,
-        end=5.0, # 截取视频前5秒
+        end=5.0, # Trim first 5 seconds of video
         target_start=5.0,
         track_name="main_video_track"
     )
-    print(f"视频轨道添加结果: {video_result}")
+    print(f"Video track adding result: {video_result}")
 
     if video_result and 'output' in video_result and 'draft_id' in video_result['output']:
         draft_id = video_result['output']['draft_id']
-        print(f"保存草稿: {save_draft_impl(draft_id, draft_folder)}")
+        print(f"Saving draft: {save_draft_impl(draft_id, draft_folder)}")
     else:
-        print("无法获取草稿ID，跳过保存操作。")
+        print("Unable to get draft ID, skipping save operation.")
 
 def test_generate_image01():
-    """测试添加图片"""
+    """Test adding image"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加图片1")
+    print("\nTest: Adding image 1")
     image_result = generate_image_impl(
         prompt="An Asian style doodle person floating in rough sea waves labeled 'Job Market', throwing paper boats made of resumes that are sinking, with a bank account notification bubble showing low balance. Atmosphere: Lost, anxious, turbulent. Art style: Minimalist line art, black and white cartoon style, bold outlines, extremely thick lines, expressive emotions, simple doodle, monochromatic. Composition: Wide angle showing person in center of chaotic elements. Lighting: Harsh contrast.",
         width=1024,
@@ -1856,10 +1854,10 @@ def test_generate_image01():
         transform_x=0,
         track_name="main"
     )
-    print(f"生成图片成功！{image_result['output']['draft_id']}")
+    print(f"Image generated successfully! {image_result['output']['draft_id']}")
     print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
 
-def generate_speech_impl(texts, draft_id=None, audio_track_name=None, language="中文", 
+def generate_speech_impl(texts, draft_id=None, audio_track_name=None, language="Chinese", 
                         speaker_id="爽快思思/Skye",azure_speaker_id=None, speed_ratio=1.0, start_offset=0.0,
                         end_padding=0.0, interval_time=0.5, volume=1.0, width=1080, height=1920,
                         add_subtitle=True, text_track_name=None, font="文轩体", 
@@ -1869,9 +1867,9 @@ def generate_speech_impl(texts, draft_id=None, audio_track_name=None, language="
                         background_alpha=0.0, bubble_effect_id=None, bubble_resource_id=None,
                         effect_effect_id=None, intro_animation=None, intro_duration=0.5,
                         outro_animation=None, outro_duration=0.5):
-    """生成TTS语音并添加到草稿中的API调用"""
+    """Generate TTS speech and add to draft API call"""
     data = {
-        "license_key": LICENSE_KEY,  # 使用体验版license key
+        "license_key": LICENSE_KEY,  # Using trial version license key
         "texts": texts,
         "audio_track_name": audio_track_name,
         "language": language,
@@ -1914,12 +1912,12 @@ def generate_speech_impl(texts, draft_id=None, audio_track_name=None, language="
     return make_request("generate_speech", data)
 
 def test_generate_image02():
-    """测试添加图片"""
+    """Test adding image"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：添加图片1")
+    print("\nTest: Adding image 1")
     image_result = generate_image_impl(
-        prompt="一只猫咪在花园里",
+        prompt="A cat in the garden",
         width=1024,
         height=1024,
         start=0,
@@ -1930,9 +1928,9 @@ def test_generate_image02():
         transform_x=0,
         track_name="main"
     )
-    print("\n测试：添加图片2")
+    print("\nTest: Adding image 2")
     image_result = generate_image_impl(
-        prompt="3只狗在雪地里跑",
+        prompt="3 dogs running in the snow",
         draft_id=image_result['output']['draft_id'],
         width=576,
         height=1024,
@@ -1944,18 +1942,18 @@ def test_generate_image02():
         transform_x=0,
         track_name="main"
     )
-    print(f"生成图片成功！{image_result['output']['draft_id']}")
+    print(f"Image generated successfully! {image_result['output']['draft_id']}")
     print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
 
-@timing_decorator('TTS语音生成')
+@timing_decorator('TTS Speech Generation')
 def test_speech_01():
-    """测试TTS语音生成和字幕添加"""
+    """Test TTS speech generation and subtitle addition"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
-    print("\n测试：生成TTS语音并添加字幕")
+    print("\nTest: Generate TTS speech and add subtitles")
     speech_result = generate_speech_impl(
-        texts=["大家好，欢迎来到我的视频", "今天我们要讲解一个有趣的话题","孩子不想要去上学该怎么办", "希望大家能够喜欢这个内容","大家好，欢迎来到我的视频", "今天我们要讲解一个有趣的话题","孩子不想要去上学该怎么办", "希望大家能够喜欢这个内容","大家好，欢迎来到我的视频", "今天我们要讲解一个有趣的话题","孩子不想要去上学该怎么办", "希望大家能够喜欢这个内容"],
-        language="中文",
+        texts=["Hello everyone, welcome to my video", "Today we will discuss an interesting topic","What to do when your child doesn't want to go to school", "Hope you enjoy this content","Hello everyone, welcome to my video", "Today we will discuss an interesting topic","What to do when your child doesn't want to go to school", "Hope you enjoy this content","Hello everyone, welcome to my video", "Today we will discuss an interesting topic","What to do when your child doesn't want to go to school", "Hope you enjoy this content"],
+        language="Chinese",
         draft_id="123",
         speaker_id="渊博小叔",
         azure_speaker_id="zh-CN-YunjianNeural",
@@ -1976,19 +1974,19 @@ def test_speech_01():
         border_color="#000000",
         border_alpha=0.8
     )
-    print(f"TTS语音生成结果: {speech_result}")
+    print(f"TTS speech generation result: {speech_result}")
     
     # if speech_result.get('success'):
-    #     # 保存草稿
+    #     # Save draft
     #     save_result = save_draft_impl(speech_result['output']['draft_id'], draft_folder)
-    #     print(f"保存草稿结果: {save_result}")
+    #     print(f"Draft saving result: {save_result}")
     # else:
-    #     print(f"TTS生成失败: {speech_result.get('error')}")
+    #     print(f"TTS generation failed: {speech_result.get('error')}")
 
 if __name__ == "__main__":
     # test01()
     # test02()
-    # test_effect_01()  # 运行特效测试
+    # test_effect_01()  # Run effect test
     # test_audio01()
     # test_audio02()
     # test_audio03()
