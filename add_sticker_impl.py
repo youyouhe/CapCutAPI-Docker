@@ -24,44 +24,44 @@ def add_sticker_impl(
     height: int = 1920
 ) -> Dict[str, str]:
     """
-    向指定草稿添加贴纸
-    :param resource_id: 贴纸资源ID
-    :param start: 开始时间（秒）
-    :param end: 结束时间（秒）
-    :param draft_id: 草稿ID（可选，默认None则创建新草稿）
-    :param transform_y: Y轴位置（默认0，屏幕中间）
-    :param transform_x: X轴位置（默认0，屏幕中间）
-    :param alpha: 图像不透明度，范围0-1（默认1.0，完全不透明）
-    :param flip_horizontal: 是否水平翻转（默认False）
-    :param flip_vertical: 是否垂直翻转（默认False）
-    :param rotation: 顺时针旋转的角度，可正可负（默认0.0）
-    :param scale_x: 水平缩放比例（默认1.0）
-    :param scale_y: 垂直缩放比例（默认1.0）
-    :param track_name: 轨道名称
-    :param relative_index: 相对（同类型轨道的）图层位置，越高越接近前景（默认0）
-    :param width: 视频宽度，默认1080
-    :param height: 视频高度，默认1920
-    :return: 更新后的草稿信息
+    Add sticker to specified draft
+    :param resource_id: Sticker resource ID
+    :param start: Start time (seconds)
+    :param end: End time (seconds)
+    :param draft_id: Draft ID (optional, default None creates a new draft)
+    :param transform_y: Y-axis position (default 0, screen center)
+    :param transform_x: X-axis position (default 0, screen center)
+    :param alpha: Image opacity, range 0-1 (default 1.0, completely opaque)
+    :param flip_horizontal: Whether to flip horizontally (default False)
+    :param flip_vertical: Whether to flip vertically (default False)
+    :param rotation: Clockwise rotation angle, can be positive or negative (default 0.0)
+    :param scale_x: Horizontal scale ratio (default 1.0)
+    :param scale_y: Vertical scale ratio (default 1.0)
+    :param track_name: Track name
+    :param relative_index: Relative layer position (of the same track type), higher is closer to foreground (default 0)
+    :param width: Video width, default 1080
+    :param height: Video height, default 1920
+    :return: Updated draft information
     """
-    # 获取或创建草稿
+    # Get or create draft
     draft_id, script = get_or_create_draft(
         draft_id=draft_id,
         width=width,
         height=height
     )
 
-    # 添加贴纸轨道
+    # Add sticker track
     if track_name is not None:
         try:
             imported_track = script.get_imported_track(draft.Track_type.sticker, name=track_name)
-            # 如果没有抛出异常，说明轨道已存在
+            # If no exception is thrown, the track already exists
         except exceptions.TrackNotFound:
-            # 轨道不存在，创建新轨道
+            # Track doesn't exist, create a new track
             script.add_track(draft.Track_type.sticker, track_name=track_name, relative_index=relative_index)
     else:
         script.add_track(draft.Track_type.sticker, relative_index=relative_index)
     
-    # 创建贴纸片段
+    # Create sticker segment
     sticker_segment = draft.Sticker_segment(
         resource_id,
         trange(f"{start}s", f"{end-start}s"),
@@ -77,7 +77,7 @@ def add_sticker_impl(
         )
     )
 
-    # 添加贴纸片段到轨道
+    # Add sticker segment to track
     script.add_segment(sticker_segment, track_name=track_name)
 
     return {
