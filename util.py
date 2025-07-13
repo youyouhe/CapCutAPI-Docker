@@ -8,69 +8,69 @@ import time
 from settings.local import DRAFT_DOMAIN, PREVIEW_ROUTER
 
 def hex_to_rgb(hex_color: str) -> tuple:
-    """将十六进制颜色代码转换为 RGB 元组（范围 0.0-1.0）"""
+    """Convert hexadecimal color code to RGB tuple (range 0.0-1.0)"""
     hex_color = hex_color.lstrip('#')
     if len(hex_color) == 3:
-        hex_color = ''.join([c*2 for c in hex_color])  # 处理简写形式（如 #fff）
+        hex_color = ''.join([c*2 for c in hex_color])  # Handle shorthand form (e.g. #fff)
     try:
         r = int(hex_color[0:2], 16) / 255.0
         g = int(hex_color[2:4], 16) / 255.0
         b = int(hex_color[4:6], 16) / 255.0
         return (r, g, b)
     except ValueError:
-        raise ValueError(f"无效的十六进制颜色代码: {hex_color}")
+        raise ValueError(f"Invalid hexadecimal color code: {hex_color}")
 
 
 def is_windows_path(path):
-    """检测路径是否是Windows风格"""
-    # 检查是否以驱动器号开头 (如 C:\) 或包含Windows风格的分隔符
+    """Detect if the path is Windows style"""
+    # Check if it starts with a drive letter (e.g. C:\) or contains Windows style separators
     return re.match(r'^[a-zA-Z]:\\|\\\\', path) is not None
 
 
 def zip_draft(draft_name):
-    # 压缩文件夹
+    # Compress folder
     zip_path = f"./tmp/zip/{draft_name}.zip"
     shutil.make_archive(f"./tmp/zip/{draft_name}", 'zip', draft_name)
     return zip_path
 
 def url_to_hash(url, length=16):
     """
-    将 URL 转换为固定长度的哈希字符串（不含扩展名）
+    Convert URL to a fixed-length hash string (without extension)
     
-    参数:
-    - url: 原始 URL 字符串
-    - length: 哈希字符串的长度（最大64，默认16）
+    Parameters:
+    - url: Original URL string
+    - length: Length of the hash string (maximum 64, default 16)
     
-    返回:
-    - 哈希字符串（如：3a7f9e7d9a1b4e2d）
+    Returns:
+    - Hash string (e.g.: 3a7f9e7d9a1b4e2d)
     """
-    # 确保 URL 是字节类型
+    # Ensure URL is bytes type
     url_bytes = url.encode('utf-8')
     
-    # 使用 SHA-256 生成哈希（安全且唯一性强）
+    # Use SHA-256 to generate hash (secure and highly unique)
     hash_object = hashlib.sha256(url_bytes)
     
-    # 截取指定长度的十六进制字符串
+    # Truncate to specified length of hexadecimal string
     return hash_object.hexdigest()[:length]
 
 
 def timing_decorator(func_name):
-    """装饰器：用于监控函数执行时间"""
+    """Decorator: Used to monitor function execution time"""
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             start_time = time.time()
-            print(f"[{func_name}] 开始执行...")
+            print(f"[{func_name}] Starting execution...")
             try:
                 result = func(*args, **kwargs)
                 end_time = time.time()
                 duration = end_time - start_time
-                print(f"[{func_name}] 执行完成，耗时: {duration:.3f}秒")
+                print(f"[{func_name}] Execution completed, time taken: {duration:.3f} seconds")
                 return result
             except Exception as e:
                 end_time = time.time()
                 duration = end_time - start_time
-                print(f"[{func_name}] 执行失败，耗时: {duration:.3f}秒，错误: {e}")
+                print(f"[{func_name}] Execution failed, time taken: {duration:.3f} seconds, error: {e}")
                 raise
         return wrapper
     return decorator
