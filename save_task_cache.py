@@ -2,77 +2,77 @@ from collections import OrderedDict
 import threading
 from typing import Dict, Any
 
-# 使用OrderedDict实现LRU缓存，限制最大数量为1000
-DRAFT_TASKS: Dict[str, dict] = OrderedDict()  # 使用 Dict 进行类型提示
+# Using OrderedDict to implement LRU cache, limiting the maximum number to 1000
+DRAFT_TASKS: Dict[str, dict] = OrderedDict()  # Using Dict for type hinting
 MAX_TASKS_CACHE_SIZE = 1000
 
 
 def update_tasks_cache(task_id: str, task_status: dict) -> None:
-    """更新任务状态LRU缓存
+    """Update task status LRU cache
     
-    :param task_id: 任务ID
-    :param task_status: 任务状态信息字典
+    :param task_id: Task ID
+    :param task_status: Task status information dictionary
     """
 
     if task_id in DRAFT_TASKS:
-        # 如果键存在，删除旧的项
+        # If the key exists, delete the old item
         DRAFT_TASKS.pop(task_id)
     elif len(DRAFT_TASKS) >= MAX_TASKS_CACHE_SIZE:
-        # 如果缓存已满，删除最久未使用的项（第一个项）
+        # If the cache is full, delete the least recently used item (the first item)
         DRAFT_TASKS.popitem(last=False)
-    # 添加新项到末尾（最近使用）
+    # Add new item to the end (most recently used)
     DRAFT_TASKS[task_id] = task_status
 
 def update_task_field(task_id: str, field: str, value: Any) -> None:
-    """更新任务状态中的单个字段
+    """Update a single field in the task status
     
-    :param task_id: 任务ID
-    :param field: 要更新的字段名
-    :param value: 字段的新值
+    :param task_id: Task ID
+    :param field: Field name to update
+    :param value: New value for the field
     """
     if task_id in DRAFT_TASKS:
-        # 复制当前状态，修改指定字段，然后更新缓存
+        # Copy the current status, modify the specified field, then update the cache
         task_status = DRAFT_TASKS[task_id].copy()
         task_status[field] = value
-        # 删除旧项并添加更新后的项
+        # Delete the old item and add the updated item
         DRAFT_TASKS.pop(task_id)
         DRAFT_TASKS[task_id] = task_status
     else:
-        # 如果任务不存在，创建一个默认状态并设置指定字段
+        # If the task doesn't exist, create a default status and set the specified field
         task_status = {
             "status": "initialized",
-            "message": "任务已初始化",
+            "message": "Task initialized",
             "progress": 0,
             "completed_files": 0,
             "total_files": 0,
             "draft_url": ""
         }
         task_status[field] = value
-        # 如果缓存已满，删除最久未使用的项
+        # If the cache is full, delete the least recently used item
         if len(DRAFT_TASKS) >= MAX_TASKS_CACHE_SIZE:
             DRAFT_TASKS.popitem(last=False)
-        # 添加新项
+        # Add new item
         DRAFT_TASKS[task_id] = task_status
 
 def update_task_fields(task_id: str, **fields) -> None:
-    """更新任务状态中的多个字段
+    """Update multiple fields in the task status
     
-    :param task_id: 任务ID
-    :param fields: 要更新的字段及其值，以关键字参数形式提供
+    :param task_id: Task ID
+    :param fields: Fields to update and their values, provided as keyword arguments
     """
     if task_id in DRAFT_TASKS:
-        # 复制当前状态，修改指定字段，然后更新缓存
+        # Copy the current status, modify the specified fields, then update the cache
         task_status = DRAFT_TASKS[task_id].copy()
         for field, value in fields.items():
             task_status[field] = value
-        # 删除旧项并添加更新后的项
+        # Delete the old item and add the updated item
         DRAFT_TASKS.pop(task_id)
         DRAFT_TASKS[task_id] = task_status
     else:
-        # 如果任务不存在，创建一个默认状态并设置指定字段
+        # If the task doesn't exist, create a default status and set the specified fields
         task_status = {
             "status": "initialized",
-            "message": "任务已初始化",
+            "message": "Task initialized",
             "progress": 0,
             "completed_files": 0,
             "total_files": 0,
@@ -80,60 +80,60 @@ def update_task_fields(task_id: str, **fields) -> None:
         }
         for field, value in fields.items():
             task_status[field] = value
-        # 如果缓存已满，删除最久未使用的项
+        # If the cache is full, delete the least recently used item
         if len(DRAFT_TASKS) >= MAX_TASKS_CACHE_SIZE:
             DRAFT_TASKS.popitem(last=False)
-        # 添加新项
+        # Add new item
         DRAFT_TASKS[task_id] = task_status
 
 def increment_task_field(task_id: str, field: str, increment: int = 1) -> None:
-    """增加任务状态中的数值字段
+    """Increment a numeric field in the task status
     
-    :param task_id: 任务ID
-    :param field: 要增加的字段名
-    :param increment: 增加的值，默认为1
+    :param task_id: Task ID
+    :param field: Field name to increment
+    :param increment: Value to increment by, default is 1
     """
     if task_id in DRAFT_TASKS:
-        # 复制当前状态，增加指定字段，然后更新缓存
+        # Copy the current status, increment the specified field, then update the cache
         task_status = DRAFT_TASKS[task_id].copy()
         if field in task_status and isinstance(task_status[field], (int, float)):
             task_status[field] += increment
         else:
             task_status[field] = increment
-        # 删除旧项并添加更新后的项
+        # Delete the old item and add the updated item
         DRAFT_TASKS.pop(task_id)
         DRAFT_TASKS[task_id] = task_status
 
 def get_task_status(task_id: str) -> dict:
-    """获取任务状态
+    """Get task status
     
-    :param task_id: 任务ID
-    :return: 任务状态信息字典
+    :param task_id: Task ID
+    :return: Task status information dictionary
     """
     task_status = DRAFT_TASKS.get(task_id, {
         "status": "not_found",
-        "message": "任务不存在",
+        "message": "Task does not exist",
         "progress": 0,
         "completed_files": 0,
         "total_files": 0,
         "draft_url": ""
     })
     
-    # 如果找到了任务，更新其在LRU缓存中的位置
+    # If the task is found, update its position in the LRU cache
     if task_id in DRAFT_TASKS:
-        # 先删除，再添加到末尾，实现LRU更新
+        # First delete, then add to the end, implementing LRU update
         update_tasks_cache(task_id, task_status)
         
     return task_status
 
 def create_task(task_id: str) -> None:
-    """创建新任务并初始化状态
+    """Create a new task and initialize its status
     
-    :param task_id: 任务ID
+    :param task_id: Task ID
     """
     task_status = {
         "status": "initialized",
-        "message": "任务已初始化",
+        "message": "Task initialized",
         "progress": 0,
         "completed_files": 0,
         "total_files": 0,
