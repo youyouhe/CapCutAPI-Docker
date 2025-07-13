@@ -6,7 +6,7 @@ from util import generate_draft_url
 from settings import IS_CAPCUT_ENV
 
 def add_effect_impl(
-    effect_type: str,  # 修改为字符串类型
+    effect_type: str,  # Changed to string type
     start: float = 0,
     end: float = 3.0,
     draft_id: Optional[str] = None,
@@ -16,36 +16,36 @@ def add_effect_impl(
     height: int = 1920
 ) -> Dict[str, str]:
     """
-    向指定草稿添加特效
-    :param effect_type: 特效类型名称，将从Video_scene_effect_type或Video_character_effect_type中匹配
-    :param start: 开始时间（秒），默认0
-    :param end: 结束时间（秒），默认3秒
-    :param draft_id: 草稿ID，如果为None或找不到对应的zip文件，则创建新草稿
-    :param track_name: 轨道名称，当特效轨道仅有一条时可省略
-    :param params: 特效参数列表，参数列表中未提供或为None的项使用默认值
-    :param width: 视频宽度，默认1080
-    :param height: 视频高度，默认1920
-    :return: 更新后的草稿信息
+    Add an effect to the specified draft
+    :param effect_type: Effect type name, will be matched from Video_scene_effect_type or Video_character_effect_type
+    :param start: Start time (seconds), default 0
+    :param end: End time (seconds), default 3 seconds
+    :param draft_id: Draft ID, if None or corresponding zip file not found, a new draft will be created
+    :param track_name: Track name, can be omitted when there is only one effect track
+    :param params: Effect parameter list, items not provided or None in the parameter list will use default values
+    :param width: Video width, default 1080
+    :param height: Video height, default 1920
+    :return: Updated draft information
     """
-    # 获取或创建草稿
+    # Get or create draft
     draft_id, script = get_or_create_draft(
         draft_id=draft_id,
         width=width,
         height=height
     )
 
-    # 计算时间范围
+    # Calculate time range
     duration = end - start
     t_range = trange(f"{start}s", f"{duration}s")
 
-    # 动态获取特效类型对象
+    # Dynamically get effect type object
     if IS_CAPCUT_ENV:
-        # 如果是CapCut环境，使用CapCut特效
+        # If in CapCut environment, use CapCut effects
         effect_enum = CapCut_Video_scene_effect_type[effect_type]
         if effect_enum is None:
             effect_enum = CapCut_Video_character_effect_type[effect_type]
     else:
-        # 默认使用剪映特效
+        # Default to using JianYing effects
         effect_enum = Video_scene_effect_type[effect_type]
         if effect_enum is None:
             effect_enum = Video_character_effect_type[effect_type]
@@ -53,18 +53,18 @@ def add_effect_impl(
     if effect_enum is None:
         raise ValueError(f"Unknown effect type: {effect_type}")
 
-    # 添加特效轨道（仅当轨道不存在时）
+    # Add effect track (only when track doesn't exist)
     if track_name is not None:
         try:
             imported_track=script.get_imported_track(draft.Track_type.effect, name=track_name)
-            # 如果没有抛出异常，说明轨道已存在
+            # If no exception is thrown, the track already exists
         except exceptions.TrackNotFound:
-            # 轨道不存在，创建新轨道
+            # Track doesn't exist, create a new track
             script.add_track(draft.Track_type.effect, track_name=track_name)
     else:
         script.add_track(draft.Track_type.effect)
 
-    # 添加特效
+    # Add effect
     script.add_effect(effect_enum, t_range, params=params[::-1], track_name=track_name)
 
     return {

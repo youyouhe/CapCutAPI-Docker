@@ -22,130 +22,130 @@ def add_audio_track(
     sound_effects: Optional[List[Tuple[str, Optional[List[Optional[float]]]]]]=None,
     width: int = 1080,
     height: int = 1920,
-    duration: Optional[float] = None  # 新增 duration 参数
+    duration: Optional[float] = None  # Added duration parameter
 ) -> Dict[str, str]:
     """
-    向指定草稿添加音频轨道
-    :param draft_folder: 草稿文件夹路径，可选参数
-    :param audio_url: 音频URL
-    :param start: 开始时间（秒），默认0
-    :param end: 结束时间（秒），默认None（使用音频总时长）
-    :param target_start: 目标轨道的插入位置（秒），默认0
-    :param draft_id: 草稿ID，如果为None或找不到对应的zip文件，则创建新草稿
-    :param volume: 音量大小，范围0.0-1.0，默认1.0
-    :param track_name: 轨道名称，默认"audio_main"
-    :param speed: 播放速度，默认1.0
-    :param sound_effects: 场景音效果列表，每个元素是一个元组，包含效果类型名称和参数列表，默认None
-    :return: 更新后的草稿信息
+    Add an audio track to the specified draft
+    :param draft_folder: Draft folder path, optional parameter
+    :param audio_url: Audio URL
+    :param start: Start time (seconds), default 0
+    :param end: End time (seconds), default None (use total audio duration)
+    :param target_start: Target track insertion position (seconds), default 0
+    :param draft_id: Draft ID, if None or corresponding zip file not found, a new draft will be created
+    :param volume: Volume level, range 0.0-1.0, default 1.0
+    :param track_name: Track name, default "audio_main"
+    :param speed: Playback speed, default 1.0
+    :param sound_effects: Scene sound effect list, each element is a tuple containing effect type name and parameter list, default None
+    :return: Updated draft information
     """
-    # 获取或创建草稿
+    # Get or create draft
     draft_id, script = get_or_create_draft(
         draft_id=draft_id,
         width=width,
         height=height
     )
     
-    # 添加音频轨道（仅当轨道不存在时）
+    # Add audio track (only when track doesn't exist)
     if track_name is not None:
         try:
             imported_track = script.get_imported_track(draft.Track_type.audio, name=track_name)
-            # 如果没有抛出异常，说明轨道已存在
+            # If no exception is thrown, the track already exists
         except exceptions.TrackNotFound:
-            # 轨道不存在，创建新轨道
+            # Track doesn't exist, create a new track
             script.add_track(draft.Track_type.audio, track_name=track_name)
     else:
        script.add_track(draft.Track_type.audio)
 
-    # 如果传递了 duration 参数，优先使用它；否则使用默认音频时长0秒，在下载时，才会获取真实时长
+    # If duration parameter is provided, prioritize it; otherwise use default audio duration of 0 seconds, real duration will be obtained during download
     if duration is not None:
-        # 使用传递进来的 duration，跳过时长获取和检查
+        # Use the provided duration, skip duration retrieval and checking
         audio_duration = duration
     else:
-        # 使用默认音频时长0秒，在下载草稿时，才会获取真实时长
-        audio_duration = 0.0  # 默认音频时长为0秒
-        # duration_result = get_video_duration(audio_url)  # 复用视频时长获取函数
+        # Use default audio duration of 0 seconds, real duration will be obtained when downloading the draft
+        audio_duration = 0.0  # Default audio duration is 0 seconds
+        # duration_result = get_video_duration(audio_url)  # Reuse video duration retrieval function
         # if not duration_result["success"]:
-        #     print(f"获取音频时长失败: {duration_result['error']}")
+        #     print(f"Failed to get audio duration: {duration_result['error']}")
         
-        # # 检查音频时长是否超过10分钟
-        # if duration_result["output"] > 600:  # 600秒 = 10分钟
-        #     raise Exception(f"音频时长超过10分钟限制，当前时长: {duration_result['output']}秒")
+        # # Check if audio duration exceeds 10 minutes
+        # if duration_result["output"] > 600:  # 600 seconds = 10 minutes
+        #     raise Exception(f"Audio duration exceeds 10-minute limit, current duration: {duration_result['output']} seconds")
         
         # audio_duration = duration_result["output"]
     
-    # 下载音频到本地
+    # Download audio to local
     # local_audio_path = download_audio(audio_url, draft_dir)
 
-    material_name = f"audio_{url_to_hash(audio_url)}.mp3"  # 使用原始文件名+时间戳+固定mp3扩展名
+    material_name = f"audio_{url_to_hash(audio_url)}.mp3"  # Use original filename + timestamp + fixed mp3 extension
     
-    # 构建draft_audio_path
+    # Build draft_audio_path
     draft_audio_path = None
     if draft_folder:
         if is_windows_path(draft_folder):
-            # Windows路径处理
+            # Windows path processing
             windows_drive, windows_path = re.match(r'([a-zA-Z]:)(.*)', draft_folder).groups()
             parts = [p for p in windows_path.split('\\') if p]
             draft_audio_path = os.path.join(windows_drive, *parts, draft_id, "assets", "audio", material_name)
-            # 规范化路径（确保分隔符一致）
+            # Normalize path (ensure consistent separators)
             draft_audio_path = draft_audio_path.replace('/', '\\')
         else:
-            # macOS/Linux路径处理
+            # macOS/Linux path processing
             draft_audio_path = os.path.join(draft_folder, draft_id, "assets", "audio", material_name)
     
-    # 设置音频结束时间的默认值
+    # Set default value for audio end time
     audio_end = end if end is not None else audio_duration
     
-    # 计算音频时长
+    # Calculate audio duration
     duration = audio_end - start
     
-    # 创建音频片段
+    # Create audio segment
     if draft_audio_path:
         print('replace_path:', draft_audio_path)
         audio_material = draft.Audio_material(replace_path=draft_audio_path, remote_url=audio_url, material_name=material_name, duration=audio_duration)
     else:
         audio_material = draft.Audio_material(remote_url=audio_url, material_name=material_name, duration=audio_duration)
     audio_segment = draft.Audio_segment(
-        audio_material,  # 传入素材对象
-        target_timerange=trange(f"{target_start}s", f"{duration}s"),  # 使用target_start和duration
+        audio_material,  # Pass material object
+        target_timerange=trange(f"{target_start}s", f"{duration}s"),  # Use target_start and duration
         source_timerange=trange(f"{start}s", f"{duration}s"),
-        speed=speed,  # 设置播放速度
-        volume=volume  # 设置音量
+        speed=speed,  # Set playback speed
+        volume=volume  # Set volume
     )
     
-    # 添加场景音效果
+    # Add scene sound effects
     if sound_effects:
         for effect_name, params in sound_effects:
-            # 根据IS_CAPCUT_ENV选择不同的效果类型
+            # Choose different effect types based on IS_CAPCUT_ENV
             effect_type = None
             
             if IS_CAPCUT_ENV:
-                # CapCut环境下，查找CapCut_Voice_filters_effect_type中的效果
+                # In CapCut environment, look for effects in CapCut_Voice_filters_effect_type
                 effect_type = getattr(CapCut_Voice_filters_effect_type, effect_name)
-                # 如果在Voice_filters中没找到，可以继续在其他CapCut效果类型中查找
+                # If not found in Voice_filters, continue searching in other CapCut effect types
                 if effect_type is None:
-                    # 查找CapCut_Voice_characters_effect_type中的效果
+                    # Look for effects in CapCut_Voice_characters_effect_type
                     effect_type = getattr(CapCut_Voice_characters_effect_type, effect_name)
-                # 如果仍未找到，查找CapCut_Speech_to_song_effect_type中的效果
+                # If still not found, look for effects in CapCut_Speech_to_song_effect_type
                 if effect_type is None:
                     effect_type = getattr(CapCut_Speech_to_song_effect_type, effect_name)
             else:
-                # 剪映环境下，查找Audio_scene_effect_type中的效果
+                # In JianYing environment, look for effects in Audio_scene_effect_type
                 effect_type = getattr(Audio_scene_effect_type, effect_name)
-                # 如果在Audio_scene_effect_type中没找到，可以继续在其他效果类型中查找
+                # If not found in Audio_scene_effect_type, continue searching in other effect types
                 if effect_type is None:
                     effect_type = getattr(Tone_effect_type, effect_name)
-                # 如果仍未找到，查找Speech_to_song_type中的效果
+                # If still not found, look for effects in Speech_to_song_type
                 if effect_type is None:
                     effect_type = getattr(Speech_to_song_type, effect_name)
-                # 这里可以根据需要添加其他效果类型的查找逻辑
+                # Additional effect type lookup logic can be added here as needed
             
-            # 如果找到了对应的效果类型，则添加到音频片段
+            # If corresponding effect type is found, add it to the audio segment
             if effect_type:
                 audio_segment.add_effect(effect_type, params)
             else:
-                print(f"警告: 未找到名为 {effect_name} 的音频效果")
+                print(f"Warning: Audio effect named {effect_name} not found")
     
-    # 添加音频片段到轨道
+    # Add audio segment to track
     script.add_segment(audio_segment, track_name=track_name)
     
     return {
