@@ -510,6 +510,12 @@ class Script_file:
             lines = srt_content.splitlines()
 
         def __add_text_segment(text: str, t_range: Timerange) -> None:
+            fixed_width = -1
+            if self.width < self.height:  # 竖屏
+                fixed_width = int(1080 * 0.6)
+            else:  # 横屏
+                fixed_width = int(1920 * 0.7)
+            
             if style_reference:
                 seg = Text_segment.create_from_template(text, t_range, style_reference)
                 if clip_settings is not None:
@@ -523,9 +529,12 @@ class Script_file:
                     seg.bubble = deepcopy(bubble)
                 if effect:
                     seg.effect = deepcopy(effect)
+                # 设置固定宽高
+                seg.fixed_width = fixed_width
             else:
                 seg = Text_segment(text, t_range, style=text_style, clip_settings=clip_settings,
-                                  border=border, background=background)
+                                  border=border, background=background,
+                                  fixed_width=fixed_width)
                 # 添加气泡和花字效果
                 if bubble:
                     seg.bubble = deepcopy(bubble)

@@ -4,6 +4,7 @@ from create_draft import get_or_create_draft
 from pyJianYingDraft.text_segment import TextBubble, TextEffect
 from typing import Optional
 import requests
+import os
 
 def add_subtitle_impl(
     srt_path: str,
@@ -76,8 +77,14 @@ def add_subtitle_impl(
             srt_content = response.text
         except Exception as e:
             raise Exception(f"Failed to download subtitle file: {str(e)}")
+    elif os.path.isfile(srt_path):  # Check if it's a file
+        try:
+            with open(srt_path, 'r', encoding='utf-8') as f:
+                srt_content = f.read()
+        except Exception as e:
+            raise Exception(f"Failed to read local subtitle file: {str(e)}")
     else:
-        # If not a URL, use content directly
+        # If not a URL or local file, use content directly
         srt_content = srt_path
         # Handle possible escape characters
         srt_content = srt_content.replace('\\n', '\n').replace('/n', '\n')

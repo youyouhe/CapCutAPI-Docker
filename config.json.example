@@ -1,20 +1,15 @@
 {
-  // Whether it is CapCut international version, default is true
   "is_capcut_env": true,
-  // API route
   "draft_domain": "https://www.install-ai-guider.top",
-  // Preview route
+  "port": 9001,
   "preview_router": "/draft/downloader",
-  // Whether to upload draft files
   "is_upload_draft": false,
-  // Configuration for uploading draft files to Alibaba Cloud OSS
   "oss_config": {
     "bucket_name": "your-bucket-name",
     "access_key_id": "your-access-key-id",
     "access_key_secret": "your-access-key-secret",
     "endpoint": "https://your-endpoint.aliyuncs.com"
   },
-  // Configuration for uploading rendered MP4 files to Alibaba Cloud OSS
   "mp4_oss_config": {
     "bucket_name": "your-mp4-bucket-name",
     "access_key_id": "your-access-key-id",

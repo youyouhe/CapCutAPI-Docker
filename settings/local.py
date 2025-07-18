@@ -20,6 +20,12 @@ PREVIEW_ROUTER = "/draft/downloader"
 # 是否上传草稿文件
 IS_UPLOAD_DRAFT = False
 
+# 端口号
+PORT = 9000
+
+OSS_CONFIG = []
+MP4_OSS_CONFIG=[]
+
 # 尝试加载本地配置文件
 if os.path.exists(CONFIG_FILE_PATH):
     try:
@@ -33,6 +39,10 @@ if os.path.exists(CONFIG_FILE_PATH):
             # 更新域名配置
             if "draft_domain" in local_config:
                 DRAFT_DOMAIN = local_config["draft_domain"]
+
+            # 更新端口号配置
+            if "port" in local_config:
+                PORT = local_config["port"]
 
             # 更新预览路由
             if "preview_router" in local_config:

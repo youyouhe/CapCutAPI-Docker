@@ -89,7 +89,8 @@ def save_draft_background(draft_id, draft_folder, task_id):
 
         logger.info(f"Starting to save draft: {draft_id}")
         # Save draft
-        draft_folder_for_duplicate = draft.Draft_folder("./")
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        draft_folder_for_duplicate = draft.Draft_folder(current_dir)
         # Choose different template directory based on configuration
         template_dir = "template" if IS_CAPCUT_ENV else "template_jianying"
         draft_folder_for_duplicate.duplicate_as_template(template_dir, draft_id)
@@ -108,6 +109,9 @@ def save_draft_background(draft_id, draft_folder, task_id):
             for audio in audios:
                 remote_url = audio.remote_url
                 material_name = audio.material_name
+                # Use helper function to build path
+                if draft_folder:
+                    audio.replace_path = build_asset_path(draft_folder, draft_id, "audio", material_name)
                 if not remote_url:
                     logger.warning(f"Audio file {material_name} has no remote_url, skipping download.")
                     continue
@@ -116,7 +120,7 @@ def save_draft_background(draft_id, draft_folder, task_id):
                 download_tasks.append({
                     'type': 'audio',
                     'func': download_file,
-                    'args': (remote_url, f"{draft_id}/assets/audio/{material_name}"),
+                    'args': (remote_url, os.path.join(current_dir, f"{draft_id}/assets/audio/{material_name}")),
                     'material': audio
                 })
         
@@ -139,7 +143,7 @@ def save_draft_background(draft_id, draft_folder, task_id):
                     download_tasks.append({
                         'type': 'image',
                         'func': download_file,
-                        'args': (remote_url, f"{draft_id}/assets/image/{material_name}"),
+                        'args': (remote_url, os.path.join(current_dir, f"{draft_id}/assets/image/{material_name}")),
                         'material': video
                     })
                 
@@ -155,7 +159,7 @@ def save_draft_background(draft_id, draft_folder, task_id):
                     download_tasks.append({
                         'type': 'video',
                         'func': download_file,
-                        'args': (remote_url, f"{draft_id}/assets/video/{material_name}"),
+                        'args': (remote_url, os.path.join(current_dir, f"{draft_id}/assets/video/{material_name}")),
                         'material': video
                     })
 
@@ -208,8 +212,8 @@ def save_draft_background(draft_id, draft_folder, task_id):
         update_task_field(task_id, "message", "Saving draft information")
         logger.info(f"Task {task_id} progress 70%: Saving draft information.")
         
-        script.dump(f"{draft_id}/draft_info.json")
-        logger.info(f"Draft information has been saved to {draft_id}/draft_info.json.")
+        script.dump(os.path.join(current_dir, f"{draft_id}/draft_info.json"))
+        logger.info(f"Draft information has been saved to {os.path.join(current_dir, draft_id)}/draft_info.json.")
 
         draft_url = ""
         # Only upload draft information when IS_UPLOAD_DRAFT is True
@@ -221,7 +225,7 @@ def save_draft_background(draft_id, draft_folder, task_id):
             
             # Compress the entire draft directory
             zip_path = zip_draft(draft_id)
-            logger.info(f"Draft directory {draft_id} has been compressed to {zip_path}.")
+            logger.info(f"Draft directory {os.path.join(current_dir, draft_id)} has been compressed to {zip_path}.")
             
             # Update task status - Start uploading to OSS
             update_task_field(task_id, "progress", 90)
@@ -234,9 +238,9 @@ def save_draft_background(draft_id, draft_folder, task_id):
             update_task_field(task_id, "draft_url", draft_url)
 
             # Clean up temporary files
-            if os.path.exists(draft_id):
-                shutil.rmtree(draft_id)
-                logger.info(f"Cleaned up temporary draft folder: {draft_id}")
+            if os.path.exists(os.path.join(current_dir, draft_id)):
+                shutil.rmtree(os.path.join(current_dir, draft_id))
+                logger.info(f"Cleaned up temporary draft folder: {os.path.join(current_dir, draft_id)}")
 
     
         # Update task status - Completed

@@ -2,6 +2,7 @@ import os
 import subprocess
 import time
 import requests
+import shutil
 from requests.exceptions import RequestException, Timeout
 from urllib.parse import urlparse, unquote
 
@@ -109,6 +110,27 @@ def download_audio(audio_url, draft_name, material_name):
         raise Exception(f"Failed to download audio:\n{e.stderr}")
 
 def download_file(url:str, local_filename, max_retries=3, timeout=180):
+    # 检查是否是本地文件路径
+    if os.path.exists(url) and os.path.isfile(url):
+        # 是本地文件，直接复制
+        directory = os.path.dirname(local_filename)
+        
+        # 创建目标目录（如果不存在）
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory, exist_ok=True)
+            print(f"Created directory: {directory}")
+        
+        print(f"Copying local file: {url} to {local_filename}")
+        start_time = time.time()
+        
+        # 复制文件
+        shutil.copy2(url, local_filename)
+        
+        print(f"Copy completed in {time.time()-start_time:.2f} seconds")
+        print(f"File saved as: {os.path.abspath(local_filename)}")
+        return True
+    
+    # 原有的下载逻辑
     # Extract directory part
     directory = os.path.dirname(local_filename)
 

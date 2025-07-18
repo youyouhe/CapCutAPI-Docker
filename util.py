@@ -2,6 +2,7 @@ import shutil
 import subprocess
 import json
 import re
+import os
 import hashlib
 import functools
 import time
@@ -27,10 +28,13 @@ def is_windows_path(path):
     return re.match(r'^[a-zA-Z]:\\|\\\\', path) is not None
 
 
-def zip_draft(draft_name):
+def zip_draft(draft_id):
+    current_dir = os.path.dirname(os.path.abspath(__file__))
     # Compress folder
-    zip_path = f"./tmp/zip/{draft_name}.zip"
-    shutil.make_archive(f"./tmp/zip/{draft_name}", 'zip', draft_name)
+    zip_dir = os.path.join(current_dir, "tmp/zip")
+    os.makedirs(zip_dir, exist_ok=True)
+    zip_path = os.path.join(zip_dir, f"{draft_id}.zip")
+    shutil.make_archive(os.path.join(zip_dir, draft_id), 'zip', os.path.join(current_dir, draft_id))
     return zip_path
 
 def url_to_hash(url, length=16):
