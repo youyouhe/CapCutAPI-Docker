@@ -6,6 +6,8 @@ from copy import deepcopy
 from typing import Optional, Literal, Union, overload
 from typing import Type, Dict, List, Any
 
+from core.capcut_api.pyJianYingDraft.metadata.font_meta import Font_type
+
 from . import util
 from . import exceptions
 from .template_mode import ImportedTrack, EditableTrack, ImportedMediaTrack, ImportedTextTrack, Shrink_mode, Extend_mode, import_track
@@ -466,6 +468,7 @@ class Script_file:
     def import_srt(self, srt_content: str, track_name: str, *,
                    time_offset: Union[str, float] = 0.0,
                    style_reference: Optional[Text_segment] = None,
+                   font: Optional[str] = None,
                    text_style: Text_style = Text_style(size=5, align=1),
                    clip_settings: Optional[Clip_settings] = Clip_settings(transform_y=-0.8),
                    border: Optional[Text_border] = None,
@@ -480,6 +483,7 @@ class Script_file:
             srt_content (`str`): SRT字幕内容或本地文件路径
             track_name (`str`): 导入到的文本轨道名称, 若不存在则自动创建
             style_reference (`Text_segment`, optional): 作为样式参考的文本片段, 若提供则使用其样式.
+            font (`Optional[str]`, optional): 字体, 默认为None.
             time_offset (`Union[str, float]`, optional): 字幕整体时间偏移, 单位为微秒, 默认为0.
             text_style (`Text_style`, optional): 字幕样式, 默认模仿剪映导入字幕时的样式, 会被`style_reference`覆盖.
             clip_settings (`Clip_settings`, optional): 图像调节设置, 默认模仿剪映导入字幕时的设置, 会覆盖`style_reference`的设置除非指定为`None`.
@@ -494,6 +498,13 @@ class Script_file:
         """
         if style_reference is None and clip_settings is None:
             raise ValueError("未提供样式参考时请提供`clip_settings`参数")
+
+        if font:
+            try:
+                font_type = getattr(Font_type, font)
+            except:
+                available_fonts = [attr for attr in dir(Font_type) if not attr.startswith('_')]
+                raise ValueError(f"Unsupported font: {font}, please use one of the fonts in Font_type: {available_fonts}")
 
         time_offset = tim(time_offset)
         # 检查 track_name 是否存在于 self.tracks 或 self.imported_tracks
@@ -531,9 +542,13 @@ class Script_file:
                     seg.effect = deepcopy(effect)
                 # 设置固定宽高
                 seg.fixed_width = fixed_width
+                # 设置字体
+                if font_type:
+                    seg.font = font_type.value
             else:
                 seg = Text_segment(text, t_range, style=text_style, clip_settings=clip_settings,
                                   border=border, background=background,
+                                  font = font_type,
                                   fixed_width=fixed_width)
                 # 添加气泡和花字效果
                 if bubble:

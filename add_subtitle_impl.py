@@ -12,6 +12,7 @@ def add_subtitle_impl(
     track_name: str = "subtitle",
     time_offset: float = 0,
     # Font style parameters
+    font: str = None,
     font_size: float = 8.0,
     bold: bool = False,
     italic: bool = False,
@@ -153,6 +154,7 @@ def add_subtitle_impl(
         track_name=track_name,
         time_offset=int(time_offset * 1000000),  # Convert seconds to microseconds
         text_style=text_style,
+        font=font,
         clip_settings=clip_settings,
         style_reference=style_reference,
         border=text_border,
