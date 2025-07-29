@@ -120,24 +120,32 @@ def add_audio_track(
             
             if IS_CAPCUT_ENV:
                 # In CapCut environment, look for effects in CapCut_Voice_filters_effect_type
-                effect_type = getattr(CapCut_Voice_filters_effect_type, effect_name)
-                # If not found in Voice_filters, continue searching in other CapCut effect types
-                if effect_type is None:
-                    # Look for effects in CapCut_Voice_characters_effect_type
-                    effect_type = getattr(CapCut_Voice_characters_effect_type, effect_name)
-                # If still not found, look for effects in CapCut_Speech_to_song_effect_type
-                if effect_type is None:
-                    effect_type = getattr(CapCut_Speech_to_song_effect_type, effect_name)
+                try:
+                    effect_type = getattr(CapCut_Voice_filters_effect_type, effect_name)
+                except AttributeError:
+                    try:
+                        # Look for effects in CapCut_Voice_characters_effect_type
+                        effect_type = getattr(CapCut_Voice_characters_effect_type, effect_name)
+                    except AttributeError:
+                        # If still not found, look for effects in CapCut_Speech_to_song_effect_type
+                        try:
+                            effect_type = getattr(CapCut_Speech_to_song_effect_type, effect_name)
+                        except AttributeError:
+                            effect_type = None
             else:
                 # In JianYing environment, look for effects in Audio_scene_effect_type
-                effect_type = getattr(Audio_scene_effect_type, effect_name)
-                # If not found in Audio_scene_effect_type, continue searching in other effect types
-                if effect_type is None:
-                    effect_type = getattr(Tone_effect_type, effect_name)
-                # If still not found, look for effects in Speech_to_song_type
-                if effect_type is None:
-                    effect_type = getattr(Speech_to_song_type, effect_name)
-                # Additional effect type lookup logic can be added here as needed
+                try:
+                    effect_type = getattr(Audio_scene_effect_type, effect_name)
+                except AttributeError:
+                    # If not found in Audio_scene_effect_type, continue searching in other effect types
+                    try:
+                        effect_type = getattr(Tone_effect_type, effect_name)
+                    except AttributeError:
+                        # If still not found, look for effects in Speech_to_song_type
+                        try:
+                            effect_type = getattr(Speech_to_song_type, effect_name)
+                        except AttributeError:
+                            effect_type = None
             
             # If corresponding effect type is found, add it to the audio segment
             if effect_type:
