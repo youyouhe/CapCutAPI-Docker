@@ -2,6 +2,8 @@
 
 轻量、灵活、易上手的剪映/CapCutAPI工具，构建全自动化视频剪辑/混剪流水线。
 
+直接体验：https://www.capcutapi.top
+
 ## 项目功能
 
 本项目是一个基于Python的剪映/CapCut处理工具，提供以下核心功能：
