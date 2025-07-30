@@ -38,7 +38,8 @@ def add_video_track(
     mask_invert: bool = False,  # Whether to invert mask
     mask_rect_width: Optional[float] = None,  # Rectangle mask width (only for rectangle mask)
     mask_round_corner: Optional[float] = None,  # Rectangle mask rounded corner (only for rectangle mask, 0-100)
-    volume: float = 1.0  # Volume level, default 1.0
+    volume: float = 1.0,  # Volume level, default 1.0
+    background_blur: Optional[int] = None  # Background blur level, optional values: 1 (light), 2 (medium), 3 (strong), 4 (maximum), default None (no background blur)
 ) -> Dict[str, str]:
     """
     Add video track to specified draft
@@ -70,6 +71,7 @@ def add_video_track(
     :param mask_rect_width: Rectangle mask width, only allowed when mask type is rectangle, represented as a proportion of material width
     :param mask_round_corner: Rectangle mask rounded corner parameter, only allowed when mask type is rectangle, range 0~100
     :param volume: Volume level, default 1.0 (0.0 is mute, 1.0 is original volume)
+    :param background_blur: Background blur level, optional values: 1 (light), 2 (medium), 3 (strong), 4 (maximum), default None (no background blur)
     :return: Updated draft information, including draft_id and draft_url
     """
     # Get or create draft
@@ -208,6 +210,23 @@ def add_video_track(
             )
         except:
             raise ValueError(f"Unsupported mask type {mask_type}, supported types include: linear, mirror, circle, rectangle, heart, star")
+    
+    # Add background blur effect
+    if background_blur is not None:
+        # Validate if background blur level is valid
+        if background_blur not in [1, 2, 3, 4]:
+            raise ValueError(f"Invalid background blur level: {background_blur}, valid values are: 1, 2, 3, 4")
+        
+        # Map blur level to specific blur values
+        blur_values = {
+            1: 0.0625,  # Light blur
+            2: 0.375,   # Medium blur
+            3: 0.75,    # Strong blur
+            4: 1.0      # Maximum blur
+        }
+        
+        # Add background blur
+        video_segment.add_background_filling("blur", blur=blur_values[background_blur])
     
     # Add video segment to track
     # if imported_track is not None:

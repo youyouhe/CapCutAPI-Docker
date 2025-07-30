@@ -70,6 +70,8 @@ def add_video():
     mask_rect_width = data.get('mask_rect_width')  # Rectangle mask width
     mask_round_corner = data.get('mask_round_corner')  # Rectangle mask rounded corner
 
+    background_blur = data.get('background_blur')  # Background blur level, optional values: 1 (light), 2 (medium), 3 (strong), 4 (maximum), default None (no background blur)
+
     result = {
         "success": False,
         "output": "",
@@ -112,7 +114,8 @@ def add_video():
             mask_feather=mask_feather,
             mask_invert=mask_invert,
             mask_rect_width=mask_rect_width,
-            mask_round_corner=mask_round_corner
+            mask_round_corner=mask_round_corner,
+            background_blur=background_blur
         )
         
         result["success"] = True
@@ -456,6 +459,8 @@ def add_image():
     mask_rect_width = data.get('mask_rect_width')  # Rectangle mask width
     mask_round_corner = data.get('mask_round_corner')  # Rectangle mask rounded corner
 
+    background_blur = data.get('background_blur')  # Background blur level, optional values: 1 (light), 2 (medium), 3 (strong), 4 (maximum), default None (no background blur)
+
     result = {
         "success": False,
         "output": "",
@@ -502,7 +507,8 @@ def add_image():
             mask_feather=mask_feather,
             mask_invert=mask_invert,
             mask_rect_width=mask_rect_width,
-            mask_round_corner=mask_round_corner
+            mask_round_corner=mask_round_corner,
+            background_blur=background_blur
         )
         
         result["success"] = True

@@ -43,7 +43,8 @@ def add_image_impl(
     mask_feather: float = 0.0,  # Mask feather parameter (0-100)
     mask_invert: bool = False,  # Whether to invert the mask
     mask_rect_width: Optional[float] = None,  # Rectangle mask width (rectangle mask only)
-    mask_round_corner: Optional[float] = None  # Rectangle mask rounded corner (rectangle mask only, 0-100)
+    mask_round_corner: Optional[float] = None,  # Rectangle mask rounded corner (rectangle mask only, 0-100)
+    background_blur: Optional[int] = None  # Background blur level, 1-4, corresponding to four blur intensity levels
 ) -> Dict[str, str]:
     """
     Add an image track to the specified draft
@@ -79,6 +80,7 @@ def add_image_impl(
     :param mask_invert: Whether to invert the mask, default not inverted
     :param mask_rect_width: Rectangle mask width, only allowed when mask type is rectangle, represented as a proportion of material width
     :param mask_round_corner: Rectangle mask rounded corner parameter, only allowed when mask type is rectangle, range 0~100
+    :param background_blur: Background blur level, 1-4, corresponding to four blur intensity levels (0.0625, 0.375, 0.75, 1.0)
     :return: Updated draft information, including draft_id and draft_url
     """
     # Get or create draft
@@ -222,6 +224,23 @@ def add_image_impl(
             )
         except:
             raise ValueError(f"Unsupported mask type {mask_type}, supported types include: Linear, Mirror, Circle, Rectangle, Heart, Star")
+    
+    # Add background blur effect
+    if background_blur is not None:
+        # Background blur level mapping table
+        blur_levels = {
+            1: 0.0625,  # Light blur
+            2: 0.375,   # Medium blur
+            3: 0.75,    # Heavy blur
+            4: 1.0      # Maximum blur
+        }
+        
+        # Validate background blur level
+        if background_blur not in blur_levels:
+            raise ValueError(f"Invalid background blur level {background_blur}, valid values are 1-4")
+        
+        # Add background blur effect
+        image_segment.add_background_filling("blur", blur=blur_levels[background_blur])
     
     # Add image segment to track
     script.add_segment(image_segment, track_name=track_name)
