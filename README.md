@@ -2,6 +2,8 @@
 
 Open source CapCut API tool.
 
+Try It: https://www.capcutapi.top/
+
 [中文说明](https://github.com/sun-guannan/CapCutAPI/blob/main/README-zh.md)
 
 ## Project Features
