@@ -143,3 +143,7 @@ Please refer to the `example.py` file in the project, which contains more usage 
 - **Rich APIs**: Provides comprehensive API interfaces for easy integration into other systems
 - **Flexible Configuration**: Achieve flexible function customization through configuration files
 - **AI Enhancement**: Integrate multiple AI services to improve video production efficiency
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=sun-guannan/CapCutAPI&type=Date)](https://www.star-history.com/#sun-guannan/CapCutAPI&Date)
