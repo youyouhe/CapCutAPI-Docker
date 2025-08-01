@@ -1,4 +1,4 @@
-# 🎬 CapCutAPI - 企业级视频编辑自动化平台
+# 🎬 CapCutAPI - 轻量、灵活、易上手的剪映/CapCutAPI工具，构建全自动化视频剪辑/混剪流水线。
 
 <div align="center">
 
