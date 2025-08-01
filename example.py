@@ -11,6 +11,7 @@ from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
 
 # Base URL of the service, please modify according to actual situation
 BASE_URL = f"http://localhost:{PORT}"
+LICENSE_KEY = "trial"  # Trial license key
 def make_request(endpoint, data, method='POST'):
     """Send HTTP request to the server and handle the response"""
     url = f"{BASE_URL}/{endpoint}"
@@ -68,7 +69,7 @@ def add_text_impl(text, start, end, font, font_color, font_size, track_name, dra
                   width=1080, height=1920,
                   fixed_width=-1, fixed_height=-1,
                   text_styles=None):
-    """add text"""
+    """Add text with support for multiple styles, shadows, and backgrounds"""
     data = {
         "draft_folder": draft_folder,
         "text": text,
@@ -360,7 +361,7 @@ def test_effect_01():
 
 
 def test_text():
-    """Test adding text"""
+    """Test adding text with various features"""
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
     # Test case 1: Basic text addition
@@ -406,7 +407,7 @@ def test_text():
         track_name="main_text",
         transform_y=0.0,
         transform_x=0.5,
-        border_color="#FF0000",  # Black border
+        border_color="#FF0000",  # Red border
         border_width=20.0,
         border_alpha=1.0,
         background_color="#0000FF",  # Blue background
@@ -415,13 +416,149 @@ def test_text():
     )
     print("Test case 3 (Border and background) successful:", result3)
     
+    # Test case 4: Text with shadow effect
+    result4 = add_text_impl(
+        draft_id=result3['output']['draft_id'],
+        text="Shadow effect test",
+        start=9,
+        end=12,
+        font="思源中宋",
+        font_color="#FFFFFF",  # White text
+        font_size=28.0,
+        track_name="main_text",
+        transform_y=-0.3,
+        transform_x=0.5,
+        shadow_enabled=True,  # Enable shadow
+        shadow_alpha=0.8,
+        shadow_angle=-30.0,
+        shadow_color="#000000",  # Black shadow
+        shadow_distance=8.0,
+        shadow_smoothing=0.2
+    )
+    print("Test case 4 (Shadow effect) successful:", result4)
+    
+    # Test case 5: Multi-style text using TextStyleRange
+    # Create different text styles
+    style1 = {
+        "start": 0,
+        "end": 5,
+        "style": {
+            "color": "#FF0000",  # Red
+            "size": 30,
+            "bold": True
+        },
+        "border": {
+            "color": "#FFFFFF",  # White border
+            "width": 40,
+            "alpha": 1.0
+        },
+        "font": "思源中宋"
+    }
+    
+    style2 = {
+        "start": 5,
+        "end": 10,
+        "style": {
+            "color": "#00FF00",  # Green
+            "size": 25,
+            "italic": True
+        },
+        "font": "挥墨体"
+    }
+    
+    style3 = {
+        "start": 10,
+        "end": 15,
+        "style": {
+            "color": "#0000FF",  # Blue
+            "size": 20,
+            "underline": True
+        },
+        "font": "金陵体"
+    }
+    
+    # Add multi-style text
+    result5 = add_text_impl(
+        draft_id=result4['output']['draft_id'],
+        text="Multi-style text test",
+        start=12,
+        end=15,
+        font="思源粗宋",
+        track_name="main_text",
+        transform_y=0.3,
+        transform_x=0.5,
+        font_color="#000000",  # Default black
+        font_size=20.0,
+        # Use dictionary list instead of TextStyleRange object list
+        text_styles=[style1, style2, style3]
+    )
+    print("Test case 5 (Multi-style text) successful:", result5)
+    
+    # Test case 6: Combined effects - shadow + background + multi-style
+    combined_style1 = {
+        "start": 0,
+        "end": 8,
+        "style": {
+            "color": "#FFD700",  # Gold
+            "size": 32,
+            "bold": True
+        },
+        "border": {
+            "color": "#8B4513",  # Brown border
+            "width": 30,
+            "alpha": 0.8
+        },
+        "font": "思源中宋"
+    }
+    
+    combined_style2 = {
+        "start": 8,
+        "end": 16,
+        "style": {
+            "color": "#FF69B4",  # Hot pink
+            "size": 28,
+            "italic": True
+        },
+        "font": "挥墨体"
+    }
+    
+    result6 = add_text_impl(
+        draft_id=result5['output']['draft_id'],
+        text="Combined effects demo",
+        start=15,
+        end=18,
+        font="思源粗宋",
+        track_name="main_text",
+        transform_y=-0.6,
+        transform_x=0.5,
+        font_color="#FFFFFF",  # Default white
+        font_size=24.0,
+        # Background settings
+        background_color="#4169E1",  # Royal blue background
+        background_alpha=0.6,
+        background_style=1,
+        background_round_radius=0.3,
+        background_height=0.18,
+        background_width=0.8,
+        # Shadow settings
+        shadow_enabled=True,
+        shadow_alpha=0.7,
+        shadow_angle=-60.0,
+        shadow_color="#2F4F4F",  # Dark slate gray shadow
+        shadow_distance=6.0,
+        shadow_smoothing=0.25,
+        # Multi-style text
+        text_styles=[combined_style1, combined_style2]
+    )
+    print("Test case 6 (Combined effects) successful:", result6)
+    
     # Finally save and upload the draft
-    if result3.get('success') and result3.get('output'):
-        save_result = save_draft_impl(result3['output']['draft_id'],draft_folder)
+    if result6.get('success') and result6.get('output'):
+        save_result = save_draft_impl(result6['output']['draft_id'], draft_folder)
         print(f"Draft save result: {save_result}")
     
     # Return the last test result for subsequent operations (if any)
-    return result3
+    return result6
 
 
 def test_text_02():
@@ -854,8 +991,10 @@ def test_mask_01():
 
 def test_mask_02():
     """Test adding videos to different tracks"""
+    # Set draft folder path for saving  
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
+    # Define video URL for testing
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4"
     draft_id = None  # Initialize draft_id
     
     # Add video to first track
@@ -1847,7 +1986,9 @@ def test_subtitle_02():
     return text_result
 
 
-def test_video():
+def test_video_01():
+    """Test adding single video with transform and speed parameters"""
+    # Set draft folder path for saving
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
     print("\nTest: Adding video")
@@ -1874,6 +2015,8 @@ def test_video():
         save_draft_impl(video_result['output']['draft_id'], draft_folder)
         
 def test_video_02():
+    """Test adding multiple videos with different resolutions to the same draft"""
+    # Set draft folder path for saving
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
     print("\nTest: Adding video")
@@ -1911,7 +2054,7 @@ def test_video_02():
         relative_index=0
     )
     video_result = add_video_impl(
-        video_url="https://videos.pexels.com/video-files/3129769/3129769-uhd_3840_2160_30fps.mp4", # 替换为实际的视频URL
+        video_url="https://videos.pexels.com/video-files/3129769/3129769-uhd_3840_2160_30fps.mp4", # Replace with actual video URL
         draft_id=video_result['output']['draft_id'],
         start=0,
         end=5,
@@ -1927,7 +2070,7 @@ def test_video_02():
         relative_index=0
     )
     video_result = add_video_impl(
-        video_url="https://videos.pexels.com/video-files/3129769/3129769-sd_426_240_30fps.mp4", # 替换为实际的视频URL
+        video_url="https://videos.pexels.com/video-files/3129769/3129769-sd_426_240_30fps.mp4", # Replace with actual video URL
         draft_id=video_result['output']['draft_id'],
         start=0,
         end=5,
@@ -1943,7 +2086,7 @@ def test_video_02():
         relative_index=0
     )
     video_result = add_video_impl(
-        video_url="https://videos.pexels.com/video-files/3129769/3129769-sd_640_360_30fps.mp4", # 替换为实际的视频URL
+        video_url="https://videos.pexels.com/video-files/3129769/3129769-sd_640_360_30fps.mp4", # Replace with actual video URL
         draft_id=video_result['output']['draft_id'],
         start=0,
         end=5,
@@ -1959,7 +2102,7 @@ def test_video_02():
         relative_index=0
     )
     video_result = add_video_impl(
-        video_url="https://videos.pexels.com/video-files/3129769/3129769-uhd_2560_1440_30fps.mp4", # 替换为实际的视频URL
+        video_url="https://videos.pexels.com/video-files/3129769/3129769-uhd_2560_1440_30fps.mp4", # Replace with actual video URL
         draft_id=video_result['output']['draft_id'],
         start=0,
         end=5,
@@ -2064,7 +2207,8 @@ def test_stiker_03():
 
 
 def test_transition_01():
-    """Test adding multiple images"""
+    """Test adding multiple images with dissolve transition effects"""
+    # Set draft folder path for saving
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
     print("\nTest: Adding image 1")
@@ -2103,9 +2247,11 @@ def test_transition_01():
 
 
 def test_transition_02():
-    """Test adding video tracks"""
+    """Test adding video tracks with transition effects"""
+    # Set draft folder path for saving  
     draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
+    # Define video URL for testing
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4"
 
     print("\nTest: Adding video track")
     video_result = add_video_impl(
@@ -2148,13 +2294,13 @@ if __name__ == "__main__":
     # test_audio02()
     # test_audio03()
     # test_audio04()
-    test_image01()
+    # test_image01()
     # test_image02()
     # test_image03()
     # test_image04()
     # test_video()
     # test_video_02()
-    # test_text()
+    test_text()
     # test_video_track01()
     # test_video_track02()
     # test_video_track03()
