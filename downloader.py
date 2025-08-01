@@ -63,6 +63,7 @@ def download_image(image_url, draft_name, material_name):
         # Use ffmpeg to download and convert image to PNG format
         command = [
             'ffmpeg',
+            '-headers', 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36\r\nReferer: https://www.163.com/\r\n',
             '-i', image_url,
             '-vf', 'format=rgba',  # Convert to RGBA format to support transparency
             '-frames:v', '1',      # Ensure only one frame is processed
@@ -150,7 +151,15 @@ def download_file(url:str, local_filename, max_retries=3, timeout=180):
                 os.makedirs(directory, exist_ok=True)
                 print(f"Created directory: {directory}")
 
-            with requests.get(url, stream=True, timeout=timeout) as response:
+            # Add headers
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+                'Referer': 'https://www.163.com/',  # 网易的Referer
+                'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+            }
+
+            with requests.get(url, stream=True, timeout=timeout, headers=headers) as response:
                 response.raise_for_status()
                 
                 total_size = int(response.headers.get('content-length', 0))
