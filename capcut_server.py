@@ -29,7 +29,8 @@ from save_draft_impl import save_draft_impl, query_task_status, query_script_imp
 from add_effect_impl import add_effect_impl
 from add_sticker_impl import add_sticker_impl
 from create_draft import create_draft
-from util import generate_draft_url as utilgenerate_draft_url
+from util import generate_draft_url as utilgenerate_draft_url, hex_to_rgb
+from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
 
 from settings.local import IS_CAPCUT_ENV, DRAFT_DOMAIN, PREVIEW_ROUTER, PORT
 
@@ -325,14 +326,13 @@ def add_text():
     transform_y = data.get('transform_y', 0)
     transform_x = data.get('transform_x', 0)
     font = data.get('font', "文轩体")
-    font_color = data.get('font_color', "#FF0000")
-    font_size = data.get('font_size', 8.0)
+    font_color = data.get('color', data.get('font_color', "#FF0000"))  # Support both 'color' and 'font_color'
+    font_size = data.get('size', data.get('font_size', 8.0))  # Support both 'size' and 'font_size'
     track_name = data.get('track_name', "text_main")
     vertical = data.get('vertical', False)
-    font_alpha = data.get('font_alpha', 1.0)  
+    font_alpha = data.get('alpha', data.get('font_alpha', 1.0))  # Support both 'alpha' and 'font_alpha'  
     outro_animation = data.get('outro_animation', None)
     outro_duration = data.get('outro_duration', 0.5)
-    track_name = data.get('track_name', 'text_main')
     width = data.get('width', 1080)
     height = data.get('height', 1920)
     
@@ -350,18 +350,18 @@ def add_text():
     background_style = data.get('background_style', 0)
     background_alpha = data.get('background_alpha', 0.0)
     background_round_radius = data.get('background_round_radius', 0.0)
-    background_height = data.get('background_height', 0.14)  # 背景高度，范围0.0-1.0
-    background_width = data.get('background_width', 0.14)  # 背景宽度，范围0.0-1.0
-    background_horizontal_offset = data.get('background_horizontal_offset', 0.5)  # 背景水平偏移，范围0.0-1.0
-    background_vertical_offset = data.get('background_vertical_offset', 0.5)  # 背景垂直偏移，范围0.0-1.0
+    background_height = data.get('background_height', 0.14)  # Background height, range 0.0-1.0
+    background_width = data.get('background_width', 0.14)  # Background width, range 0.0-1.0
+    background_horizontal_offset = data.get('background_horizontal_offset', 0.5)  # Background horizontal offset, range 0.0-1.0
+    background_vertical_offset = data.get('background_vertical_offset', 0.5)  # Background vertical offset, range 0.0-1.0
 
-    # 阴影参数
-    shadow_enabled = data.get('shadow_enabled', False)  # 是否启用阴影
-    shadow_alpha = data.get('shadow_alpha', 0.9)  # 阴影透明度，范围0.0-1.0
-    shadow_angle = data.get('shadow_angle', -45.0)  # 阴影角度，范围-180.0-180.0
-    shadow_color = data.get('shadow_color', "#000000")  # 阴影颜色
-    shadow_distance = data.get('shadow_distance', 5.0)  # 阴影距离
-    shadow_smoothing = data.get('shadow_smoothing', 0.15)  # 阴影平滑度，范围0.0-1.0
+    # Shadow parameters
+    shadow_enabled = data.get('shadow_enabled', False)  # Whether to enable shadow
+    shadow_alpha = data.get('shadow_alpha', 0.9)  # Shadow transparency, range 0.0-1.0
+    shadow_angle = data.get('shadow_angle', -45.0)  # Shadow angle, range -180.0-180.0
+    shadow_color = data.get('shadow_color', "#000000")  # Shadow color
+    shadow_distance = data.get('shadow_distance', 5.0)  # Shadow distance
+    shadow_smoothing = data.get('shadow_smoothing', 0.15)  # Shadow smoothing, range 0.0-1.0
     
     # Bubble and decorative text effects
     bubble_effect_id = data.get('bubble_effect_id')
@@ -376,17 +376,17 @@ def add_text():
     outro_animation = data.get('outro_animation')
     outro_duration = data.get('outro_duration', 0.5)
 
-    # 新增多样式文本参数
+    # Multi-style text parameters
     text_styles_data = data.get('text_styles', [])
     text_styles = None
     if text_styles_data:
         text_styles = []
         for style_data in text_styles_data:
-            # 获取样式范围
+            # Get style range
             start_pos = style_data.get('start', 0)
             end_pos = style_data.get('end', 0)
             
-            # 创建文本样式
+            # Create text style
             style = Text_style(
                 size=style_data.get('style',{}).get('size', font_size),
                 bold=style_data.get('style',{}).get('bold', False),
@@ -400,7 +400,7 @@ def add_text():
                 line_spacing=style_data.get('style',{}).get('line_spacing', 0)
             )
             
-            # 创建描边（如果有）
+            # Create border (if any)
             border = None
             if style_data.get('border',{}).get('width', 0) > 0:
                 border = Text_border(
@@ -409,7 +409,7 @@ def add_text():
                     width=style_data.get('border',{}).get('width', border_width)
                 )
             
-            # 创建样式范围对象
+            # Create style range object
             style_range = TextStyleRange(
                 start=start_pos,
                 end=end_pos,
@@ -476,7 +476,7 @@ def add_text():
             height=height,
             fixed_width=fixed_width,
             fixed_height=fixed_height,
-            text_styles = text_styles
+            text_styles=text_styles
         )
         
         result["success"] = True
