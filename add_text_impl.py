@@ -2,7 +2,7 @@ import pyJianYingDraft as draft
 from settings.local import IS_CAPCUT_ENV
 from util import generate_draft_url, hex_to_rgb
 from pyJianYingDraft import trange, Font_type
-from typing import Optional
+from typing import Optional, List  # add List type hint
 from pyJianYingDraft import exceptions
 from create_draft import get_or_create_draft
 from pyJianYingDraft.text_segment import TextBubble, TextEffect, TextStyleRange
