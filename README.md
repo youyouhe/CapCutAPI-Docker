@@ -8,6 +8,9 @@ Try It: https://www.capcutapi.top
 
 ## Gallery
 
+**MCP agent**
+[![AI Cut](https://img.youtube.com/vi/fBqy6WFC78E/hqdefault.jpg)](https://www.youtube.com/watch?v=fBqy6WFC78E)
+
 **Connect AI generated via CapCutAPI**
 
 [![Horse](https://img.youtube.com/vi/IF1RDFGOtEU/hqdefault.jpg)](https://www.youtube.com/watch?v=IF1RDFGOtEU)
