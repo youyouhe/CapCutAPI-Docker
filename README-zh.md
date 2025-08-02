@@ -150,7 +150,7 @@ print(response.json())
 - **AI增强**：集成多种AI服务，提升视频制作效率
 
 ## 进群交流
-![image](https://github.com/user-attachments/assets/cbaf2cfb-b3d6-4ab1-8517-3f6e79be13e2)
+![image](https://github.com/user-attachments/assets/d09b0325-d3fe-4e1e-a458-d3342e63c038)
 
 
 - 反馈问题
