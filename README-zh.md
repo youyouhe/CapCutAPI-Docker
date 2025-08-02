@@ -146,7 +146,8 @@ print(response.json())
 - **AI增强**：集成多种AI服务，提升视频制作效率
 
 ## 进群交流
-![image](https://github.com/user-attachments/assets/2103d43a-bfa4-4739-9c58-82552aa7e92c)
+![image](https://github.com/user-attachments/assets/cbaf2cfb-b3d6-4ab1-8517-3f6e79be13e2)
+
 
 - 反馈问题
 - 功能建议
