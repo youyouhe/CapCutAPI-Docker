@@ -9,6 +9,10 @@
 ```
 
 ## 效果演示
+**MCP,创建属于自己的剪辑Agent**
+
+[![AI Cut](https://img.youtube.com/vi/fBqy6WFC78E/hqdefault.jpg)](https://www.youtube.com/watch?v=fBqy6WFC78E)
+
 **通过工具，将AI生成的图片，视频组合起来**
 
 [![Horse](https://img.youtube.com/vi/IF1RDFGOtEU/hqdefault.jpg)](https://www.youtube.com/watch?v=IF1RDFGOtEU)
