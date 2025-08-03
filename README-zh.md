@@ -2,6 +2,23 @@
 
 轻量、灵活、易上手的剪映/CapCutAPI工具，构建全自动化视频剪辑/混剪流水线。
 
+直接体验：https://www.capcutapi.top
+
+```
+👏👏👏👏 庆祝github 600星，送出价值6000点不记名云渲染券：17740F41-5ECB-44B1-AAAE-1C458A0EFF43
+```
+
+## 效果演示
+**MCP,创建属于自己的剪辑Agent**
+
+[![AI Cut](https://img.youtube.com/vi/fBqy6WFC78E/hqdefault.jpg)](https://www.youtube.com/watch?v=fBqy6WFC78E)
+
+**通过工具，将AI生成的图片，视频组合起来**
+
+[![Horse](https://img.youtube.com/vi/IF1RDFGOtEU/hqdefault.jpg)](https://www.youtube.com/watch?v=IF1RDFGOtEU)
+
+[![Song](https://img.youtube.com/vi/rGNLE_slAJ8/hqdefault.jpg)](https://www.youtube.com/watch?v=rGNLE_slAJ8)
+
 ## 项目功能
 
 本项目是一个基于Python的剪映/CapCut处理工具，提供以下核心功能：
@@ -133,7 +150,8 @@ print(response.json())
 - **AI增强**：集成多种AI服务，提升视频制作效率
 
 ## 进群交流
-![image](https://github.com/user-attachments/assets/2103d43a-bfa4-4739-9c58-82552aa7e92c)
+![image](https://github.com/user-attachments/assets/d09b0325-d3fe-4e1e-a458-d3342e63c038)
+
 
 - 反馈问题
 - 功能建议
