@@ -7,11 +7,16 @@ from util import timing_decorator
 import functools
 import threading
 from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
+from util import hex_to_rgb
 
 
 # Base URL of the service, please modify according to actual situation
 BASE_URL = f"http://localhost:{PORT}"
 LICENSE_KEY = "trial"  # Trial license key
+
+CAPCUT_DRAFT_FOLDER = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+JIANYINGPRO_DRAFT_FOLDER = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+
 def make_request(endpoint, data, method='POST'):
     """Send HTTP request to the server and handle the response"""
     url = f"{BASE_URL}/{endpoint}"
@@ -76,8 +81,8 @@ def add_text_impl(text, start, end, font, font_color, font_size, track_name, dra
         "start": start,
         "end": end,
         "font": font,
-        "color": font_color,
-        "size": font_size,
+        "font_color": font_color,
+        "font_size": font_size,
         "alpha": font_alpha,
         "track_name": track_name,
         "vertical": vertical,
@@ -339,8 +344,7 @@ def add_effect(effect_type, start, end, draft_id=None, track_name="effect_01",
 
 def test_effect_01():
     """Test adding effect service"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     
     print("\nTest: Adding effect")
     effect_result = add_effect(
@@ -362,7 +366,7 @@ def test_effect_01():
 
 def test_text():
     """Test adding text with various features"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # Test case 1: Basic text addition
     print("\nTest: Adding basic text")
@@ -563,8 +567,7 @@ def test_text():
 
 def test_text_02():
     """测试添加文本"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # 测试用例1：基本文本添加
     print("\n测试：添加基本文本")
@@ -686,8 +689,7 @@ def test_text_02():
 
 def test_text_03():
     """测试添加文本"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    # draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # 测试用例1：基本文本添加
     print("\n测试：添加基本文本")
@@ -784,8 +786,7 @@ def test_text_03():
 
 def test_image01():
     """Test adding image"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -806,7 +807,7 @@ def test_image01():
 
 def test_image02():
     """Test adding multiple images"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -843,7 +844,7 @@ def test_image02():
 
 def test_image03():
     """Test adding images to different tracks"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -896,7 +897,7 @@ def test_image03():
 
 def test_image04():
     """Test adding image"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -916,8 +917,7 @@ def test_image04():
 
 def test_image05():
     """测试添加图片"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    # draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\n测试：添加图片1")
     image_result = add_image_impl(
@@ -934,7 +934,7 @@ def test_image05():
 
 def test_mask_01():
     """Test adding images to different tracks"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -992,7 +992,7 @@ def test_mask_01():
 def test_mask_02():
     """Test adding videos to different tracks"""
     # Set draft folder path for saving  
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     # Define video URL for testing
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4"
     draft_id = None  # Initialize draft_id
@@ -1057,8 +1057,7 @@ def test_mask_02():
 
 def test_audio01():
     """Test adding audio"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding audio")
     audio_result = add_audio_track(
@@ -1079,8 +1078,7 @@ def test_audio01():
 
 def test_audio02():
     """Test adding multiple audio segments"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding audio 1")
     audio_result = add_audio_track(
@@ -1117,8 +1115,7 @@ def test_audio02():
 
 def test_audio03():
     """Test adding audio in a loop"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     draft_id = None  # Initialize draft_id
     
@@ -1149,8 +1146,7 @@ def test_audio03():
 
 def test_audio04():
     """Test adding audio to different tracks"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding audio 1")
     audio_result = add_audio_track(
@@ -1319,7 +1315,7 @@ def query_draft_status_impl_polling(task_id, timeout=300, callback=None):
     return thread, result_container
 
 def test_subtitle():
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # Test case: Add text subtitles
     print("\nTest: Adding text subtitles")
@@ -1353,8 +1349,7 @@ def test_subtitle():
         print(f"Draft save result: {save_result}")
 
 def test01():
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    # draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # Combined test
     print("\nTest 2: Add audio")
@@ -1505,8 +1500,7 @@ def test01():
     save_draft_impl(keyframe_result['output']['draft_id'], draft_folder)
 
 def test02():
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # Combined test
     print("\nTest 2: Add audio")
@@ -1658,7 +1652,7 @@ def test02():
 
 def test_video_track01():
     """Test adding video track"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
 
     print("\nTest: Add video track")
@@ -1682,7 +1676,7 @@ def test_video_track01():
 
 def test_video_track02():
     """Test adding video tracks in a loop"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
     draft_id = None  # Initialize draft_id
     
@@ -1709,7 +1703,7 @@ def test_video_track02():
 
 def test_video_track03():
     """Test adding videos to different tracks"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
     draft_id = None  # Initialize draft_id
     
@@ -1767,7 +1761,7 @@ def test_video_track03():
 
 def test_video_track04():
     """Test adding video track"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
 
     print("\nTest: Add video track")
@@ -1791,8 +1785,7 @@ def test_video_track04():
 
 def test_video_track05():
     """测试添加视频轨道"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    # draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # 替换为实际视频URL
 
@@ -1813,7 +1806,7 @@ def test_video_track05():
 
 def test_keyframe():
     """Test adding keyframes"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     draft_id = None  # Initialize draft_id
     
     print("\nTest: Add basic video track")
@@ -1871,7 +1864,7 @@ def test_keyframe():
 
 def test_keyframe_02():
     """Test adding keyframes - Batch adding to implement fade-in and zoom bounce effects"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     draft_id = None  # Initialize draft_id
     
     print("\nTest: Adding basic video track")
@@ -1932,7 +1925,7 @@ def test_keyframe_02():
 
 def test_subtitle_01():
     """Test adding text subtitles"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     
     print("\nTest 3: Adding text subtitles")
     text_result = add_subtitle_impl(
@@ -1960,7 +1953,7 @@ def test_subtitle_01():
 
 def test_subtitle_02():
     """Test adding text subtitles via SRT URL"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     
     print("\nTest 3: Adding text subtitles (from URL)")
     text_result = add_subtitle_impl(
@@ -1989,7 +1982,7 @@ def test_subtitle_02():
 def test_video_01():
     """Test adding single video with transform and speed parameters"""
     # Set draft folder path for saving
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding video")
     video_result = add_video_impl(
@@ -2017,7 +2010,7 @@ def test_video_01():
 def test_video_02():
     """Test adding multiple videos with different resolutions to the same draft"""
     # Set draft folder path for saving
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding video")
     video_result = add_video_impl(
@@ -2125,8 +2118,8 @@ def test_video_02():
    
 def test_stiker_01():
     """Test adding stickers"""
-    # Add stickers, test various parameters
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    # Add stickers, test various parameters, only for jianyingpro
+    draft_folder = JIANYINGPRO_DRAFT_FOLDER
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         start=1.0,
@@ -2143,8 +2136,8 @@ def test_stiker_01():
 
 def test_stiker_02():
     """Test adding stickers"""
-    # Add stickers, test various parameters
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    # Add stickers, test various parameters, only for jianyingpro
+    draft_folder = JIANYINGPRO_DRAFT_FOLDER
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         start=1.0,
@@ -2173,8 +2166,8 @@ def test_stiker_02():
 
 def test_stiker_03():
     """Test adding stickers"""
-    # Add stickers, test various parameters
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    # Add stickers, test various parameters, only for jianyingpro
+    draft_folder = JIANYINGPRO_DRAFT_FOLDER
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         start=1.0,
@@ -2209,7 +2202,7 @@ def test_stiker_03():
 def test_transition_01():
     """Test adding multiple images with dissolve transition effects"""
     # Set draft folder path for saving
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -2249,7 +2242,7 @@ def test_transition_01():
 def test_transition_02():
     """Test adding video tracks with transition effects"""
     # Set draft folder path for saving  
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     # Define video URL for testing
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4"
 
@@ -2287,36 +2280,36 @@ def test_transition_02():
         print("Unable to get draft ID, skipping save operation.")
 
 if __name__ == "__main__":
-    # test01()
-    # test02()
-    # test_effect_01()  # Run effect test
-    # test_audio01()
-    # test_audio02()
-    # test_audio03()
-    # test_audio04()
-    # test_image01()
-    # test_image02()
-    # test_image03()
-    # test_image04()
+    test01()
+    test02()
+    test_effect_01()  # Run effect test
+    test_audio01()
+    test_audio02()
+    test_audio03()
+    test_audio04()
+    test_image01()
+    test_image02()
+    test_image03()
+    test_image04()
     # test_video()
-    # test_video_02()
+    test_video_02()
     test_text()
-    # test_video_track01()
-    # test_video_track02()
-    # test_video_track03()
-    # test_video_track04()
-    # test_keyframe()
-    # test_keyframe_02()
-    # test_subtitle_01()
-    # test_subtitle_02()
-    # test_subtitle()
-    # test_stiker_01()
-    # test_stiker_02()
-    # test_stiker_03()
-    # test_transition_01()
-    # test_transition_02()
+    test_video_track01()
+    test_video_track02()
+    test_video_track03()
+    test_video_track04()
+    test_keyframe()
+    test_keyframe_02()
+    test_subtitle_01()
+    test_subtitle_02()
+    test_subtitle()
+    test_stiker_01()
+    test_stiker_02()
+    test_stiker_03()
+    test_transition_01()
+    test_transition_02()
     # test_generate_image01()
     # test_generate_image02()
     # test_speech_01()
-    # test_mask_01()
-    # test_mask_02()
+    test_mask_01()
+    test_mask_02()
