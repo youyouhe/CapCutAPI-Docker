@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![CapCutAPI Logo](https://img.shields.io/badge/CapCutAPI-v2.0-blue?style=for-the-badge&logo=video&logoColor=white)
+![CapCutAPI Logo](https://img.shields.io/badge/CapCutAPI-v1.1.0-blue?style=for-the-badge&logo=video&logoColor=white)
 
 [![GitHub Stars](https://img.shields.io/github/stars/sun-guannan/CapCutAPI?style=for-the-badge&logo=github)](https://github.com/sun-guannan/CapCutAPI/stargazers)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green?style=for-the-badge)](LICENSE)
