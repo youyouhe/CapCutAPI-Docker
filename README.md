@@ -1,4 +1,4 @@
-# 🎬 CapCutAPI - Enterprise Video Editing Automation Platform
+# 🎬 CapCutAPI - Open source CapCut API tool.
 
 <div align="center">
 
