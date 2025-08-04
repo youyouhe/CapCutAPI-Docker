@@ -1,11 +1,11 @@
-# 🎬 CapCutAPI - 轻量、灵活、易上手的剪映/CapCutAPI工具，构建全自动化视频剪辑/混剪流水线。
+# 🎬 CapCutAPI - 轻量、灵活、易上手的剪映/CapCut API工具
 
 <div align="center">
 
 ![CapCutAPI Logo](https://img.shields.io/badge/CapCutAPI-v2.0-blue?style=for-the-badge&logo=video&logoColor=white)
 
 [![GitHub Stars](https://img.shields.io/github/stars/sun-guannan/CapCutAPI?style=for-the-badge&logo=github)](https://github.com/sun-guannan/CapCutAPI/stargazers)
-[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green?style=for-the-badge)](LICENSE)
 [![Python Version](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python)](https://python.org)
 [![MCP Support](https://img.shields.io/badge/MCP-支持-orange?style=for-the-badge)](./MCP_文档_中文.md)
 
@@ -529,14 +529,22 @@ git push origin feature/amazing-feature
 
 <div align="center">
 
-本项目采用 MIT 许可证开源。详情请查看 [LICENSE](LICENSE) 文件。
+本项目采用 Apache 2.0 许可证开源。详情请查看 [LICENSE](LICENSE) 文件。
 
-MIT License
+Apache License 2.0
 
-Copyright (c) 2024 CapCutAPI Contributors
+Copyright (c) 2025 CapCutAPI Contributors
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files...
+根据 Apache 许可证 2.0 版（"许可证"）获得许可；
+除非符合许可证，否则您不得使用此文件。
+您可以在以下网址获得许可证副本：
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+除非适用法律要求或书面同意，否则根据许可证分发的软件
+是按"原样"分发的，不附带任何明示或暗示的保证或条件。
+请参阅许可证以了解许可证下的特定语言管理权限和
+限制。
 
 
 </div>
