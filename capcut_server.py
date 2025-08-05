@@ -642,6 +642,7 @@ def add_effect():
     # Get required parameters
     effect_type = data.get('effect_type')  # Effect type name, will match from Video_scene_effect_type or Video_character_effect_type
     start = data.get('start', 0)  # Start time (seconds), default 0
+    effect_category = data.get('effect_category', "scene") # Effect category, "scene" or "character", default "scene"
     end = data.get('end', 3.0)  # End time (seconds), default 3 seconds
     draft_id = data.get('draft_id')  # Draft ID, if None or corresponding zip file not found, create new draft
     track_name = data.get('track_name', "effect_01")  # Track name, can be omitted when there is only one effect track
@@ -665,6 +666,7 @@ def add_effect():
         # Call add_effect_impl method
         draft_result = add_effect_impl(
             effect_type=effect_type,
+            effect_category=effect_category,
             start=start,
             end=end,
             draft_id=draft_id,
