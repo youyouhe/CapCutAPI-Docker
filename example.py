@@ -1240,7 +1240,7 @@ def test_audio04():
     query_draft_status_impl_polling(audio_result['output']['draft_id'])
     save_draft_impl(audio_result['output']['draft_id'], draft_folder)
 
-def add_subtitle_impl(srt, draft_id=None, time_offset=0.0, font_size=5.0,
+def add_subtitle_impl(srt, draft_id=None, time_offset=0.0, font_size=5.0, font = "思源粗宋",
                     bold=False, italic=False, underline=False, font_color="#ffffff",
                     transform_x=0.0, transform_y=0.0, scale_x=1.0, scale_y=1.0,
                     vertical=False, track_name="subtitle", alpha=1,
@@ -1253,6 +1253,7 @@ def add_subtitle_impl(srt, draft_id=None, time_offset=0.0, font_size=5.0,
         "srt": srt,  # Modified parameter name to match server side
         "draft_id": draft_id,
         "time_offset": time_offset,
+        "font": font,
         "font_size": font_size,
         "bold": bold,
         "italic": italic,
@@ -2342,7 +2343,7 @@ if __name__ == "__main__":
     # test01()
     # test02()
     # test_effect_01()  # Run effect test
-    test_effect_02()
+    # test_effect_02()
     # test_audio01()
     # test_audio02()
     # test_audio03()
@@ -2360,7 +2361,7 @@ if __name__ == "__main__":
     # test_video_track04()
     # test_keyframe()
     # test_keyframe_02()
-    # test_subtitle_01()
+    test_subtitle_01()
     # test_subtitle_02()
     # test_subtitle()
     # test_stiker_01()

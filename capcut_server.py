@@ -233,7 +233,7 @@ def add_subtitle():
     time_offset = data.get('time_offset', 0.0)  # Default 0 seconds
     
     # Font style parameters
-    font = data.get('font', None)
+    font = data.get('font', "思源粗宋")
     font_size = data.get('font_size', 5.0)  # Default size 5.0
     bold = data.get('bold', False)  # Default not bold
     italic = data.get('italic', False)  # Default not italic
