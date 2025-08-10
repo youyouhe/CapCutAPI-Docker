@@ -39,16 +39,25 @@ def add_effect_impl(
     t_range = trange(f"{start}s", f"{duration}s")
 
     # Dynamically get effect type object
+    effect_enum = None
     if IS_CAPCUT_ENV:
         # If in CapCut environment, use CapCut effects
-        effect_enum = CapCut_Video_scene_effect_type[effect_type]
-        if effect_enum is None:
-            effect_enum = CapCut_Video_character_effect_type[effect_type]
+        try:
+            effect_enum = CapCut_Video_scene_effect_type[effect_type]
+        except KeyError:
+            try:
+                effect_enum = CapCut_Video_character_effect_type[effect_type]
+            except KeyError:
+                effect_enum = None
     else:
         # Default to using JianYing effects
-        effect_enum = Video_scene_effect_type[effect_type]
-        if effect_enum is None:
-            effect_enum = Video_character_effect_type[effect_type]
+        try:
+            effect_enum = Video_scene_effect_type[effect_type]
+        except KeyError:
+            try:
+                effect_enum = Video_character_effect_type[effect_type]
+            except KeyError:
+                effect_enum = None
     
     if effect_enum is None:
         raise ValueError(f"Unknown effect type: {effect_type}")
@@ -65,7 +74,9 @@ def add_effect_impl(
         script.add_track(draft.Track_type.effect)
 
     # Add effect
-    script.add_effect(effect_enum, t_range, params=params[::-1], track_name=track_name)
+    # Handle case where params is None
+    effect_params = params[::-1] if params is not None else None
+    script.add_effect(effect_enum, t_range, params=effect_params, track_name=track_name)
 
     return {
         "draft_id": draft_id,

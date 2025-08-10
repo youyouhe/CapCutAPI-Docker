@@ -26,6 +26,14 @@ PORT = 9000
 OSS_CONFIG = []
 MP4_OSS_CONFIG=[]
 
+# MinIO配置
+MINIO_CONFIG = {
+    "endpoint": "",
+    "access_key": "",
+    "secret_key": "",
+    "bucket_name": ""
+}
+
 # 尝试加载本地配置文件
 if os.path.exists(CONFIG_FILE_PATH):
     try:
@@ -59,6 +67,10 @@ if os.path.exists(CONFIG_FILE_PATH):
             # 更新MP4 OSS配置
             if "mp4_oss_config" in local_config:
                 MP4_OSS_CONFIG = local_config["mp4_oss_config"]
+                
+            # 更新MinIO配置
+            if "minio_config" in local_config:
+                MINIO_CONFIG = local_config["minio_config"]
 
     except (json.JSONDecodeError, IOError):
         # 配置文件加载失败，使用默认配置

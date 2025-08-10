@@ -1,24 +1,68 @@
 
 import oss2
 import os
-from settings.local import OSS_CONFIG, MP4_OSS_CONFIG
+from minio import Minio
+from urllib.parse import urljoin
+from settings.local import OSS_CONFIG, MP4_OSS_CONFIG, MINIO_CONFIG
 
 def upload_to_oss(path):
-    # Create OSS client
-    auth = oss2.Auth(OSS_CONFIG['access_key_id'], OSS_CONFIG['access_key_secret'])
-    bucket = oss2.Bucket(auth, OSS_CONFIG['endpoint'], OSS_CONFIG['bucket_name'])
-    
-    # Upload file
-    object_name = os.path.basename(path)
-    bucket.put_object_from_file(object_name, path)
-    
-    # Generate signed URL (valid for 24 hours)
-    url = bucket.sign_url('GET', object_name, 24 * 60 * 60)
-    
-    # Clean up temporary file
-    os.remove(path)
-    
-    return url
+    # Check if MinIO configuration exists and is properly configured
+    if MINIO_CONFIG and isinstance(MINIO_CONFIG, dict) and MINIO_CONFIG.get('endpoint'):
+        return upload_to_minio(path)
+    else:
+        # Create OSS client
+        auth = oss2.Auth(OSS_CONFIG['access_key_id'], OSS_CONFIG['access_key_secret'])
+        bucket = oss2.Bucket(auth, OSS_CONFIG['endpoint'], OSS_CONFIG['bucket_name'])
+        
+        # Upload file
+        object_name = os.path.basename(path)
+        bucket.put_object_from_file(object_name, path)
+        
+        # Generate signed URL (valid for 24 hours)
+        url = bucket.sign_url('GET', object_name, 24 * 60 * 60)
+        
+        # Clean up temporary file
+        os.remove(path)
+        
+        return url
+
+def upload_to_minio(path):
+    """Upload file to MinIO storage"""
+    try:
+        # Create MinIO client
+        client = Minio(
+            MINIO_CONFIG['endpoint'].replace('http://', '').replace('https://', ''),
+            access_key=MINIO_CONFIG['access_key'],
+            secret_key=MINIO_CONFIG['secret_key'],
+            secure=MINIO_CONFIG['endpoint'].startswith('https://')
+        )
+        
+        # Upload file
+        object_name = os.path.basename(path)
+        result = client.fput_object(
+            MINIO_CONFIG['bucket_name'],
+            object_name,
+            path
+        )
+        
+        # Generate presigned URL (valid for 24 hours)
+        from datetime import timedelta
+        url = client.presigned_get_object(
+            MINIO_CONFIG['bucket_name'],
+            object_name,
+            expires=timedelta(hours=24)
+        )
+        
+        # Clean up temporary file
+        os.remove(path)
+        
+        return url
+    except Exception as e:
+        print(f"MinIO upload failed: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        # Fallback to local file if upload fails
+        return f"file://{os.path.abspath(path)}"
 
 def upload_mp4_to_oss(path):
     """Special method for uploading MP4 files, using custom domain and v4 signature"""
