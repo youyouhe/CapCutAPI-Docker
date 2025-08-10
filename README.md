@@ -91,7 +91,7 @@ python mcp_server.py # Start the MCP protocol service, supports stdio communicat
 
 ## MCP Integration Guide
 
-[MCP Documentation in Chinese](https://www.google.com/search?q=./MCP_%E6%96%87%E6%A1%A3_%E4%B8%AD%E6%96%87.md) • [MCP English Guide](https://www.google.com/search?q=./MCP_Documentation_English.md)
+[MCP 中文文档](https://www.google.com/search?q=./MCP_%E6%96%87%E6%A1%A3_%E4%B8%AD%E6%96%87.md) • [MCP English Guide](https://www.google.com/search?q=./MCP_Documentation_English.md)
 
 ### 1\. Client Configuration
 
@@ -251,7 +251,7 @@ We welcome contributions of all forms\! Our iteration rules are:
   - PRs can be submitted to the dev branch
   - Merges from dev to main and releases will happen every Monday
 
-## Join our group
+## Join Or Contact Us
 
   - Feedback on issues
   - Feature suggestions
@@ -265,15 +265,14 @@ We welcome contributions of all forms\! Our iteration rules are:
 
   - **Contact**:
 
-      - WeChat: sguann
-      - Douyin: 剪映草稿助手
+  sguann2023@gmail.com
 
 ## 📈 Star History
 
-\<div align="center"\>
+<div align="center">
 
 [](https://www.star-history.com/#sun-guannan/CapCutAPI&Date)
 
-\</div\>
+</div>
 
 *Made with ❤️ by the CapCutAPI Community*
