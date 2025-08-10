@@ -132,9 +132,8 @@ python test_mcp_client.py
 
 ## 使用示例
 
-### API 示例
-<details>
-<summary><b>📹 添加视频素材</b></summary>
+### 1. API 示例
+添加视频素材
 
 ```python
 import requests
@@ -151,10 +150,7 @@ response = requests.post("http://localhost:9001/add_video", json={
 print(f"视频添加结果: {response.json()}")
 ```
 
-</details>
-
-<details>
-<summary><b>📝 创建样式文本</b></summary>
+创建样式文本
 
 ```python
 import requests
@@ -174,12 +170,7 @@ response = requests.post("http://localhost:9001/add_text", json={
 print(f"文本添加结果: {response.json()}")
 ```
 
-</details>
-
-
-```
-在example.py文件中获取更多示例。
-```
+可以在`example.py`文件中获取更多示例。
 
 ### 🔧 MCP 协议示例
 
