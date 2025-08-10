@@ -23,11 +23,10 @@
 
 4. 可以利用API将剪辑结果生成视频，实现全云端操作。
 
-## 产品展示
+## 效果展示
 
 <div align="center">
 
-## 效果演示
 **MCP,创建属于自己的剪辑Agent**
 
 [![AI Cut](https://img.youtube.com/vi/fBqy6WFC78E/hqdefault.jpg)](https://www.youtube.com/watch?v=fBqy6WFC78E)
