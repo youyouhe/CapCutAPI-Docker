@@ -172,10 +172,9 @@ print(f"文本添加结果: {response.json()}")
 
 可以在`example.py`文件中获取更多示例。
 
-### 🔧 MCP 协议示例
+### 2. MCP 协议示例
 
-<details>
-<summary><b>🎯 完整工作流程</b></summary>
+完整工作流程
 
 ```python
 # 1. 创建新项目
@@ -221,11 +220,7 @@ result = mcp_client.call_tool("save_draft", {
 
 print(f"项目已保存: {result['result']['draft_url']}")
 ```
-
-</details>
-
-<details>
-<summary><b>🎨 高级文本效果</b></summary>
+高级文本效果
 
 ```python
 # 多样式彩色文本
@@ -247,42 +242,20 @@ mcp_client.call_tool("add_text", {
 })
 ```
 
-</details>
+### 3. 下载草稿
 
-### 使用 REST Client 测试
-
-您可以使用 `rest_client_test.http` 文件配合 REST Client IDE 插件进行 HTTP 测试。
-
-### 草稿管理
-
-调用 `save_draft` 会在服务器当前目录下生成一个 `dfd_` 开头的文件夹，将其复制到剪映/CapCut 草稿目录，即可在应用中看到生成的草稿。
-
----
-
-## 📚 文档中心
-
-<div align="center">
-
-| 📖 文档类型 | 🌍 语言 | 📄 链接 | 📝 描述 |
-|------------|---------|---------|----------|
-| **MCP 完整指南** | 🇨🇳 中文 | [MCP 中文文档](./MCP_文档_中文.md) | 详细的中文使用说明 |
-| **MCP Complete Guide** | 🇺🇸 English | [MCP Documentation](./MCP_Documentation_English.md) | 完整的 MCP 服务器使用指南 |
-| **API 参考** | 🇺🇸 English | [example.py](./example.py) | 代码示例和最佳实践 |
-| **REST 测试** | 🌐 通用 | [rest_client_test.http](./rest_client_test.http) | HTTP 接口测试用例 |
-
-</div>
-
----
+调用 `save_draft` 会在`capcut_server.py`当前目录下生成一个 `dfd_` 开头的文件夹，将其复制到剪映/CapCut 草稿目录，即可在应用中看到生成的草稿。
 
 ## 🤝 社区与支持
 
 ### 🎯 贡献指南
 
-我们欢迎各种形式的贡献！
+我们欢迎各种形式的贡献！我们的迭代规则
 
-```bash
-向dev分支提交pr，每周一从dev合并到main分支并发版
-```
+- 禁止直接向main提交pr
+- 可以向dev分支提交pr
+- 每周一从dev合并到main分支，并发版
+
 
 ### 🏆 进群交流
 
