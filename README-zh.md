@@ -246,18 +246,14 @@ mcp_client.call_tool("add_text", {
 
 调用 `save_draft` 会在`capcut_server.py`当前目录下生成一个 `dfd_` 开头的文件夹，将其复制到剪映/CapCut 草稿目录，即可在应用中看到生成的草稿。
 
-## 🤝 社区与支持
+## 社区与支持
 
-### 🎯 贡献指南
-
-我们欢迎各种形式的贡献！我们的迭代规则
+我们欢迎各种形式的贡献！我们的迭代规则：
 
 - 禁止直接向main提交pr
 - 可以向dev分支提交pr
 - 每周一从dev合并到main分支，并发版
 
-
-### 🏆 进群交流
 
 ## 进群交流
 ![交流群](https://github.com/user-attachments/assets/343c0f57-1551-49c1-bec3-c6bbcdbbbf32)
