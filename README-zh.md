@@ -1,24 +1,17 @@
-# 🎬 CapCutAPI - 轻量、灵活、易上手的剪映/CapCut API工具
+# 通过CapCutAPI连接AI生成的一切   [🌐 在线体验](https://www.capcutapi.top)
 
 <div align="center">
-
-![CapCutAPI Logo](https://img.shields.io/badge/CapCutAPI-v1.1.0-blue?style=for-the-badge&logo=video&logoColor=white)
 
 ```
 👏👏👏👏 庆祝github 700星，送出价值7000点不记名云渲染券：08B88A2C-1D16-4CE1-982E-E3732F2655F3
 ```
-
-**🚀 轻量、灵活、易上手的剪映/CapCut API工具，支持 MCP (Model Context Protocol) 协议**
-
-[🌐 在线体验](https://www.capcutapi.top) • [📖 English Docs](README.md) • [🔧 MCP 文档](./MCP_文档_中文.md) • [🌍 MCP English Guide](./MCP_Documentation_English.md)
-
 </div>
-
----
 
 ## 🎯 项目概览
 
-**CapCutAPI** 是一个功能强大的企业级视频编辑自动化平台，基于 Python 构建，提供完整的剪映/CapCut 视频编辑能力。通过 HTTP API 和 MCP 协议双重接口，实现与 AI 助手和自动化工具的无缝集成，构建全自动化视频剪辑/混剪流水线。
+**CapCutAPI** 是一款强大的云端 API，它赋予您对 AI 生成素材（包括图片、音频、视频和文字）的精确控制权。
+它提供了精确的编辑能力来拼接原始的 AI 输出，例如给视频变速或将图片镜像反转。这种能力有效地解决了 AI 生成的结果缺乏精确控制，难以复制的问题，让您能够轻松地将创意想法转化为精致的视频。
+所有这些功能均旨在对标剪映软件的功能，确保您在云端也能获得熟悉且高效的剪辑体验。
 
 ### 🏆 核心优势
 
@@ -46,11 +39,10 @@
 <tr>
 <td>
 
-**🔌 双重 API 接口**
-- RESTful HTTP API
-- Model Context Protocol
-- 实时处理响应
-- 企业级稳定性
+**☁️ 云与本地双模式**
+- 支持云端预览与直接生成视频
+- 也可导出草稿到本地，能导入剪映或 CapCut 二次编辑
+- 灵活选择创作流程
 
 </td>
 <td>
@@ -94,7 +86,7 @@
 
 | 功能模块 | HTTP API | MCP 协议 | 描述 |
 |---------|----------|----------|------|
-| 🎬 **草稿管理** | ✅ | ✅ | 创建、读取、修改、保存剪映/CapCut草稿文件 |
+| 🎬 **草稿管理** | ✅ | ✅ | 创建、保存剪映/CapCut草稿文件 |
 | 🎥 **视频处理** | ✅ | ✅ | 多格式视频导入、剪辑、转场、特效 |
 | 🔊 **音频编辑** | ✅ | ✅ | 音频轨道、音量控制、音效处理 |
 | 🖼️ **图像处理** | ✅ | ✅ | 图片导入、动画、蒙版、滤镜 |
@@ -129,6 +121,7 @@
 </details>
 
 <details>
+
 <summary><b>🔧 MCP 工具集 (11个工具)</b></summary>
 
 🎬 项目管理
@@ -162,19 +155,17 @@
 <table>
 <tr>
 <td width="30%"><b>🐍 Python 环境</b></td>
-<td>Python 3.8.20+ (推荐 3.10+)</td>
+<td>Python 3.10+</td>
 </tr>
 <tr>
 <td><b>🎬 剪映应用</b></td>
-<td>剪映中国版 或 CapCut 国际版</td>
+<td>剪映 或 CapCut 国际版</td>
 </tr>
 <tr>
 <td><b>🎵 FFmpeg</b></td>
 <td>用于媒体文件处理和分析</td>
 </tr>
 <tr>
-<td><b>💾 存储空间</b></td>
-<td>至少 2GB 可用空间</td>
 </tr>
 </table>
 
@@ -228,6 +219,8 @@ python mcp_server.py
 
 ## 🔧 MCP 集成指南
 
+[🔧 MCP 文档](./MCP_文档_中文.md) • [🌍 MCP English Guide](./MCP_Documentation_English.md)
+
 ### 📱 客户端配置
 
 创建或更新 `mcp_config.json` 配置文件：
@@ -279,7 +272,6 @@ python test_mcp_client.py
 ## 💡 使用示例
 
 ### 🌐 HTTP API 示例
-
 <details>
 <summary><b>📹 添加视频素材</b></summary>
 
@@ -290,9 +282,7 @@ import requests
 response = requests.post("http://localhost:9001/add_video", json={
     "video_url": "https://example.com/background.mp4",
     "start": 0,
-    "end": 10,
-    "width": 1080,
-    "height": 1920,
+    "end": 10
     "volume": 0.8,
     "transition": "fade_in"
 })
@@ -310,7 +300,7 @@ import requests
 
 # 添加标题文字
 response = requests.post("http://localhost:9001/add_text", json={
-    "text": "🎬 欢迎使用 CapCutAPI",
+    "text": "欢迎使用 CapCutAPI",
     "start": 0,
     "end": 5,
     "font": "思源黑体",
@@ -324,6 +314,11 @@ print(f"文本添加结果: {response.json()}")
 ```
 
 </details>
+
+
+```
+在example.py文件中获取更多示例。
+```
 
 ### 🔧 MCP 协议示例
 
@@ -383,7 +378,7 @@ print(f"项目已保存: {result['result']['draft_url']}")
 ```python
 # 多样式彩色文本
 mcp_client.call_tool("add_text", {
-    "text": "🌈 彩色文字效果展示",
+    "text": "彩色文字效果展示",
     "draft_id": draft_id,
     "start": 2,
     "end": 8,
@@ -427,64 +422,14 @@ mcp_client.call_tool("add_text", {
 
 ---
 
-## 🌟 企业级特性
-
-### 🔒 安全性
-
-- **🛡️ 输入验证**: 严格的参数校验和类型检查
-- **🔐 错误处理**: 完善的异常捕获和错误报告
-- **📊 日志记录**: 详细的操作日志和调试信息
-- **🚫 资源限制**: 内存和处理时间限制保护
-
-### ⚡ 性能优化
-
-- **🚀 异步处理**: 非阻塞的并发操作支持
-- **💾 内存管理**: 智能的资源回收和缓存机制
-- **📈 批量处理**: 高效的批量操作接口
-- **⏱️ 响应时间**: 毫秒级的 API 响应速度
-
-### 🔧 可扩展性
-
-- **🔌 插件架构**: 模块化的功能扩展支持
-- **🌐 多协议**: HTTP REST 和 MCP 双协议支持
-- **☁️ 云端部署**: 容器化和微服务架构就绪
-- **📊 监控集成**: 完整的性能监控和指标收集
-
----
-
 ## 🤝 社区与支持
-
-### 💬 获取帮助
-
-<div align="center">
-
-| 📞 支持渠道 | 🔗 链接 | 📝 描述 |
-|------------|---------|----------|
-| **🐛 问题报告** | [GitHub Issues](https://github.com/sun-guannan/CapCutAPI/issues) | Bug 报告和功能请求 |
-| **💡 功能建议** | [Discussions](https://github.com/sun-guannan/CapCutAPI/discussions) | 社区讨论和建议 |
-| **📖 文档反馈** | [Documentation Issues](https://github.com/sun-guannan/CapCutAPI/issues?q=label%3Adocumentation) | 文档改进建议 |
-| **🔧 技术支持** | [Stack Overflow](https://stackoverflow.com/questions/tagged/capcut-api) | 技术问题解答 |
-
-</div>
 
 ### 🎯 贡献指南
 
 我们欢迎各种形式的贡献！
 
 ```bash
-# 1. Fork 项目
-git clone https://github.com/your-username/CapCutAPI.git
-
-# 2. 创建功能分支
-git checkout -b feature/amazing-feature
-
-# 3. 提交更改
-git commit -m 'Add amazing feature'
-
-# 4. 推送分支
-git push origin feature/amazing-feature
-
-# 5. 创建 Pull Request
+向dev分支提交pr，每周一从dev合并到main分支并发版
 ```
 
 ### 🏆 进群交流
@@ -498,7 +443,7 @@ git push origin feature/amazing-feature
 
 ### 🤝 合作机会
 
-- **出海视频制作**: 想要利用这个API批量制作出海视频吗？我提供免费的咨询服务，帮助你利用这个API制作。相应的，我要将工作流代码放到这个项目里公开出来。
+- **出海视频制作**: 想要利用这个API批量制作出海视频吗？我提供免费的咨询服务，帮助你利用这个API制作。相应的，我要将制作的工作流模板放到这个项目中的template目录中**开源**出来。
 
 - **加入我们**: 我们的目标是提供稳定可靠的视频剪辑工具，方便融合AI生成的图片/视频/语音。如果你有兴趣，可以先从将工程里的中文翻译成英文开始！提交pr，我会看到。更深入的，还有MCP剪辑Agent, web剪辑端，云渲染这三个模块代码还没有开源出来。
 
@@ -561,12 +506,7 @@ Copyright (c) 2025 CapCutAPI Contributors
 **现在就体验 CapCutAPI 的强大功能！**
 
 [![立即开始](https://img.shields.io/badge/🚀_立即开始-blue?style=for-the-badge&logo=rocket)](https://www.capcutapi.top)
-[![下载项目](https://img.shields.io/badge/📥_下载项目-green?style=for-the-badge&logo=download)](https://github.com/sun-guannan/CapCutAPI/archive/refs/heads/main.zip)
-[![查看文档](https://img.shields.io/badge/📖_查看文档-orange?style=for-the-badge&logo=book)](./MCP_文档_中文.md)
-
 ---
-
-**🆕 新功能**: 现已支持 MCP 协议，实现与 AI 助手的无缝集成！立即尝试 MCP 服务器，体验高级视频编辑自动化。
 
 *Made with ❤️ by the CapCutAPI Community*
 
