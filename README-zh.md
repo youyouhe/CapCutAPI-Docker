@@ -31,7 +31,7 @@
 
 [![AI Cut](https://img.youtube.com/vi/fBqy6WFC78E/hqdefault.jpg)](https://www.youtube.com/watch?v=fBqy6WFC78E)
 
-**通过工具，将AI生成的图片，视频组合起来**
+**通过CapCutAPI，将AI生成的图片，视频组合起来**
 
 [![Airbnb](https://img.youtube.com/vi/1zmQWt13Dx0/hqdefault.jpg)](https://www.youtube.com/watch?v=1zmQWt13Dx0)
 

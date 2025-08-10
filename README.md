@@ -19,21 +19,21 @@ Enjoy It!  😀😀😀
 
 ## Demos
 
-\<div align="center"\>
+<div align="center">
 
 **MCP, create your own editing Agent**
 
-[](https://www.youtube.com/watch?v=fBqy6WFC78E)
+[![AI Cut](https://img.youtube.com/vi/fBqy6WFC78E/hqdefault.jpg)](https://www.youtube.com/watch?v=fBqy6WFC78E)
 
-**Combine AI-generated images and videos using tools**
+**Combine AI-generated images and videos using CapCutAPI**
 
-[](https://www.youtube.com/watch?v=1zmQWt13Dx0)
+[![Airbnb](https://img.youtube.com/vi/1zmQWt13Dx0/hqdefault.jpg)](https://www.youtube.com/watch?v=1zmQWt13Dx0)
 
-[](https://www.youtube.com/watch?v=IF1RDFGOtEU)
+[![Horse](https://img.youtube.com/vi/IF1RDFGOtEU/hqdefault.jpg)](https://www.youtube.com/watch?v=IF1RDFGOtEU)
 
-[](https://www.youtube.com/watch?v=rGNLE_slAJ8)
+[![Song](https://img.youtube.com/vi/rGNLE_slAJ8/hqdefault.jpg)](https://www.youtube.com/watch?v=rGNLE_slAJ8)
 
-\</div\>
+</div>
 
 ## Key Features
 
