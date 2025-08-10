@@ -4,8 +4,18 @@
 
 直接体验：https://www.capcutapi.top
 
+```
+👏👏👏👏 庆祝github 700星，送出价值7000点不记名云渲染券：08B88A2C-1D16-4CE1-982E-E3732F2655F3
+```
+
 ## 效果演示
+**MCP,创建属于自己的剪辑Agent**
+
+[![AI Cut](https://img.youtube.com/vi/fBqy6WFC78E/hqdefault.jpg)](https://www.youtube.com/watch?v=fBqy6WFC78E)
+
 **通过工具，将AI生成的图片，视频组合起来**
+
+[![Airbnb](https://img.youtube.com/vi/1zmQWt13Dx0/hqdefault.jpg)](https://www.youtube.com/watch?v=1zmQWt13Dx0)
 
 [![Horse](https://img.youtube.com/vi/IF1RDFGOtEU/hqdefault.jpg)](https://www.youtube.com/watch?v=IF1RDFGOtEU)
 
@@ -142,7 +152,9 @@ print(response.json())
 - **AI增强**：集成多种AI服务，提升视频制作效率
 
 ## 进群交流
-![image](https://github.com/user-attachments/assets/2103d43a-bfa4-4739-9c58-82552aa7e92c)
+![微信图片_2025-08-09_160139_314](https://github.com/user-attachments/assets/343c0f57-1551-49c1-bec3-c6bbcdbbbf32)
+
+
 
 - 反馈问题
 - 功能建议

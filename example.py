@@ -2,14 +2,20 @@ import requests
 import json
 import sys
 import time
+from settings.local import PORT
 from util import timing_decorator
 import functools
 import threading
+from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
+from util import hex_to_rgb
 
 
 # Base URL of the service, please modify according to actual situation
-BASE_URL = "http://localhost:9000"
-LICENSE_KEY = "539C3FEB-74AE48D4-A964D52B-C520F801"  # Using trial version license key
+BASE_URL = f"http://localhost:{PORT}"
+LICENSE_KEY = "trial"  # Trial license key
+
+CAPCUT_DRAFT_FOLDER = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+JIANYINGPRO_DRAFT_FOLDER = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
 
 def make_request(endpoint, data, method='POST'):
     """Send HTTP request to the server and handle the response"""
@@ -37,7 +43,6 @@ def add_audio_track(audio_url, start, end, target_start, volume=1.0,
                     speed=1.0, track_name="main_audio", effect_type=None, effect_params=None, draft_id=None):
     """API call to add audio track"""
     data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
         "audio_url": audio_url,
         "start": start,
         "end": end,
@@ -54,22 +59,30 @@ def add_audio_track(audio_url, start, end, target_start, volume=1.0,
         
     return make_request("add_audio", data)
 
-def add_text_impl(text, start, end, font, font_color, font_size, track_name,draft_folder="123", draft_id=None,
-                  vertical=False, transform_x=0.5, transform_y=0.5, font_alpha=1.0,
+def add_text_impl(text, start, end, font, font_color, font_size, track_name, draft_folder="123", draft_id=None,
+                  vertical=False, transform_x=0, transform_y=0, font_alpha=1.0,
                   border_color=None, border_width=0.0, border_alpha=1.0,
                   background_color=None, background_alpha=1.0, background_style=None,
+                  background_round_radius=0.0, background_height=0.14, background_width=0.14,
+                  background_horizontal_offset=0.5, background_vertical_offset=0.5,
+                  shadow_enabled=False, shadow_alpha=0.9, shadow_angle=-45.0,
+                  shadow_color="#000000", shadow_distance=5.0, shadow_smoothing=0.15,
                   bubble_effect_id=None, bubble_resource_id=None,
-                  effect_effect_id=None, outro_animation=None):
-    """API call to add text"""
+                  effect_effect_id=None, 
+                  intro_animation=None, intro_duration=0.5,
+                  outro_animation=None, outro_duration=0.5,
+                  width=1080, height=1920,
+                  fixed_width=-1, fixed_height=-1,
+                  text_styles=None):
+    """Add text with support for multiple styles, shadows, and backgrounds"""
     data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
         "draft_folder": draft_folder,
         "text": text,
         "start": start,
         "end": end,
         "font": font,
-        "color": font_color,
-        "size": font_size,
+        "font_color": font_color,
+        "font_size": font_size,
         "alpha": font_alpha,
         "track_name": track_name,
         "vertical": vertical,
@@ -89,6 +102,21 @@ def add_text_impl(text, start, end, font, font_color, font_size, track_name,draf
         data["background_alpha"] = background_alpha
         if background_style:
             data["background_style"] = background_style
+        data["background_round_radius"] = background_round_radius
+        data["background_height"] = background_height
+        data["background_width"] = background_width
+        data["background_horizontal_offset"] = background_horizontal_offset
+        data["background_vertical_offset"] = background_vertical_offset
+    
+    # Add shadow parameters
+    if shadow_enabled:
+        data["shadow_enabled"] = shadow_enabled
+        data["shadow_alpha"] = shadow_alpha
+        data["shadow_angle"] = shadow_angle
+        data["shadow_color"] = shadow_color
+        data["shadow_distance"] = shadow_distance
+        data["shadow_smoothing"] = shadow_smoothing
+    
     
     # Add bubble effect parameters
     if bubble_effect_id:
@@ -100,23 +128,45 @@ def add_text_impl(text, start, end, font, font_color, font_size, track_name,draf
     if effect_effect_id:
         data["effect_effect_id"] = effect_effect_id
     
-    if draft_id:
-        data["draft_id"] = draft_id
-        
+    # Add intro animation parameters
+    if intro_animation:
+        data["intro_animation"] = intro_animation
+        data["intro_duration"] = intro_duration
+    
+    # Add outro animation parameters
     if outro_animation:
         data["outro_animation"] = outro_animation
+        data["outro_duration"] = outro_duration
+    
+    # Add size parameters
+    data["width"] = width
+    data["height"] = height
+    
+    # Add fixed size parameters
+    if fixed_width > 0:
+        data["fixed_width"] = fixed_width
+    if fixed_height > 0:
+        data["fixed_height"] = fixed_height
+    
+    if draft_id:
+        data["draft_id"] = draft_id
+    
+    # Add text styles parameters
+    if text_styles:
+        data["text_styles"] = text_styles
+
+    if draft_id:
+        data["draft_id"] = draft_id
         
     return make_request("add_text", data)
 
 def add_image_impl(image_url, width, height, start, end, track_name, draft_id=None,
                   transform_x=0, transform_y=0, scale_x=1.0, scale_y=1.0, transition=None, transition_duration=None,
-                  # New mask-related parameters
                   mask_type=None, mask_center_x=0.0, mask_center_y=0.0, mask_size=0.5,
                   mask_rotation=0.0, mask_feather=0.0, mask_invert=False,
-                  mask_rect_width=None, mask_round_corner=None):
+                  mask_rect_width=None, mask_round_corner=None, background_blur=None):
     """API call to add image"""
     data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
         "image_url": image_url,
         "width": width,
         "height": height,
@@ -143,6 +193,8 @@ def add_image_impl(image_url, width, height, start, end, track_name, draft_id=No
     
     if draft_id:
         data["draft_id"] = draft_id
+    if background_blur:
+        data["background_blur"] = background_blur
         
     return make_request("add_image", data)
 
@@ -150,7 +202,6 @@ def generate_image_impl(prompt, width, height, start, end, track_name, draft_id=
                   transform_x=0, transform_y=0, scale_x=1.0, scale_y=1.0, transition=None, transition_duration=None):
     """API call to add image"""
     data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
         "prompt": prompt,
         "width": width,
         "height": height,
@@ -176,7 +227,6 @@ def add_sticker_impl(resource_id, start, end, draft_id=None, transform_x=0, tran
                     width=1080, height=1920):
     """API call to add sticker"""
     data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
         "sticker_id": resource_id,
         "start": start,
         "end": end,
@@ -208,7 +258,6 @@ def add_video_keyframe_impl(draft_id, track_name, property_type=None, time=None,
     2. Batch keyframes: using property_types, times, values parameters (in list form)
     """
     data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
         "draft_id": draft_id,
         "track_name": track_name
     }
@@ -237,10 +286,9 @@ def add_video_impl(video_url, start=None, end=None, width=None, height=None, tra
                    # Mask-related parameters
                    mask_type=None, mask_center_x=0.5, mask_center_y=0.5, mask_size=1.0,
                    mask_rotation=0.0, mask_feather=0.0, mask_invert=False,
-                   mask_rect_width=None, mask_round_corner=None):
+                   mask_rect_width=None, mask_round_corner=None, background_blur=None):
     """API call to add video track"""
     data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
         "video_url": video_url,
         "height": height,
         "track_name": track_name,
@@ -272,13 +320,14 @@ def add_video_impl(video_url, start=None, end=None, width=None, height=None, tra
         data["width"] = width
     if height:
         data["height"] = height
+    if background_blur:
+        data["background_blur"] = background_blur
     return make_request("add_video", data)
 
 def add_effect(effect_type, start, end, draft_id=None, track_name="effect_01",
               params=None, width=1080, height=1920):
     """API call to add effect"""
     data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
         "effect_type": effect_type,
         "start": start,
         "end": end,
@@ -295,8 +344,7 @@ def add_effect(effect_type, start, end, draft_id=None, track_name="effect_01",
 
 def test_effect_01():
     """Test adding effect service"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     
     print("\nTest: Adding effect")
     effect_result = add_effect(
@@ -317,8 +365,8 @@ def test_effect_01():
 
 
 def test_text():
-    """Test adding text"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    """Test adding text with various features"""
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # Test case 1: Basic text addition
     print("\nTest: Adding basic text")
@@ -363,7 +411,7 @@ def test_text():
         track_name="main_text",
         transform_y=0.0,
         transform_x=0.5,
-        border_color="#FF0000",  # Black border
+        border_color="#FF0000",  # Red border
         border_width=20.0,
         border_alpha=1.0,
         background_color="#0000FF",  # Blue background
@@ -372,19 +420,373 @@ def test_text():
     )
     print("Test case 3 (Border and background) successful:", result3)
     
+    # Test case 4: Text with shadow effect
+    result4 = add_text_impl(
+        draft_id=result3['output']['draft_id'],
+        text="Shadow effect test",
+        start=9,
+        end=12,
+        font="思源中宋",
+        font_color="#FFFFFF",  # White text
+        font_size=28.0,
+        track_name="main_text",
+        transform_y=-0.3,
+        transform_x=0.5,
+        shadow_enabled=True,  # Enable shadow
+        shadow_alpha=0.8,
+        shadow_angle=-30.0,
+        shadow_color="#000000",  # Black shadow
+        shadow_distance=8.0,
+        shadow_smoothing=0.2
+    )
+    print("Test case 4 (Shadow effect) successful:", result4)
+    
+    # Test case 5: Multi-style text using TextStyleRange
+    # Create different text styles
+    style1 = {
+        "start": 0,
+        "end": 5,
+        "style": {
+            "color": "#FF0000",  # Red
+            "size": 30,
+            "bold": True
+        },
+        "border": {
+            "color": "#FFFFFF",  # White border
+            "width": 40,
+            "alpha": 1.0
+        },
+        "font": "思源中宋"
+    }
+    
+    style2 = {
+        "start": 5,
+        "end": 10,
+        "style": {
+            "color": "#00FF00",  # Green
+            "size": 25,
+            "italic": True
+        },
+        "font": "挥墨体"
+    }
+    
+    style3 = {
+        "start": 10,
+        "end": 15,
+        "style": {
+            "color": "#0000FF",  # Blue
+            "size": 20,
+            "underline": True
+        },
+        "font": "金陵体"
+    }
+    
+    # Add multi-style text
+    result5 = add_text_impl(
+        draft_id=result4['output']['draft_id'],
+        text="Multi-style text test",
+        start=12,
+        end=15,
+        font="思源粗宋",
+        track_name="main_text",
+        transform_y=0.3,
+        transform_x=0.5,
+        font_color="#000000",  # Default black
+        font_size=20.0,
+        # Use dictionary list instead of TextStyleRange object list
+        text_styles=[style1, style2, style3]
+    )
+    print("Test case 5 (Multi-style text) successful:", result5)
+    
+    # Test case 6: Combined effects - shadow + background + multi-style
+    combined_style1 = {
+        "start": 0,
+        "end": 8,
+        "style": {
+            "color": "#FFD700",  # Gold
+            "size": 32,
+            "bold": True
+        },
+        "border": {
+            "color": "#8B4513",  # Brown border
+            "width": 30,
+            "alpha": 0.8
+        },
+        "font": "思源中宋"
+    }
+    
+    combined_style2 = {
+        "start": 8,
+        "end": 16,
+        "style": {
+            "color": "#FF69B4",  # Hot pink
+            "size": 28,
+            "italic": True
+        },
+        "font": "挥墨体"
+    }
+    
+    result6 = add_text_impl(
+        draft_id=result5['output']['draft_id'],
+        text="Combined effects demo",
+        start=15,
+        end=18,
+        font="思源粗宋",
+        track_name="main_text",
+        transform_y=-0.6,
+        transform_x=0.5,
+        font_color="#FFFFFF",  # Default white
+        font_size=24.0,
+        # Background settings
+        background_color="#4169E1",  # Royal blue background
+        background_alpha=0.6,
+        background_style=1,
+        background_round_radius=0.3,
+        background_height=0.18,
+        background_width=0.8,
+        # Shadow settings
+        shadow_enabled=True,
+        shadow_alpha=0.7,
+        shadow_angle=-60.0,
+        shadow_color="#2F4F4F",  # Dark slate gray shadow
+        shadow_distance=6.0,
+        shadow_smoothing=0.25,
+        # Multi-style text
+        text_styles=[combined_style1, combined_style2]
+    )
+    print("Test case 6 (Combined effects) successful:", result6)
+    
     # Finally save and upload the draft
-    if result3.get('success') and result3.get('output'):
-        save_result = save_draft_impl(result3['output']['draft_id'],draft_folder)
+    if result6.get('success') and result6.get('output'):
+        save_result = save_draft_impl(result6['output']['draft_id'], draft_folder)
         print(f"Draft save result: {save_result}")
     
     # Return the last test result for subsequent operations (if any)
-    return result3
+    return result6
+
+
+def test_text_02():
+    """测试添加文本"""
+    draft_folder = CAPCUT_DRAFT_FOLDER
+
+    # 测试用例1：基本文本添加
+    print("\n测试：添加基本文本")
+    text_result = add_text_impl(
+        text="你好，我是剪映助手",
+        start=0,
+        end=3,
+        font="思源中宋",
+        font_color="#FF0000",  # 红色
+        track_name="main_text",
+        transform_y=0.8,
+        transform_x=0.5,
+        font_size=30.0
+    )
+    print("测试用例1（基本文本）成功:", text_result)
+
+    # 测试用例2：竖排文本
+    result2 = add_text_impl(
+        draft_id=text_result['output']['draft_id'],
+        text="竖排文本演示",
+        start=3,
+        end=6,
+        font="云书法三行魏碑体",
+        font_color="#00FF00",  # 绿色
+        font_size=8.0,
+        track_name="main_text",
+        vertical=True,  # 启用竖排
+        transform_y=-0.5,
+        outro_animation='晕开'
+    )
+    print("测试用例2（竖排文本）成功:", result2)
+
+    # 测试用例3：带描边和背景的文本
+    result3 = add_text_impl(
+        draft_id=result2['output']['draft_id'],
+        text="描边和背景测试",
+        start=6,
+        end=9,
+        font="思源中宋",
+        font_color="#FFFFFF",  # 白色文字
+        font_size=24.0,
+        track_name="main_text",
+        transform_y=0.0,
+        transform_x=0.5,
+        border_color="#FF0000",  # 红色描边
+        border_width=20.0,
+        border_alpha=1.0,
+        background_color="#0000FF",  # 蓝色背景
+        background_alpha=0.5,  # 半透明背景
+        background_style=0  # 气泡样式背景
+    )
+    print("测试用例3（描边和背景）成功:", result3)
+    
+    # 测试用例4：使用 TextStyleRange 的多样式文本
+    # 创建不同的文本样式
+    style1 = {
+        "start": 0,
+        "end": 2,
+        "style": {
+            "color": "#FF0000",  # 红色
+            "size": 30,
+            "bold": True
+        },
+        "border": {
+            "color": "#FFFFFF",  # 白色描边
+            "width": 40,
+            "alpha": 1.0
+        },
+        "font": "思源中宋"
+    }
+    
+    style2 = {
+        "start": 2,
+        "end": 4,
+        "style": {
+            "color": "#00FF00",  # 绿色
+            "size": 25,
+            "italic": True
+        },
+        "font": "挥墨体"
+    }
+    
+    style3 = {
+        "start": 4,
+        "end": 6,
+        "style": {
+            "color": "#0000FF",  # 蓝色
+            "size": 20,
+            "underline": True
+        },
+        "font": "金陵体"
+    }
+    
+    # 添加多样式文本
+    result4 = add_text_impl(
+        draft_id=result3['output']['draft_id'],
+        text="多样式\n文本测试",
+        start=9,
+        end=12,
+        font="思源粗宋",
+        track_name="main_text",
+        transform_y=0.5,
+        transform_x=0.5,
+        font_color="#000000",  # 默认黑色
+        font_size=20.0,
+        # 使用字典列表而不是 TextStyleRange 对象列表
+        text_styles=[style1, style2, style3]
+    )
+    print("测试用例4（多样式文本）成功:", result4)
+    
+    # 最后保存并上传草稿
+    if result4.get('success') and result4.get('output'):
+        save_result = save_draft_impl(result4['output']['draft_id'],draft_folder)
+        print(f"草稿保存结果: {save_result}")
+    
+    # 返回最后一个测试结果用于后续操作（如果有的话）
+    return result4
+
+
+def test_text_03():
+    """测试添加文本"""
+    draft_folder = CAPCUT_DRAFT_FOLDER
+
+    # 测试用例1：基本文本添加
+    print("\n测试：添加基本文本")
+    text_result = add_text_impl(
+        text="现在支持",
+        start=0,
+        end=6,
+        font="挥墨体",
+        font_color="#FFFFFF",  # 红色
+        track_name="text_01",
+        transform_y=0.58,
+        transform_x=0,
+        font_size=24.0,
+        intro_animation="弹入",
+        intro_duration=0.5
+    )
+    print("测试用例1（基本文本）成功:", text_result)
+
+    # 测试用例2：带背景参数的文本
+    result2 = add_text_impl(
+        draft_id=text_result['output']['draft_id'],
+        text="文字背景",
+        start=1.5,
+        end=6,
+        font="思源中宋",
+        font_color="#FFFFFF", 
+        font_size=20.0,
+        track_name="text_2",
+        transform_y=0.15,
+        transform_x=0,
+        background_color="#0000FF",  # 蓝色背景
+        background_alpha=0.7,  # 70%透明度
+        background_style=1,  
+        background_round_radius=0.5,  # 圆角半径
+        background_height=0.2,  # 背景高度
+        background_width=0.8,  # 背景宽度
+        background_horizontal_offset=0.5,  # 水平居中
+        background_vertical_offset=0.5,  # 垂直居中
+        intro_animation="弹入",
+        intro_duration=0.5
+    )
+    print("测试用例2（背景参数）成功:", result2)
+
+    # 测试用例3：带阴影参数的文本
+    result3 = add_text_impl(
+        draft_id=result2['output']['draft_id'],
+        text="文字阴影",
+        start=3,
+        end=6,
+        font="金陵体",
+        font_color="#FFFF00",  # 黄色文字
+        font_size=25.0,
+        track_name="text3",
+        transform_y=-0.16,
+        transform_x=0,
+        shadow_enabled=True,  # 启用阴影
+        shadow_alpha=0.8,  # 阴影透明度
+        shadow_angle=-45.0,  # 阴影角度
+        shadow_color="#0000FF",  # 蓝色阴影
+        shadow_distance=10.0,  # 阴影距离
+        shadow_smoothing=0.3,  # 阴影平滑度
+        intro_animation="弹入",
+        intro_duration=0.5
+    )
+    print("测试用例3（阴影参数）成功:", result3)
+    
+    # 测试用例4：带描边和背景的文本
+    result4 = add_text_impl(
+        draft_id=result3['output']['draft_id'],
+        text="文字描边",
+        start=4.5,
+        end=6,
+        font="思源中宋",
+        font_color="#FFFFFF",  # 白色文字
+        font_size=24.0,
+        track_name="text_4",
+        transform_y=-0.58,
+        border_color="#FF0000",  # 红色描边
+        border_width=20.0,
+        border_alpha=1.0,
+        intro_animation="弹入",
+        intro_duration=0.5
+    )
+    print("测试用例4（综合参数）成功:", result4)
+    
+    # 最后保存并上传草稿
+    if text_result.get('success') and text_result.get('output'):
+        save_result = save_draft_impl(text_result['output']['draft_id'],draft_folder)
+        print(f"草稿保存结果: {save_result}")
+    
+    # 返回最后一个测试结果用于后续操作（如果有的话）
+    return text_result
 
 
 def test_image01():
     """Test adding image"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -405,7 +807,7 @@ def test_image01():
 
 def test_image02():
     """Test adding multiple images"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -442,7 +844,7 @@ def test_image02():
 
 def test_image03():
     """Test adding images to different tracks"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -495,7 +897,7 @@ def test_image03():
 
 def test_image04():
     """Test adding image"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -513,10 +915,26 @@ def test_image04():
     print(f"Image added successfully! {image_result['output']['draft_id']}")
     print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
 
+def test_image05():
+    """测试添加图片"""
+    draft_folder = CAPCUT_DRAFT_FOLDER
+
+    print("\n测试：添加图片1")
+    image_result = add_image_impl(
+        image_url="https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_image_v2/d6e33c84d7554146a25b1093b012838b_0.png?x-oss-process=image/resize,w_500/watermark,image_aW1nL3dhdGVyMjAyNDExMjkwLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSxtX2ZpeGVkLHdfMTQ1LGhfMjU=,t_80,g_se,x_10,y_10/format,webp",
+        width=1920,
+        height=1080,
+        start=5.0,
+        end=10.0,
+        track_name="image_main",
+        background_blur=3
+    )
+    print(f"添加图片成功！{image_result['output']['draft_id']}")
+    print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
 
 def test_mask_01():
     """Test adding images to different tracks"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -573,8 +991,10 @@ def test_mask_01():
 
 def test_mask_02():
     """Test adding videos to different tracks"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
+    # Set draft folder path for saving  
+    draft_folder = CAPCUT_DRAFT_FOLDER
+    # Define video URL for testing
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4"
     draft_id = None  # Initialize draft_id
     
     # Add video to first track
@@ -637,8 +1057,7 @@ def test_mask_02():
 
 def test_audio01():
     """Test adding audio"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding audio")
     audio_result = add_audio_track(
@@ -659,8 +1078,7 @@ def test_audio01():
 
 def test_audio02():
     """Test adding multiple audio segments"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding audio 1")
     audio_result = add_audio_track(
@@ -697,8 +1115,7 @@ def test_audio02():
 
 def test_audio03():
     """Test adding audio in a loop"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     draft_id = None  # Initialize draft_id
     
@@ -729,8 +1146,7 @@ def test_audio03():
 
 def test_audio04():
     """Test adding audio to different tracks"""
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding audio 1")
     audio_result = add_audio_track(
@@ -899,7 +1315,7 @@ def query_draft_status_impl_polling(task_id, timeout=300, callback=None):
     return thread, result_container
 
 def test_subtitle():
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # Test case: Add text subtitles
     print("\nTest: Adding text subtitles")
@@ -933,8 +1349,7 @@ def test_subtitle():
         print(f"Draft save result: {save_result}")
 
 def test01():
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    # draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # Combined test
     print("\nTest 2: Add audio")
@@ -1085,8 +1500,7 @@ def test01():
     save_draft_impl(keyframe_result['output']['draft_id'], draft_folder)
 
 def test02():
-    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     # Combined test
     print("\nTest 2: Add audio")
@@ -1238,7 +1652,7 @@ def test02():
 
 def test_video_track01():
     """Test adding video track"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
 
     print("\nTest: Add video track")
@@ -1262,7 +1676,7 @@ def test_video_track01():
 
 def test_video_track02():
     """Test adding video tracks in a loop"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
     draft_id = None  # Initialize draft_id
     
@@ -1289,7 +1703,7 @@ def test_video_track02():
 
 def test_video_track03():
     """Test adding videos to different tracks"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
     draft_id = None  # Initialize draft_id
     
@@ -1347,7 +1761,7 @@ def test_video_track03():
 
 def test_video_track04():
     """Test adding video track"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
 
     print("\nTest: Add video track")
@@ -1369,9 +1783,30 @@ def test_video_track04():
     else:
         print("Unable to get draft ID, skipping save operation.")
 
+def test_video_track05():
+    """测试添加视频轨道"""
+    draft_folder = CAPCUT_DRAFT_FOLDER
+
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # 替换为实际视频URL
+
+    print("\n测试：添加视频轨道")
+    video_result = add_video_impl(
+        video_url='https://p26-bot-workflow-sign.byteimg.com/tos-cn-i-mdko3gqilj/07bf6797a1834d75beb05c63293af204.mp4~tplv-mdko3gqilj-image.image?rk3s=81d4c505&x-expires=1782141919&x-signature=2ETX83Swh%2FwKzHeWB%2F9oGq9vqt4%3D&x-wf-file_name=output-997160b5.mp4',
+        background_blur=2,
+        width=1920,
+        height=1080
+    )
+
+    print(f"视频轨道添加结果: {video_result}")
+    if video_result and 'output' in video_result and 'draft_id' in video_result['output']:
+        draft_id = video_result['output']['draft_id']
+        print(f"保存草稿: {save_draft_impl(draft_id, draft_folder)}")
+    else:
+        print("无法获取草稿ID，跳过保存操作。")
+
 def test_keyframe():
     """Test adding keyframes"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     draft_id = None  # Initialize draft_id
     
     print("\nTest: Add basic video track")
@@ -1429,7 +1864,7 @@ def test_keyframe():
 
 def test_keyframe_02():
     """Test adding keyframes - Batch adding to implement fade-in and zoom bounce effects"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     draft_id = None  # Initialize draft_id
     
     print("\nTest: Adding basic video track")
@@ -1490,7 +1925,7 @@ def test_keyframe_02():
 
 def test_subtitle_01():
     """Test adding text subtitles"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     
     print("\nTest 3: Adding text subtitles")
     text_result = add_subtitle_impl(
@@ -1518,7 +1953,7 @@ def test_subtitle_01():
 
 def test_subtitle_02():
     """Test adding text subtitles via SRT URL"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = CAPCUT_DRAFT_FOLDER
     
     print("\nTest 3: Adding text subtitles (from URL)")
     text_result = add_subtitle_impl(
@@ -1544,8 +1979,10 @@ def test_subtitle_02():
     return text_result
 
 
-def test_video():
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+def test_video_01():
+    """Test adding single video with transform and speed parameters"""
+    # Set draft folder path for saving
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding video")
     video_result = add_video_impl(
@@ -1571,7 +2008,9 @@ def test_video():
         save_draft_impl(video_result['output']['draft_id'], draft_folder)
         
 def test_video_02():
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    """Test adding multiple videos with different resolutions to the same draft"""
+    # Set draft folder path for saving
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding video")
     video_result = add_video_impl(
@@ -1608,7 +2047,7 @@ def test_video_02():
         relative_index=0
     )
     video_result = add_video_impl(
-        video_url="https://videos.pexels.com/video-files/3129769/3129769-uhd_3840_2160_30fps.mp4", # 替换为实际的视频URL
+        video_url="https://videos.pexels.com/video-files/3129769/3129769-uhd_3840_2160_30fps.mp4", # Replace with actual video URL
         draft_id=video_result['output']['draft_id'],
         start=0,
         end=5,
@@ -1624,7 +2063,7 @@ def test_video_02():
         relative_index=0
     )
     video_result = add_video_impl(
-        video_url="https://videos.pexels.com/video-files/3129769/3129769-sd_426_240_30fps.mp4", # 替换为实际的视频URL
+        video_url="https://videos.pexels.com/video-files/3129769/3129769-sd_426_240_30fps.mp4", # Replace with actual video URL
         draft_id=video_result['output']['draft_id'],
         start=0,
         end=5,
@@ -1640,7 +2079,7 @@ def test_video_02():
         relative_index=0
     )
     video_result = add_video_impl(
-        video_url="https://videos.pexels.com/video-files/3129769/3129769-sd_640_360_30fps.mp4", # 替换为实际的视频URL
+        video_url="https://videos.pexels.com/video-files/3129769/3129769-sd_640_360_30fps.mp4", # Replace with actual video URL
         draft_id=video_result['output']['draft_id'],
         start=0,
         end=5,
@@ -1656,7 +2095,7 @@ def test_video_02():
         relative_index=0
     )
     video_result = add_video_impl(
-        video_url="https://videos.pexels.com/video-files/3129769/3129769-uhd_2560_1440_30fps.mp4", # 替换为实际的视频URL
+        video_url="https://videos.pexels.com/video-files/3129769/3129769-uhd_2560_1440_30fps.mp4", # Replace with actual video URL
         draft_id=video_result['output']['draft_id'],
         start=0,
         end=5,
@@ -1679,8 +2118,8 @@ def test_video_02():
    
 def test_stiker_01():
     """Test adding stickers"""
-    # Add stickers, test various parameters
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    # Add stickers, test various parameters, only for jianyingpro
+    draft_folder = JIANYINGPRO_DRAFT_FOLDER
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         start=1.0,
@@ -1697,8 +2136,8 @@ def test_stiker_01():
 
 def test_stiker_02():
     """Test adding stickers"""
-    # Add stickers, test various parameters
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    # Add stickers, test various parameters, only for jianyingpro
+    draft_folder = JIANYINGPRO_DRAFT_FOLDER
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         start=1.0,
@@ -1727,8 +2166,8 @@ def test_stiker_02():
 
 def test_stiker_03():
     """Test adding stickers"""
-    # Add stickers, test various parameters
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    # Add stickers, test various parameters, only for jianyingpro
+    draft_folder = JIANYINGPRO_DRAFT_FOLDER
     result = add_sticker_impl(
         resource_id="7107529669750066445",
         start=1.0,
@@ -1761,8 +2200,9 @@ def test_stiker_03():
 
 
 def test_transition_01():
-    """Test adding multiple images"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    """Test adding multiple images with dissolve transition effects"""
+    # Set draft folder path for saving
+    draft_folder = CAPCUT_DRAFT_FOLDER
 
     print("\nTest: Adding image 1")
     image_result = add_image_impl(
@@ -1800,9 +2240,11 @@ def test_transition_01():
 
 
 def test_transition_02():
-    """Test adding video tracks"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4" # Replace with actual video URL
+    """Test adding video tracks with transition effects"""
+    # Set draft folder path for saving  
+    draft_folder = CAPCUT_DRAFT_FOLDER
+    # Define video URL for testing
+    video_url = "https://cdn.wanx.aliyuncs.com/wanx/1719234057367822001/text_to_video/092faf3c94244973ab752ee1280ba76f.mp4?spm=5176.29623064.0.0.41ed26d6cBOhV3&file=092faf3c94244973ab752ee1280ba76f.mp4"
 
     print("\nTest: Adding video track")
     video_result = add_video_impl(
@@ -1837,183 +2279,37 @@ def test_transition_02():
     else:
         print("Unable to get draft ID, skipping save operation.")
 
-def test_generate_image01():
-    """Test adding image"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-
-    print("\nTest: Adding image 1")
-    image_result = generate_image_impl(
-        prompt="An Asian style doodle person floating in rough sea waves labeled 'Job Market', throwing paper boats made of resumes that are sinking, with a bank account notification bubble showing low balance. Atmosphere: Lost, anxious, turbulent. Art style: Minimalist line art, black and white cartoon style, bold outlines, extremely thick lines, expressive emotions, simple doodle, monochromatic. Composition: Wide angle showing person in center of chaotic elements. Lighting: Harsh contrast.",
-        width=1024,
-        height=1024,
-        start=0,
-        end=5.0,
-        transform_y=0.7,
-        scale_x=2.0,
-        scale_y=1.0,
-        transform_x=0,
-        track_name="main"
-    )
-    print(f"Image generated successfully! {image_result['output']['draft_id']}")
-    print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
-
-def generate_speech_impl(texts, draft_id=None, audio_track_name=None, language="Chinese", 
-                        speaker_id="爽快思思/Skye",azure_speaker_id=None, speed_ratio=1.0, start_offset=0.0,
-                        end_padding=0.0, interval_time=0.5, volume=1.0, width=1080, height=1920,
-                        add_subtitle=True, text_track_name=None, font="文轩体", 
-                        font_color="#ffffff", font_size=8.0, transform_y=-0.8, transform_x=0,
-                        vertical=False, font_alpha=1.0, border_alpha=1.0, border_color="#000000",
-                        border_width=0.0, background_color="#000000", background_style=1,
-                        background_alpha=0.0, bubble_effect_id=None, bubble_resource_id=None,
-                        effect_effect_id=None, intro_animation=None, intro_duration=0.5,
-                        outro_animation=None, outro_duration=0.5):
-    """Generate TTS speech and add to draft API call"""
-    data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
-        "texts": texts,
-        "audio_track_name": audio_track_name,
-        "language": language,
-        "speaker_id": speaker_id,
-        "azure_speaker_id": azure_speaker_id,
-        "speed_ratio": speed_ratio,
-        "start_offset": start_offset,
-        "end_padding": end_padding,
-        "interval_time": interval_time,
-        "volume": volume,
-        "width": width,
-        "height": height,
-        "add_subtitle": add_subtitle,
-        "text_track_name": text_track_name,
-        "font": font,
-        "font_color": font_color,
-        "font_size": font_size,
-        "transform_y": transform_y,
-        "transform_x": transform_x,
-        "vertical": vertical,
-        "font_alpha": font_alpha,
-        "border_alpha": border_alpha,
-        "border_color": border_color,
-        "border_width": border_width,
-        "background_color": background_color,
-        "background_style": background_style,
-        "background_alpha": background_alpha,
-        "bubble_effect_id": bubble_effect_id,
-        "bubble_resource_id": bubble_resource_id,
-        "effect_effect_id": effect_effect_id,
-        "intro_animation": intro_animation,
-        "intro_duration": intro_duration,
-        "outro_animation": outro_animation,
-        "outro_duration": outro_duration
-    }
-    
-    if draft_id:
-        data["draft_id"] = draft_id
-        
-    return make_request("generate_speech", data)
-
-def test_generate_image02():
-    """Test adding image"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-
-    print("\nTest: Adding image 1")
-    image_result = generate_image_impl(
-        prompt="A cat in the garden",
-        width=1024,
-        height=1024,
-        start=0,
-        end=5.0,
-        transform_y=0.7,
-        scale_x=2.0,
-        scale_y=1.0,
-        transform_x=0,
-        track_name="main"
-    )
-    print("\nTest: Adding image 2")
-    image_result = generate_image_impl(
-        prompt="3 dogs running in the snow",
-        draft_id=image_result['output']['draft_id'],
-        width=576,
-        height=1024,
-        start=5.0,
-        end=10.0,
-        transform_y=-0.7,
-        scale_x=2.0,
-        scale_y=2.0,
-        transform_x=0,
-        track_name="main"
-    )
-    print(f"Image generated successfully! {image_result['output']['draft_id']}")
-    print(save_draft_impl(image_result['output']['draft_id'], draft_folder))
-
-@timing_decorator('TTS Speech Generation')
-def test_speech_01():
-    """Test TTS speech generation and subtitle addition"""
-    draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
-
-    print("\nTest: Generate TTS speech and add subtitles")
-    speech_result = generate_speech_impl(
-        texts=["Hello everyone, welcome to my video", "Today we will discuss an interesting topic","What to do when your child doesn't want to go to school", "Hope you enjoy this content","Hello everyone, welcome to my video", "Today we will discuss an interesting topic","What to do when your child doesn't want to go to school", "Hope you enjoy this content","Hello everyone, welcome to my video", "Today we will discuss an interesting topic","What to do when your child doesn't want to go to school", "Hope you enjoy this content"],
-        language="Chinese",
-        draft_id="123",
-        speaker_id="渊博小叔",
-        azure_speaker_id="zh-CN-YunjianNeural",
-        speed_ratio=1.0,
-        start_offset=1.0,
-        end_padding=1.0,
-        interval_time=0.5,
-        volume=0.8,
-        width=1080,
-        height=1920,
-        add_subtitle=True,
-        font="文轩体",
-        font_color="#ffffff",
-        font_size=8.0,
-        transform_y=-0.8,
-        transform_x=0,
-        border_width=2.0,
-        border_color="#000000",
-        border_alpha=0.8
-    )
-    print(f"TTS speech generation result: {speech_result}")
-    
-    # if speech_result.get('success'):
-    #     # Save draft
-    #     save_result = save_draft_impl(speech_result['output']['draft_id'], draft_folder)
-    #     print(f"Draft saving result: {save_result}")
-    # else:
-    #     print(f"TTS generation failed: {speech_result.get('error')}")
-
 if __name__ == "__main__":
-    # test01()
-    # test02()
-    # test_effect_01()  # Run effect test
-    # test_audio01()
-    # test_audio02()
-    # test_audio03()
-    # test_audio04()
+    test01()
+    test02()
+    test_effect_01()  # Run effect test
+    test_audio01()
+    test_audio02()
+    test_audio03()
+    test_audio04()
     test_image01()
-    # test_image02()
-    # test_image03()
-    # test_image04()
+    test_image02()
+    test_image03()
+    test_image04()
     # test_video()
-    # test_video_02()
-    # test_text()
-    # test_video_track01()
-    # test_video_track02()
-    # test_video_track03()
-    # test_video_track04()
-    # test_keyframe()
-    # test_keyframe_02()
-    # test_subtitle_01()
-    # test_subtitle_02()
-    # test_subtitle()
-    # test_stiker_01()
-    # test_stiker_02()
-    # test_stiker_03()
-    # test_transition_01()
-    # test_transition_02()
+    test_video_02()
+    test_text()
+    test_video_track01()
+    test_video_track02()
+    test_video_track03()
+    test_video_track04()
+    test_keyframe()
+    test_keyframe_02()
+    test_subtitle_01()
+    test_subtitle_02()
+    test_subtitle()
+    test_stiker_01()
+    test_stiker_02()
+    test_stiker_03()
+    test_transition_01()
+    test_transition_02()
     # test_generate_image01()
     # test_generate_image02()
     # test_speech_01()
-    # test_mask_01()
-    # test_mask_02()
+    test_mask_01()
+    test_mask_02()
