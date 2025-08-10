@@ -65,22 +65,9 @@
 
 ### 📋 系统要求
 
-<table>
-<tr>
-<td width="30%"><b>🐍 Python 环境</b></td>
-<td>Python 3.10+</td>
-</tr>
-<tr>
-<td><b>🎬 剪映应用</b></td>
-<td>剪映 或 CapCut 国际版</td>
-</tr>
-<tr>
-<td><b>🎵 FFmpeg</b></td>
-<td>用于媒体文件处理和分析</td>
-</tr>
-<tr>
-</tr>
-</table>
+- Python 3.10+
+- 剪映 或 CapCut 国际版
+- FFmpeg
 
 ### ⚡ 一键安装
 
