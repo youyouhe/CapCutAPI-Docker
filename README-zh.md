@@ -41,8 +41,6 @@
 
 </div>
 
----
-
 ## 核心功能
 
 
@@ -96,11 +94,11 @@ python capcut_server.py # 启动HTTP API服务器, 默认端口: 9001
 python mcp_server.py # 启动 MCP 协议服务，支持 stdio 通信
 ```
 
-## 🔧 MCP 集成指南
+## MCP 集成指南
 
-[🔧 MCP 文档](./MCP_文档_中文.md) • [🌍 MCP English Guide](./MCP_Documentation_English.md)
+[MCP 文档](./MCP_文档_中文.md) • [MCP English Guide](./MCP_Documentation_English.md)
 
-### 📱 客户端配置
+### 1. 客户端配置
 
 创建或更新 `mcp_config.json` 配置文件：
 
@@ -120,7 +118,7 @@ python mcp_server.py # 启动 MCP 协议服务，支持 stdio 通信
 }
 ```
 
-### 🧪 连接测试
+### 2. 连接测试
 
 ```bash
 # 测试 MCP 连接
@@ -132,25 +130,9 @@ python test_mcp_client.py
 ✅ 草稿创建测试通过
 ```
 
-### 🎯 MCP 特色功能
+## 使用示例
 
-<div align="center">
-
-| 功能 | 描述 | 示例 |
-|------|------|------|
-| 🎨 **高级文本样式** | 多色彩、阴影、背景效果 | `shadow_enabled: true` |
-| 🎬 **关键帧动画** | 位置、缩放、透明度动画 | `property_types: ["scale_x", "alpha"]` |
-| 🔊 **音频精控** | 音量、速度、音效处理 | `volume: 0.8, speed: 1.2` |
-| 📱 **多格式支持** | 各种视频尺寸和格式 | `width: 1080, height: 1920` |
-| ⚡ **实时处理** | 即时草稿更新和预览 | 毫秒级响应时间 |
-
-</div>
-
----
-
-## 💡 使用示例
-
-### 🌐 HTTP API 示例
+### API 示例
 <details>
 <summary><b>📹 添加视频素材</b></summary>
 
