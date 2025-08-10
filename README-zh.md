@@ -473,41 +473,6 @@ mcp_client.call_tool("add_text", {
 
 ---
 
-## 📄 许可证
-
-<div align="center">
-
-本项目采用 Apache 2.0 许可证开源。详情请查看 [LICENSE](LICENSE) 文件。
-
-Apache License 2.0
-
-Copyright (c) 2025 CapCutAPI Contributors
-
-根据 Apache 许可证 2.0 版（"许可证"）获得许可；
-除非符合许可证，否则您不得使用此文件。
-您可以在以下网址获得许可证副本：
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-除非适用法律要求或书面同意，否则根据许可证分发的软件
-是按"原样"分发的，不附带任何明示或暗示的保证或条件。
-请参阅许可证以了解许可证下的特定语言管理权限和
-限制。
-
-
-</div>
-
----
-
-<div align="center">
-
-## 🎉 立即开始
-
-**现在就体验 CapCutAPI 的强大功能！**
-
-[![立即开始](https://img.shields.io/badge/🚀_立即开始-blue?style=for-the-badge&logo=rocket)](https://www.capcutapi.top)
----
-
 *Made with ❤️ by the CapCutAPI Community*
 
 </div>
