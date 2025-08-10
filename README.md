@@ -1,18 +1,11 @@
 # Connect AI generates via CapCutAPI [Try it online](https://www.capcutapi.top)
 
-\<div align="center"\>
-
-```
-👏👏👏👏 Celebrating 700 GitHub stars, giving away a 7000-point anonymous cloud rendering coupon: 08B88A2C-1D16-4CE1-982E-E3732F2655F3
-```
-
-\</div\>
-
 ## Project Overview
+**CapCutAPI** is a powerful editing API that empowers you to take full control of your AI-generated assets, including images, audio, video, and text. It provides the precision needed to refine and customize raw AI output, such as adjusting video speed or mirroring an image. This capability effectively solves the lack of control often found in AI video generation, allowing you to easily transform your creative ideas into polished videos.
 
-**CapCutAPI** is a powerful cloud-based **editing** API that gives you precise control over AI-generated assets, including images, audio, video, and text.
-It provides the exact editing capabilities to assemble raw AI outputs, such as adjusting video speed or mirroring an image. This effectively solves the problem of a lack of precise control and difficulty in replicating AI-generated results, allowing you to easily transform creative ideas into polished videos.
-All these features are designed to be on par with the functionality of the Jianying software, ensuring you get a familiar and efficient editing experience in the cloud.
+All these features are designed to mirror the functionalities of the CapCut software, ensuring a familiar and efficient editing experience in the cloud.
+
+Enjoy It!😀😀😀
 
 ### Core Advantages
 
