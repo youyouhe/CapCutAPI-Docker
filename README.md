@@ -251,13 +251,16 @@ We welcome contributions of all forms\! Our iteration rules are:
   - PRs can be submitted to the dev branch
   - Merges from dev to main and releases will happen every Monday
 
-## Join Or Contact Us
+## Contact Us
+
+If you want to:
 
   - Feedback on issues
   - Feature suggestions
-  - Latest news
+  - Get latest news
 
-### 🤝 Collaboration Opportunities
+**Contact**: sguann2023@gmail.com
+### 🤝 Collaboration
 
   - **Video Production**: Want to use this API for batch production of videos? I offer free consulting services to help you use this API. In return, I'll ask for the production workflow template to be **open-sourced** in the `template` directory of this project.
 
