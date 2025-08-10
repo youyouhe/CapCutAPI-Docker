@@ -46,7 +46,7 @@
 ## 核心功能
 
 
-| 功能模块 | HTTP API | MCP 协议 | 描述 |
+| 功能模块 | API | MCP 协议 | 描述 |
 |---------|----------|----------|------|
 | **草稿管理** | ✅ | ✅ | 创建、保存剪映/CapCut草稿文件 |
 | **视频处理** | ✅ | ✅ | 多格式视频导入、剪辑、转场、特效 |
@@ -61,13 +61,13 @@
 
 ## 快速开始
 
-### 1.系统要求
+### 1. 系统要求
 
 - Python 3.10+
 - 剪映 或 CapCut 国际版
 - FFmpeg
 
-### 2.安装部署
+### 2. 安装部署
 
 ```bash
 # 1. 克隆项目
@@ -88,32 +88,13 @@ cp config.json.example config.json
 # 根据需要编辑 config.json
 ```
 
-### 3.启动服务
+### 3. 启动服务
 
-<table>
-<tr>
-<td width="50%">
-
-**🌐 HTTP API 服务器**
 ```bash
-python capcut_server.py
+python capcut_server.py # 启动HTTP API服务器, 默认端口: 9001
+
+python mcp_server.py # 启动 MCP 协议服务，支持 stdio 通信
 ```
-*默认端口: 9001*
-
-</td>
-<td width="50%">
-
-**🔧 MCP 协议服务器**
-```bash
-python mcp_server.py
-```
-*支持 stdio 通信*
-
-</td>
-</tr>
-</table>
-
----
 
 ## 🔧 MCP 集成指南
 
