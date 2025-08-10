@@ -7,6 +7,8 @@ All these features are designed to mirror the functionalities of the CapCut soft
 
 Enjoy It!  😀😀😀
 
+[中文说明](README-zh.md) 
+
 ### Advantages
 
 1. **API-Powered Editing:** Access all CapCut/Jianying editing features, including multi-track editing and keyframe animation, through a powerful API.
