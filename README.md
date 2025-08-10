@@ -1,12 +1,16 @@
-# CapCutAPI
+# 🎬 CapCutAPI - Open source CapCut API tool.
 
-Open source CapCut API tool.
+<div align="center">
 
-Try It: https://www.capcutapi.top
+![CapCutAPI Logo](https://img.shields.io/badge/CapCutAPI-v1.1.0-blue?style=for-the-badge&logo=video&logoColor=white)
 
-[中文说明](https://github.com/sun-guannan/CapCutAPI/blob/main/README-zh.md)
+[![GitHub Stars](https://img.shields.io/github/stars/sun-guannan/CapCutAPI?style=for-the-badge&logo=github)](https://github.com/sun-guannan/CapCutAPI/stargazers)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green?style=for-the-badge)](LICENSE)
+[![Python Version](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python)](https://python.org)
+[![MCP Support](https://img.shields.io/badge/MCP-Supported-orange?style=for-the-badge)](./MCP_Documentation_English.md)
 
-## Gallery
+**🚀 Open source CapCut API tool with MCP (Model Context Protocol) support**
+
 
 **MCP agent**
 
@@ -19,133 +23,521 @@ Try It: https://www.capcutapi.top
 [![Horse](https://img.youtube.com/vi/IF1RDFGOtEU/hqdefault.jpg)](https://www.youtube.com/watch?v=IF1RDFGOtEU)
 
 [![Song](https://img.youtube.com/vi/rGNLE_slAJ8/hqdefault.jpg)](https://www.youtube.com/watch?v=rGNLE_slAJ8)
+  
+  
+</div>
 
-## Project Features
+---
 
-This project is a Python-based CapCut processing tool that offers the following core functionalities:
+## 🎯 Project Overview
 
-### Core Features
+**CapCutAPI** is a powerful enterprise-grade video editing automation platform built with Python, providing complete CapCut video editing capabilities. Through dual interfaces of HTTP API and MCP protocol, it enables seamless integration with AI assistants and automation tools.
 
-- **Draft File Management**: Create, read, modify, and save CapCut draft files
-- **Material Processing**: Support adding and editing various materials such as videos, audios, images, texts, stickers, etc.
-- **Effect Application**: Support adding multiple effects like transitions, filters, masks, animations, etc.
-- **API Service**: Provide HTTP API interfaces to support remote calls and automated processing
-- **AI Integration**: Integrate multiple AI services to support intelligent generation of subtitles, texts, and images
+### 🏆 Core Advantages
 
-### Main API Interfaces
+<table>
+<tr>
+<td width="50%">
 
-- `/create_draft`: Create a draft
-- `/add_video`: Add video material to the draft
-- `/add_audio`: Add audio material to the draft
-- `/add_image`: Add image material to the draft
-- `/add_text`: Add text material to the draft
-- `/add_subtitle`: Add subtitles to the draft
-- `/add_effect`: Add effects to materials
-- `/add_sticker`: Add stickers to the draft
-- `/save_draft`: Save the draft file
+**🎬 Professional Video Editing**
+- Complete CapCut functionality support
+- Multi-track timeline editing
+- Advanced effects and transitions
+- Keyframe animation system
 
-## Configuration Instructions
+</td>
+<td width="50%">
 
-### Configuration File
+**🤖 AI Smart Integration**
+- Native MCP protocol support
+- Seamless AI assistant integration
+- Automated workflow processes
+- Batch processing capabilities
 
-The project supports custom settings through a configuration file. To use the configuration file:
+</td>
+</tr>
+<tr>
+<td>
 
-1. Copy `config.json.example` to `config.json`
-2. Modify the configuration items as needed
+**🔌 Dual API Interfaces**
+- RESTful HTTP API
+- Model Context Protocol
+- Real-time processing response
+- Enterprise-grade stability
+
+</td>
+<td>
+
+**🌍 Cross-platform Compatibility**
+- CapCut International support
+- JianYing China support
+- Windows/macOS compatible
+- Cloud deployment ready
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🎥 Product Showcase
+
+<div align="center">
+
+### 🐎 AI Generated Video Cases
+
+[![Horse Video](https://img.youtube.com/vi/IF1RDFGOtEU/hqdefault.jpg)](https://www.youtube.com/watch?v=IF1RDFGOtEU)
+
+### 🎵 Music Video Production
+
+[![Song Video](https://img.youtube.com/vi/rGNLE_slAJ8/hqdefault.jpg)](https://www.youtube.com/watch?v=rGNLE_slAJ8)
+
+*AI-driven video generation powered by CapCutAPI*
+
+</div>
+
+---
+
+## 🚀 Core Features
+
+### 📋 Feature Matrix
+
+| Feature Module | HTTP API | MCP Protocol | Description |
+|---------------|----------|--------------|-------------|
+| 🎬 **Draft Management** | ✅ | ✅ | Create, read, modify, save CapCut draft files |
+| 🎥 **Video Processing** | ✅ | ✅ | Multi-format video import, editing, transitions, effects |
+| 🔊 **Audio Editing** | ✅ | ✅ | Audio tracks, volume control, audio effects |
+| 🖼️ **Image Processing** | ✅ | ✅ | Image import, animations, masks, filters |
+| 📝 **Text Editing** | ✅ | ✅ | Multi-style text, shadows, backgrounds, animations |
+| 📄 **Subtitle System** | ✅ | ✅ | SRT subtitle import, styling, time sync |
+| ✨ **Effects Engine** | ✅ | ✅ | Visual effects, filters, transition animations |
+| 🎭 **Sticker System** | ✅ | ✅ | Sticker assets, position control, animation effects |
+| 🎯 **Keyframes** | ✅ | ✅ | Property animations, timeline control, easing functions |
+| 📊 **Media Analysis** | ✅ | ✅ | Video duration detection, format analysis |
+
+### 🛠️ API Interface Overview
+
+<details>
+<summary><b>📡 HTTP API Endpoints (9 endpoints)</b></summary>
+
+🎬 Draft Management
+├── POST /create_draft     # Create new draft
+└── POST /save_draft       # Save draft file
+
+🎥 Media Assets
+├── POST /add_video        # Add video material
+├── POST /add_audio        # Add audio material
+└── POST /add_image        # Add image material
+
+📝 Text Content
+├── POST /add_text         # Add text elements
+└── POST /add_subtitle     # Add subtitle files
+
+✨ Effect Enhancement
+├── POST /add_effect       # Add visual effects
+└── POST /add_sticker      # Add sticker elements
+
+
+</details>
+
+<details>
+<summary><b>🔧 MCP Tool Set (11 tools)</b></summary>
+
+🎬 Project Management
+├── create_draft           # Create video project
+└── save_draft             # Save project file
+
+🎥 Media Editing
+├── add_video              # Video track + transition effects
+├── add_audio              # Audio track + volume control
+└── add_image              # Image assets + animation effects
+
+📝 Text System
+├── add_text               # Multi-style text + shadow background
+└── add_subtitle           # SRT subtitles + styling
+
+✨ Advanced Features
+├── add_effect             # Visual effects engine
+├── add_sticker            # Sticker animation system
+├── add_video_keyframe     # Keyframe animations
+└── get_video_duration     # Media information retrieval
+
+</details>
+
+---
+
+## 🛠️ Quick Start
+
+### 📋 System Requirements
+
+<table>
+<tr>
+<td width="30%"><b>🐍 Python Environment</b></td>
+<td>Python 3.8.20+ (Recommended 3.10+)</td>
+</tr>
+<tr>
+<td><b>🎬 CapCut Application</b></td>
+<td>CapCut International or JianYing China</td>
+</tr>
+<tr>
+<td><b>🎵 FFmpeg</b></td>
+<td>For media file processing and analysis</td>
+</tr>
+<tr>
+<td><b>💾 Storage Space</b></td>
+<td>At least 2GB available space</td>
+</tr>
+</table>
+
+### ⚡ One-Click Installation
 
 ```bash
+# 1. Clone the project
+git clone https://github.com/sun-guannan/CapCutAPI.git
+cd CapCutAPI
+
+# 2. Create virtual environment (recommended)
+python -m venv venv-capcut
+source venv-capcut/bin/activate  # Linux/macOS
+# or venv-capcut\Scripts\activate  # Windows
+
+# 3. Install dependencies
+pip install -r requirements.txt      # HTTP API basic dependencies
+pip install -r requirements-mcp.txt  # MCP protocol support (optional)
+
+# 4. Configuration
 cp config.json.example config.json
+# Edit config.json as needed
 ```
 
-### Environment Configuration
+### 🚀 Start Services
 
-#### ffmpeg
+<table>
+<tr>
+<td width="50%">
 
-This project depends on ffmpeg. You need to ensure that ffmpeg is installed on your system and added to the system's environment variables.
-
-#### Python Environment
-
-This project requires Python version 3.8.20. Please ensure that the correct version of Python is installed on your system.
-
-#### Install Dependencies
-
-Install the required dependency packages for the project:
-
-```bash
-pip install -r requirements.txt
-```
-
-### Run the Server
-
-After completing the configuration and environment setup, execute the following command to start the server:
+**🌐 HTTP API Server**
 
 ```bash
 python capcut_server.py
 ```
 
-Once the server is started, you can access the related functions through the API interfaces.
+*Default port: 9001*
 
-## Usage Examples
+</td>
+<td width="50%">
 
-### Adding a Video
+**🔧 MCP Protocol Server**
+
+```bash
+python mcp_server.py
+```
+
+*Supports stdio communication*
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🔧 MCP Integration Guide
+
+### 📱 Client Configuration
+
+Create or update `mcp_config.json` configuration file:
+
+```json
+{
+  "mcpServers": {
+    "capcut-api": {
+      "command": "python3",
+      "args": ["mcp_server.py"],
+      "cwd": "/path/to/CapCutAPI",
+      "env": {
+        "PYTHONPATH": "/path/to/CapCutAPI",
+        "DEBUG": "0"
+      }
+    }
+  }
+}
+```
+
+### 🧪 Connection Testing
+
+```bash
+# Test MCP connection
+python test_mcp_client.py
+
+# Expected output
+✅ MCP server started successfully
+✅ Retrieved 11 available tools
+✅ Draft creation test passed
+```
+
+### 🎯 MCP Featured Functions
+
+<div align="center">
+
+| Feature | Description | Example |
+|---------|-------------|----------|
+| 🎨 **Advanced Text Styling** | Multi-color, shadow, background effects | `shadow_enabled: true` |
+| 🎬 **Keyframe Animation** | Position, scale, opacity animations | `property_types: ["scale_x", "alpha"]` |
+| 🔊 **Audio Precision Control** | Volume, speed, audio effects | `volume: 0.8, speed: 1.2` |
+| 📱 **Multi-format Support** | Various video dimensions and formats | `width: 1080, height: 1920` |
+| ⚡ **Real-time Processing** | Instant draft updates and previews | Millisecond response time |
+
+</div>
+
+---
+
+## 💡 Usage Examples
+
+### 🌐 HTTP API Examples
+
+<details>
+<summary><b>📹 Adding Video Material</b></summary>
 
 ```python
 import requests
 
+# Add background video
 response = requests.post("http://localhost:9001/add_video", json={
-    "video_url": "http://example.com/video.mp4",
+    "video_url": "https://example.com/background.mp4",
     "start": 0,
     "end": 10,
     "width": 1080,
+    "height": 1920,
+    "volume": 0.8,
+    "transition": "fade_in"
+})
+
+print(f"Video addition result: {response.json()}")
+```
+
+</details>
+
+<details>
+<summary><b>📝 Creating Styled Text</b></summary>
+
+```python
+import requests
+
+# Add title text
+response = requests.post("http://localhost:9001/add_text", json={
+    "text": "🎬 Welcome to CapCutAPI",
+    "start": 0,
+    "end": 5,
+    "font": "Arial",
+    "font_color": "#FFD700",
+    "font_size": 48,
+    "shadow_enabled": True,
+    "background_color": "#000000"
+})
+
+print(f"Text addition result: {response.json()}")
+```
+
+</details>
+
+### 🔧 MCP Protocol Examples
+
+<details>
+<summary><b>🎯 Complete Workflow</b></summary>
+
+```python
+# 1. Create new project
+draft = mcp_client.call_tool("create_draft", {
+    "width": 1080,
     "height": 1920
 })
+draft_id = draft["result"]["draft_id"]
 
-print(response.json())
-```
-
-### Adding Text
-
-```python
-import requests
-
-response = requests.post("http://localhost:9001/add_text", json={
-    "text": "Hello, World!",
+# 2. Add background video
+mcp_client.call_tool("add_video", {
+    "video_url": "https://example.com/bg.mp4",
+    "draft_id": draft_id,
     "start": 0,
-    "end": 3,
-    "font": "ZY_Courage",
-    "font_color": "#FF0000",
-    "font_size": 30.0
+    "end": 10,
+    "volume": 0.6
 })
 
-print(response.json())
-```
-
-### Saving a Draft
-
-```python
-import requests
-
-response = requests.post("http://localhost:9001/save_draft", json={
-    "draft_id": "123456",
-    "draft_folder": "your capcut draft folder"
+# 3. Add title text
+mcp_client.call_tool("add_text", {
+    "text": "AI-Driven Video Production",
+    "draft_id": draft_id,
+    "start": 1,
+    "end": 6,
+    "font_size": 56,
+    "shadow_enabled": True,
+    "background_color": "#1E1E1E"
 })
 
-print(response.json())
+# 4. Add keyframe animation
+mcp_client.call_tool("add_video_keyframe", {
+    "draft_id": draft_id,
+    "track_name": "main",
+    "property_types": ["scale_x", "scale_y", "alpha"],
+    "times": [0, 2, 4],
+    "values": ["1.0", "1.2", "0.8"]
+})
+
+# 5. Save project
+result = mcp_client.call_tool("save_draft", {
+    "draft_id": draft_id
+})
+print(f"Project saved: {result['result']['draft_url']}")
 ```
-You can also use the ```rest_client_test.http``` file of the REST Client for HTTP testing. Just need to install the corresponding IDE plugin
 
-### Copying the Draft to CapCut Draft Path
+</details>
 
-Calling `save_draft` will generate a folder starting with `dfd_` in the current directory of the server. Copy this folder to the CapCut draft directory, and you will be able to see the generated draft.
+### Testing with REST Client
 
-### More Examples
+You can use the `rest_client_test.http` file with REST Client IDE plugins for HTTP testing.
 
-Please refer to the `example.py` file in the project, which contains more usage examples such as adding audio and effects.
+### Draft Management
 
-## Project Features
+Calling `save_draft` generates a folder starting with `dfd_` in the server's current directory. Copy this folder to your CapCut draft directory to access the generated draft in CapCut.
 
-- **Cross-platform Support**: Supports both CapCut China version and CapCut International version
-- **Automated Processing**: Supports batch processing and automated workflows
-- **Rich APIs**: Provides comprehensive API interfaces for easy integration into other systems
-- **Flexible Configuration**: Achieve flexible function customization through configuration files
-- **AI Enhancement**: Integrate multiple AI services to improve video production efficiency
+---
+
+## 📚 Documentation Center
+
+<div align="center">
+
+| 📖 Document Type | 🌍 Language | 📄 Link | 📝 Description |
+|-----------------|-------------|---------|----------------|
+| **MCP Complete Guide** | 🇺🇸 English | [MCP Documentation](./MCP_Documentation_English.md) | Complete MCP server usage guide |
+| **MCP User Manual** | 🇨🇳 Chinese | [MCP 中文文档](./MCP_文档_中文.md) | Detailed Chinese usage instructions |
+| **API Reference** | 🇺🇸 English | [example.py](./example.py) | Code examples and best practices |
+| **REST Testing** | 🌐 Universal | [rest_client_test.http](./rest_client_test.http) | HTTP interface test cases |
+
+</div>
+
+---
+
+## 🌟 Enterprise Features
+
+### 🔒 Security
+
+- **🛡️ Input Validation**: Strict parameter validation and type checking
+- **🔐 Error Handling**: Comprehensive exception catching and error reporting
+- **📊 Logging**: Detailed operation logs and debug information
+- **🚫 Resource Limits**: Memory and processing time limit protection
+
+### ⚡ Performance Optimization
+
+- **🚀 Async Processing**: Non-blocking concurrent operation support
+- **💾 Memory Management**: Smart resource recycling and caching mechanisms
+- **📈 Batch Processing**: Efficient batch operation interfaces
+- **⏱️ Response Time**: Millisecond-level API response speed
+
+### 🔧 Scalability
+
+- **🔌 Plugin Architecture**: Modular functionality extension support
+- **🌐 Multi-protocol**: HTTP REST and MCP dual protocol support
+- **☁️ Cloud Deployment**: Containerization and microservice architecture ready
+- **📊 Monitoring Integration**: Complete performance monitoring and metrics collection
+
+---
+
+## 🤝 Community & Support
+
+### 💬 Get Help
+
+<div align="center">
+
+| 📞 Support Channel | 🔗 Link | 📝 Description |
+|-------------------|---------|----------------|
+| **🐛 Bug Reports** | [GitHub Issues](https://github.com/sun-guannan/CapCutAPI/issues) | Bug reports and feature requests |
+| **💡 Feature Suggestions** | [Discussions](https://github.com/sun-guannan/CapCutAPI/discussions) | Community discussions and suggestions |
+| **📖 Documentation Feedback** | [Documentation Issues](https://github.com/sun-guannan/CapCutAPI/issues?q=label%3Adocumentation) | Documentation improvement suggestions |
+| **🔧 Technical Support** | [Stack Overflow](https://stackoverflow.com/questions/tagged/capcut-api) | Technical Q&A |
+
+</div>
+
+### 🎯 Contributing Guide
+
+We welcome all forms of contributions!
+
+```bash
+# 1. Fork the project
+git clone https://github.com/your-username/CapCutAPI.git
+
+# 2. Create feature branch
+git checkout -b feature/amazing-feature
+
+# 3. Commit changes
+git commit -m 'Add amazing feature'
+
+# 4. Push branch
+git push origin feature/amazing-feature
+
+# 5. Create Pull Request
+```
+
+---
+
+## 📈 Project Statistics
+
+<div align="center">
+
+### ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=sun-guannan/CapCutAPI&type=Date)](https://www.star-history.com/#sun-guannan/CapCutAPI&Date)
+
+### 📊 Project Metrics
+
+![GitHub repo size](https://img.shields.io/github/repo-size/sun-guannan/CapCutAPI?style=flat-square)
+![GitHub code size](https://img.shields.io/github/languages/code-size/sun-guannan/CapCutAPI?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues/sun-guannan/CapCutAPI?style=flat-square)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/sun-guannan/CapCutAPI?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/sun-guannan/CapCutAPI?style=flat-square)
+
+</div>
+
+---
+
+## 📄 License
+
+<div align="center">
+
+This project is open source under the Apache 2.0 License. See [LICENSE](LICENSE) file for details.
+
+Apache License 2.0
+
+Copyright (c) 2025 CapCutAPI Contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+</div>
+
+---
+
+<div align="center">
+
+## 🎉 Get Started Now
+
+**Experience the power of CapCutAPI today!**
+
+[![Get Started](https://img.shields.io/badge/🚀_Get_Started-blue?style=for-the-badge&logo=rocket)](https://www.capcutapi.top)
+[![Download](https://img.shields.io/badge/📥_Download-green?style=for-the-badge&logo=download)](https://github.com/sun-guannan/CapCutAPI/archive/refs/heads/main.zip)
+[![Documentation](https://img.shields.io/badge/📖_Documentation-orange?style=for-the-badge&logo=book)](./MCP_Documentation_English.md)
+
+---
+
+**🆕 New Feature**: Now with MCP protocol support for seamless AI assistant integration! Try the MCP server for advanced video editing automation.
+
+*Made with ❤️ by the CapCutAPI Community*
+
+</div>

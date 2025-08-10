@@ -11,44 +11,44 @@ def add_text_impl(
     text: str,
     start: float,
     end: float,
-    draft_id: str = None,
+    draft_id: str | None = None,  # Python 3.10+ 新语法
     transform_y: float = -0.8,
     transform_x: float = 0,
-    font: str = "文轩体",  # Wenxuan Font
+    font: str = "文轩体",
     font_color: str = "#ffffff",
     font_size: float = 8.0,
     track_name: str = "text_main",
-    vertical: bool = False,  # Whether to display vertically
-    font_alpha: float = 1.0,  # Transparency, range 0.0-1.0
+    vertical: bool = False,
+    font_alpha: float = 1.0,
     # Border parameters
     border_alpha: float = 1.0,
     border_color: str = "#000000",
-    border_width: float = 0.0,  # Default no border display
+    border_width: float = 0.0,
     # Background parameters
     background_color: str = "#000000",
     background_style: int = 1,
-    background_alpha: float = 0.0,  # Default no background display
-    background_round_radius: float = 0.0,  # 背景圆角半径，范围0.0-1.0
-    background_height: float = 0.14,  # 背景高度，范围0.0-1.0
-    background_width: float = 0.14,  # 背景宽度，范围0.0-1.0
-    background_horizontal_offset: float = 0.5,  # 背景水平偏移，范围0.0-1.0
-    background_vertical_offset: float = 0.5,  # 背景垂直偏移，范围0.0-1.0
-    # 阴影参数
-    shadow_enabled: bool = False,  # 是否启用阴影
-    shadow_alpha: float = 0.9,  # 阴影透明度，范围0.0-1.0
-    shadow_angle: float = -45.0,  # 阴影角度，范围-180.0-180.0
-    shadow_color: str = "#000000",  # 阴影颜色
-    shadow_distance: float = 5.0,  # 阴影距离
-    shadow_smoothing: float = 0.15,  # 阴影平滑度，范围0.0-1.0
+    background_alpha: float = 0.0,
+    background_round_radius: float = 0.0,
+    background_height: float = 0.14,
+    background_width: float = 0.14,
+    background_horizontal_offset: float = 0.5,
+    background_vertical_offset: float = 0.5,
+    # Shadow parameters
+    shadow_enabled: bool = False,
+    shadow_alpha: float = 0.9,
+    shadow_angle: float = -45.0,
+    shadow_color: str = "#000000",
+    shadow_distance: float = 5.0,
+    shadow_smoothing: float = 0.15,
     # Bubble effect
-    bubble_effect_id: Optional[str] = None,
-    bubble_resource_id: Optional[str] = None,
+    bubble_effect_id: str | None = None,
+    bubble_resource_id: str | None = None,
     # Text effect
-    effect_effect_id: Optional[str] = None,
-    intro_animation: Optional[str] = None,  # Intro animation type
-    intro_duration: float = 0.5,  # Intro animation duration (seconds), default 0.5 seconds
-    outro_animation: Optional[str] = None,  # Outro animation type
-    outro_duration: float = 0.5,  # Outro animation duration (seconds), default 0.5 seconds
+    effect_effect_id: str | None = None,
+    intro_animation: str | None = None,
+    intro_duration: float = 0.5,
+    outro_animation: str | None = None,
+    outro_duration: float = 0.5,
     width: int = 1080,
     height: int = 1920,
     fixed_width: float = -1,  # Text fixed width ratio, default -1 means not fixed
