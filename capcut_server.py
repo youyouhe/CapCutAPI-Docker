@@ -1429,5 +1429,25 @@ def get_video_character_effect_types():
         return jsonify(result)
 
 
+# 健康检查端点
+@app.route('/health', methods=['GET'])
+def health_check():
+    """健康检查端点，用于Docker健康检查"""
+    try:
+        # 检查基本功能是否正常
+        return jsonify({
+            "status": "healthy",
+            "message": "CapCutAPI is running normally",
+            "timestamp": str(datetime.now()),
+            "version": "1.0.0"
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "unhealthy",
+            "message": f"Health check failed: {str(e)}",
+            "timestamp": str(datetime.now())
+        }), 500
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=PORT)

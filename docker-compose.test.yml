@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  capcut-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.cn
+    container_name: capcut-api
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./tmp:/app/tmp
+      - ./template:/app/template
+      - ./template_jianying:/app/template_jianying
+      - ./drafts:/app/drafts
+    environment:
+      - FLASK_ENV=production
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - CAPCUT_ENV=true
+      - PORT=9000
+      - DRAFT_DOMAIN=https://www.install-ai-guider.top
+      - IS_UPLOAD_DRAFT=false
+    restart: unless-stopped
+    networks:
+      - capcut-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  minio_data:
+
+networks:
+  capcut-network:
+    driver: bridge
