@@ -8,15 +8,14 @@ All these features are designed to mirror the functionalities of the CapCut soft
 Enjoy It!  😀😀😀
 
 ### Advantages
-Of course. Here is a more concise English translation.
 
-1. ** API-Powered Editing:** Access all CapCut/Jianying editing features, including multi-track editing and keyframe animation, through a powerful API.
+1. **API-Powered Editing:** Access all CapCut/Jianying editing features, including multi-track editing and keyframe animation, through a powerful API.
 
-2. ** Real-Time Cloud Preview:** Instantly preview your edits on a webpage without downloads, dramatically improving your workflow.
+2. **Real-Time Cloud Preview:** Instantly preview your edits on a webpage without downloads, dramatically improving your workflow.
 
-3. ** Flexible Local Editing:** Export projects as drafts to import into CapCut or Jianying for further refinement.
+3. **Flexible Local Editing:** Export projects as drafts to import into CapCut or Jianying for further refinement.
 
-4. ** Automated Cloud Generation:** Use the API to render and generate final videos directly in the cloud.
+4. **Automated Cloud Generation:** Use the API to render and generate final videos directly in the cloud.
 
 ## Demos
 
