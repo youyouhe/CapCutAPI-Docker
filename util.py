@@ -80,4 +80,4 @@ def timing_decorator(func_name):
     return decorator
 
 def generate_draft_url(draft_id):
-    return f"{DRAFT_DOMAIN}{PREVIEW_ROUTER}?draft_id={draft_id}"
+    return f"{DRAFT_DOMAIN}{PREVIEW_ROUTER}?draft_id={draft_id}&is_capcut={1 if IS_CAPCUT_ENV else 0}"

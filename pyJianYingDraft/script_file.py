@@ -270,7 +270,6 @@ class Script_file:
                 raise NameError("'%s' 类型的轨道已存在, 请为新轨道指定名称以避免混淆" % track_type)
             track_name = track_type.name
         if track_name in [track.name for track in self.tracks.values()]:
-            print("名为 '%s' 的轨道已存在" % track_name)
             return self
 
         render_index = track_type.value.render_index + relative_index

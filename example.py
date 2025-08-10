@@ -9,6 +9,8 @@ import threading
 from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
 from util import hex_to_rgb
 
+import shutil
+import os
 
 # Base URL of the service, please modify according to actual situation
 BASE_URL = f"http://localhost:{PORT}"
@@ -291,6 +293,7 @@ def add_video_impl(video_url, start=None, end=None, width=None, height=None, tra
     data = {
         "video_url": video_url,
         "height": height,
+        "draft_id": draft_id,
         "track_name": track_name,
         "transform_y": transform_y,
         "scale_x": scale_x,
@@ -325,7 +328,7 @@ def add_video_impl(video_url, start=None, end=None, width=None, height=None, tra
     return make_request("add_video", data)
 
 def add_effect(effect_type, start, end, draft_id=None, track_name="effect_01",
-              params=None, width=1080, height=1920):
+              params=None, width=1080, height=1920, effect_category=None):
     """API call to add effect"""
     data = {
         "effect_type": effect_type,
@@ -336,6 +339,9 @@ def add_effect(effect_type, start, end, draft_id=None, track_name="effect_01",
         "width": width,
         "height": height
     }
+    
+    if effect_category:
+        data["effect_category"] = effect_category
     
     if draft_id:
         data["draft_id"] = draft_id
@@ -363,6 +369,59 @@ def test_effect_01():
     # Return the first test result for subsequent operations (if any)
     return effect_result
 
+
+def test_effect_02():
+    """Test service for adding effects"""
+    # draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+    draft_folder = "/Users/sunguannan/Movies/CapCut/User Data/Projects/com.lveditor.draft"
+    
+    print("\nTest: Adding effects")
+    # First add video track
+    image_result = add_video_impl(
+        video_url="https://pan.superbed.cn/share/1nbrg1fl/jimeng_daweidai.mp4",
+        start=0,
+        end=3.0,
+        target_start=0,
+        width=1080,
+        height=1920
+    )
+    print(f"Video added successfully! {image_result['output']['draft_id']}")
+    image_result = add_video_impl(
+        video_url="https://pan.superbed.cn/share/1nbrg1fl/jimeng_daweidai.mp4",
+        draft_id=image_result['output']['draft_id'],
+        start=0,
+        end=3.0,
+        target_start=3,
+    )
+    print(f"Video added successfully! {image_result['output']['draft_id']}")
+    
+    # Then add effect
+    effect_result = add_effect(
+        effect_type="Like",
+        effect_category="character",  # Explicitly specify as character effect
+        start=3,
+        end=6,
+        draft_id=image_result['output']['draft_id'],
+        track_name="effect_01"
+    )
+    print(f"Effect adding result: {effect_result}")
+    print(save_draft_impl(effect_result['output']['draft_id'], draft_folder))
+    
+    source_folder = os.path.join(os.getcwd(), effect_result['output']['draft_id'])
+    destination_folder = os.path.join(draft_folder, effect_result['output']['draft_id'])
+    
+    if os.path.exists(source_folder):
+        print(f"Moving {effect_result['output']['draft_id']} to {draft_folder}")
+        shutil.move(source_folder, destination_folder)
+        print("Folder moved successfully!")
+    else:
+        print(f"Source folder {source_folder} does not exist")
+    
+    # Add log to prompt user to find the draft in CapCut
+    print(f"\n===== IMPORTANT =====\nPlease open CapCut and find the draft named '{effect_result['output']['draft_id']}'\n======================")
+    
+    # Return the first test result for subsequent operations (if any)
+    return effect_result
 
 def test_text():
     """Test adding text with various features"""
@@ -1181,7 +1240,7 @@ def test_audio04():
     query_draft_status_impl_polling(audio_result['output']['draft_id'])
     save_draft_impl(audio_result['output']['draft_id'], draft_folder)
 
-def add_subtitle_impl(srt, draft_id=None, time_offset=0.0, font_size=5.0,
+def add_subtitle_impl(srt, draft_id=None, time_offset=0.0, font_size=5.0, font = "思源粗宋",
                     bold=False, italic=False, underline=False, font_color="#ffffff",
                     transform_x=0.0, transform_y=0.0, scale_x=1.0, scale_y=1.0,
                     vertical=False, track_name="subtitle", alpha=1,
@@ -1194,6 +1253,7 @@ def add_subtitle_impl(srt, draft_id=None, time_offset=0.0, font_size=5.0,
         "srt": srt,  # Modified parameter name to match server side
         "draft_id": draft_id,
         "time_offset": time_offset,
+        "font": font,
         "font_size": font_size,
         "bold": bold,
         "italic": italic,
@@ -2280,36 +2340,37 @@ def test_transition_02():
         print("Unable to get draft ID, skipping save operation.")
 
 if __name__ == "__main__":
-    test01()
-    test02()
-    test_effect_01()  # Run effect test
-    test_audio01()
-    test_audio02()
-    test_audio03()
-    test_audio04()
-    test_image01()
-    test_image02()
-    test_image03()
-    test_image04()
-    # test_video()
-    test_video_02()
-    test_text()
-    test_video_track01()
-    test_video_track02()
-    test_video_track03()
-    test_video_track04()
-    test_keyframe()
-    test_keyframe_02()
+    # test01()
+    # test02()
+    # test_effect_01()  # Run effect test
+    # test_effect_02()
+    # test_audio01()
+    # test_audio02()
+    # test_audio03()
+    # test_audio04()
+    # test_image01()
+    # test_image02()
+    # test_image03()
+    # test_image04()
+    # # test_video()
+    # test_video_02()
+    # test_text()
+    # test_video_track01()
+    # test_video_track02()
+    # test_video_track03()
+    # test_video_track04()
+    # test_keyframe()
+    # test_keyframe_02()
     test_subtitle_01()
-    test_subtitle_02()
-    test_subtitle()
-    test_stiker_01()
-    test_stiker_02()
-    test_stiker_03()
-    test_transition_01()
-    test_transition_02()
-    # test_generate_image01()
-    # test_generate_image02()
-    # test_speech_01()
-    test_mask_01()
-    test_mask_02()
+    # test_subtitle_02()
+    # test_subtitle()
+    # test_stiker_01()
+    # test_stiker_02()
+    # test_stiker_03()
+    # test_transition_01()
+    # test_transition_02()
+    # # test_generate_image01()
+    # # test_generate_image02()
+    # # test_speech_01()
+    # test_mask_01()
+    # test_mask_02()
