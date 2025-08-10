@@ -272,17 +272,12 @@ mcp_client.call_tool("add_text", {
   - 微信：sguann
   - 抖音：剪映草稿助手
 
----
 
-## 📈 项目统计
+## 📈 Star History
 
 <div align="center">
 
-### ⭐ Star History
-
 [![Star History Chart](https://api.star-history.com/svg?repos=sun-guannan/CapCutAPI&type=Date)](https://www.star-history.com/#sun-guannan/CapCutAPI&Date)
-
-### 📊 项目指标
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/sun-guannan/CapCutAPI?style=flat-square)
 ![GitHub code size](https://img.shields.io/github/languages/code-size/sun-guannan/CapCutAPI?style=flat-square)
@@ -291,8 +286,6 @@ mcp_client.call_tool("add_text", {
 ![GitHub last commit](https://img.shields.io/github/last-commit/sun-guannan/CapCutAPI?style=flat-square)
 
 </div>
-
----
 
 *Made with ❤️ by the CapCutAPI Community*
 
