@@ -266,7 +266,7 @@ If you want to:
 
   - **Join us**: Our goal is to provide a stable and reliable video editing tool that integrates well with AI-generated images, videos, and audio. If you are interested, submit a PR and I'll see it. For more in-depth involvement, the code for the MCP Editing Agent, web-based editing client, and cloud rendering modules has not been open-sourced yet.
 
-  - **Contact**: sguann2023@gmail.com
+**Contact**: sguann2023@gmail.com
 
 ## 📈 Star History
 
