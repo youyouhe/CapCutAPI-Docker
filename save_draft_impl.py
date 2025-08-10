@@ -290,6 +290,65 @@ def save_draft_impl(draft_id: str, draft_folder: str = None) -> Dict[str, str]:
             "error": str(e)
         }
 
+def get_media_info_with_fallback(remote_url, local_path=None, material_name="", command_func=None):
+    """
+    Get media information with fallback logic: try remote URL first, then local path
+    
+    :param remote_url: Remote URL of the media file
+    :param local_path: Local file path (optional)
+    :param material_name: Name of the material for logging
+    :param command_func: Function that takes a file path and returns a command list
+    :return: tuple (success, result, error_message)
+    """
+    # Try remote URL first
+    if remote_url:
+        try:
+            command = command_func(remote_url)
+            result = subprocess.check_output(command, stderr=subprocess.STDOUT)
+            return True, result, None
+        except Exception as e:
+            logger.debug(f"Remote URL failed for {material_name}: {str(e)}")
+    
+    # Try local path if available
+    if local_path:
+        try:
+            command = command_func(local_path)
+            result = subprocess.check_output(command, stderr=subprocess.STDOUT)
+            return True, result, None
+        except Exception as e:
+            logger.debug(f"Local path failed for {material_name}: {str(e)}")
+    
+    # Both failed
+    return False, None, f"Both remote and local paths failed for {material_name}"
+
+def get_duration_with_fallback(remote_url, local_path=None, material_name=""):
+    """
+    Get media duration with fallback logic
+    
+    :param remote_url: Remote URL of the media file
+    :param local_path: Local file path (optional)
+    :param material_name: Name of the material for logging
+    :return: duration result from get_video_duration
+    """
+    # Try remote URL first
+    if remote_url:
+        duration_result = get_video_duration(remote_url)
+        if duration_result["success"]:
+            return duration_result
+        else:
+            logger.debug(f"Remote URL duration check failed for {material_name}: {duration_result['error']}")
+    
+    # Try local path if available
+    if local_path:
+        duration_result = get_video_duration(local_path)
+        if duration_result["success"]:
+            return duration_result
+        else:
+            logger.debug(f"Local path duration check failed for {material_name}: {duration_result['error']}")
+    
+    # Both failed
+    return {"success": False, "error": f"Unable to get duration for {material_name} from both remote and local paths"}
+
 def update_media_metadata(script, task_id=None):
     """
     Update metadata for all media files in the script (duration, width/height, etc.)
@@ -310,31 +369,43 @@ def update_media_metadata(script, task_id=None):
                 logger.warning(f"Warning: Audio file {material_name} has no remote_url, skipped.")
                 continue
             
+            # Get local path if available
+            local_path = audio.replace_path if hasattr(audio, 'replace_path') and audio.replace_path else None
+            
+            # Check if audio contains video streams using fallback logic
             try:
-                video_command = [
-                    'ffprobe',
-                    '-v', 'error',
-                    '-select_streams', 'v:0',
-                    '-show_entries', 'stream=codec_type',
-                    '-of', 'json',
-                    remote_url
-                ]
-                video_result = subprocess.check_output(video_command, stderr=subprocess.STDOUT)
-                video_result_str = video_result.decode('utf-8')
-                # Find JSON start position (first '{')
-                video_json_start = video_result_str.find('{')
-                if video_json_start != -1:
-                    video_json_str = video_result_str[video_json_start:]
-                    video_info = json.loads(video_json_str)
-                    if 'streams' in video_info and len(video_info['streams']) > 0:
-                        logger.warning(f"Warning: Audio file {material_name} contains video tracks, skipped its metadata update.")
-                        continue
+                def build_video_check_command(path):
+                    return [
+                        'ffprobe',
+                        '-v', 'error',
+                        '-select_streams', 'v:0',
+                        '-show_entries', 'stream=codec_type',
+                        '-of', 'json',
+                        path
+                    ]
+                
+                success, video_result, error_msg = get_media_info_with_fallback(
+                    remote_url, local_path, material_name, build_video_check_command
+                )
+                
+                if success:
+                    video_result_str = video_result.decode('utf-8')
+                    # Find JSON start position (first '{')
+                    video_json_start = video_result_str.find('{')
+                    if video_json_start != -1:
+                        video_json_str = video_result_str[video_json_start:]
+                        video_info = json.loads(video_json_str)
+                        if 'streams' in video_info and len(video_info['streams']) > 0:
+                            logger.warning(f"Warning: Audio file {material_name} contains video tracks, skipped its metadata update.")
+                            continue
+                else:
+                    logger.debug(f"Video stream check failed for {material_name}: {error_msg}")
             except Exception as e:
                 logger.error(f"Error occurred while checking if audio {material_name} contains video streams: {str(e)}", exc_info=True)
 
-            # Get audio duration and set it
+            # Get audio duration and set it using fallback logic
             try:
-                duration_result = get_video_duration(remote_url)
+                duration_result = get_duration_with_fallback(remote_url, local_path, material_name)
                 if duration_result["success"]:
                     if task_id:
                         update_task_field(task_id, "message", f"Processing audio metadata: {material_name}")
@@ -384,36 +455,67 @@ def update_media_metadata(script, task_id=None):
             if not remote_url:
                 logger.warning(f"Warning: Media file {material_name} has no remote_url, skipped.")
                 continue
+            
+            # Get local path if available
+            local_path = video.replace_path if hasattr(video, 'replace_path') and video.replace_path else None
                 
             if video.material_type == 'photo':
-                # Use imageio to get image width/height and set it
+                # Use imageio to get image width/height and set it with fallback logic
                 try:
                     if task_id:
                         update_task_field(task_id, "message", f"Processing image metadata: {material_name}")
-                    img = imageio.imread(remote_url)
-                    video.height, video.width = img.shape[:2]
-                    logger.info(f"Successfully set image {material_name} dimensions: {video.width}x{video.height}.")
+                    
+                    # Try remote URL first, then local path
+                    img = None
+                    if remote_url:
+                        try:
+                            img = imageio.imread(remote_url)
+                            logger.info(f"Successfully read image {material_name} from remote URL.")
+                        except Exception as e:
+                            logger.debug(f"Failed to read image {material_name} from remote URL: {str(e)}")
+                    
+                    if img is None and local_path:
+                        try:
+                            img = imageio.imread(local_path)
+                            logger.info(f"Successfully read image {material_name} from local path.")
+                        except Exception as e:
+                            logger.debug(f"Failed to read image {material_name} from local path: {str(e)}")
+                    
+                    if img is not None:
+                        video.height, video.width = img.shape[:2]
+                        logger.info(f"Successfully set image {material_name} dimensions: {video.width}x{video.height}.")
+                    else:
+                        raise Exception("Both remote and local image reading failed")
+                        
                 except Exception as e:
                     logger.error(f"Failed to set image {material_name} dimensions: {str(e)}, using default values 1920x1080.", exc_info=True)
                     video.width = 1920
                     video.height = 1080
             
             elif video.material_type == 'video':
-                # Get video duration and width/height information
+                # Get video duration and width/height information using fallback logic
                 try:
                     if task_id:
                         update_task_field(task_id, "message", f"Processing video metadata: {material_name}")
-                    # Use ffprobe to get video information
-                    command = [
-                        'ffprobe',
-                        '-v', 'error',
-                        '-select_streams', 'v:0',  # Select the first video stream
-                        '-show_entries', 'stream=width,height,duration',
-                        '-show_entries', 'format=duration',
-                        '-of', 'json',
-                        remote_url
-                    ]
-                    result = subprocess.check_output(command, stderr=subprocess.STDOUT)
+                    
+                    # Build ffprobe command for video info
+                    def build_video_info_command(path):
+                        return [
+                            'ffprobe',
+                            '-v', 'error',
+                            '-select_streams', 'v:0',  # Select the first video stream
+                            '-show_entries', 'stream=width,height,duration',
+                            '-show_entries', 'format=duration',
+                            '-of', 'json',
+                            path
+                        ]
+                    
+                    success, result, error_msg = get_media_info_with_fallback(
+                        remote_url, local_path, material_name, build_video_info_command
+                    )
+                    
+                    if not success:
+                        raise Exception(error_msg)
                     result_str = result.decode('utf-8')
                     # Find JSON start position (first '{')
                     json_start = result_str.find('{')
@@ -476,9 +578,9 @@ def update_media_metadata(script, task_id=None):
                     video.width = 1920
                     video.height = 1080
                     
-                    # Try to get duration separately
+                    # Try to get duration separately using fallback logic
                     try:
-                        duration_result = get_video_duration(remote_url)
+                        duration_result = get_duration_with_fallback(remote_url, local_path, material_name)
                         if duration_result["success"]:
                             # Convert seconds to microseconds
                             video.duration = int(duration_result["output"] * 1000000)
