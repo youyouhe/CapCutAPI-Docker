@@ -6,7 +6,7 @@ import os
 import hashlib
 import functools
 import time
-from settings.local import DRAFT_DOMAIN, PREVIEW_ROUTER
+from settings.local import DRAFT_DOMAIN, PREVIEW_ROUTER, IS_CAPCUT_ENV
 
 def hex_to_rgb(hex_color: str) -> tuple:
     """Convert hexadecimal color code to RGB tuple (range 0.0-1.0)"""
