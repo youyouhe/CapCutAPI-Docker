@@ -156,7 +156,7 @@ response = requests.post("http://localhost:9001/add_text", json={
     "text": "Welcome to CapCutAPI",
     "start": 0,
     "end": 5,
-    "font": "Source Han Sans",
+    "font": "Source Han Sans",read
     "font_color": "#FFD700",
     "font_size": 48,
     "shadow_enabled": True,
@@ -242,6 +242,10 @@ mcp_client.call_tool("add_text", {
 ### 3\. Downloading Drafts
 
 Calling `save_draft` will generate a folder starting with `dfd_` in the current directory of `capcut_server.py`. Copy this to the CapCut/Jianying drafts directory to see the generated draft in the application.
+
+## Pattern
+
+You can find a lot of pattern in the `pattern` directory.
 
 ## Community & Support
 

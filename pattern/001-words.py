@@ -5,6 +5,9 @@ import sys
 import time
 import json
 
+sys.path.append('/Users/sunguannan/capcutapi')
+from example import add_image_impl
+
 PORT=9001       #端口
 BASE_URL = f"http://localhost:{PORT}"
 draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
@@ -440,73 +443,73 @@ def build_segments_by_mode(
     return segments
 
 corrected_srt = [{
-                                "word": "你",
+                                "word": "Hello",
                                 "start": 0.0,
                                 "end": 0.64,
                                 "confidence": 0.93917525
                             },
                             {
-                                "word": "好",
+                                "word": "I'm",
                                 "start": 0.64,
                                 "end": 0.79999995,
                                 "confidence": 0.9976464
                             },
                             {
-                                "word": "我",
+                                "word": "PAWA",
                                 "start": 0.79999995,
                                 "end": 1.36,
                                 "confidence": 0.6848311
                             },
                             {
-                                "word": "是",
+                                "word": "Nice",
                                 "start": 1.36,
                                 "end": 1.52,
                                 "confidence": 0.9850389
                             },
                             {
-                                "word": "PAWA",
+                                "word": "To",
                                 "start": 1.52,
                                 "end": 1.68,
                                 "confidence": 0.9926886
                             },
                             {
-                                "word": "很",
+                                "word": "Meet",
                                 "start": 1.68,
                                 "end": 2.08,
                                 "confidence": 0.9972697
                             },
                             {
-                                "word": "高",
+                                "word": "You",
                                 "start": 2.08,
                                 "end": 2.72,
                                 "confidence": 0.9845563
                             },
                             {
-                                "word": "兴",
+                                "word": "Enjoy",
                                 "start": 2.72,
                                 "end": 3.04,
                                 "confidence": 0.99794894
                             },
                             {
-                                "word": "认",
+                                "word": "My",
                                 "start": 3.04,
                                 "end": 3.1999998,
                                 "confidence": 0.9970203
                             },
                             {
-                                "word": "识",
+                                "word": "Parttern",
                                 "start": 3.1999998,
                                 "end": 3.36,
                                 "confidence": 0.9970235
                             },
                             {
-                                "word": "大",
+                                "word": "Thank",
                                 "start": 3.36,
                                 "end": 3.6799998,
                                 "confidence": 0.98627764
                             },
                             {
-                                "word": "家",
+                                "word": "You",
                                 "start": 3.6799998,
                                 "end": 4.0,
                                 "confidence": 0.9939551
@@ -605,6 +608,8 @@ draft_id = add_koubo_from_srt(
 
 
 )
+
+add_image_impl(image_url="https://pic1.imgdb.cn/item/689aff2758cb8da5c81e64a2.png", start = 0, end = 4, draft_id=draft_id)
 
 save_result = save_draft_impl(draft_id, draft_folder)
 
