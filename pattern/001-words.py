@@ -3,18 +3,12 @@ import json
 from flask import Flask, request, jsonify, Response
 import sys
 import time
-from capcut_server import add_text, save_draft, add_audio
-#from settings.local import PORT
-#from util import timing_decorator
-#from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
-#from util import hex_to_rgb
-import  pandas  as pd
-import json, os, ast, csv
+import json
 
-PORT=9000       #端口
+PORT=9001       #端口
 BASE_URL = f"http://localhost:{PORT}"
-LICENSE_KEY = "trial"  # Trial license key
-draft_folder = r"z:\PAWA\项目\CapCutAPI\草稿"
+draft_folder = "/Users/sunguannan/Movies/JianyingPro/User Data/Projects/com.lveditor.draft"
+
 
 
 
@@ -43,7 +37,6 @@ def make_request(endpoint, data, method='POST'):
 def save_draft_impl(draft_id, draft_folder):
     """API wrapper for save_draft service"""
     data = {
-        "license_key": LICENSE_KEY,  # Using trial version license key
         "draft_id": draft_id,
         "draft_folder": draft_folder
     }
@@ -612,7 +605,10 @@ draft_id = add_koubo_from_srt(
 
 
 )
+
 save_result = save_draft_impl(draft_id, draft_folder)
+
+print(save_result)
 """
 # 单词高亮
 mode="word_highlight"
