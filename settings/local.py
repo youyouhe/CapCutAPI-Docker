@@ -4,7 +4,7 @@
 """
 
 import os
-import json
+import json5  # 替换原来的json模块
 
 # 配置文件路径
 CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
@@ -70,7 +70,8 @@ if MP4_OSS_ENDPOINT and MP4_OSS_ACCESS_KEY_ID and MP4_OSS_ACCESS_KEY_SECRET and 
 if os.path.exists(CONFIG_FILE_PATH):
     try:
         with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
-            local_config = json.load(f)
+            # 使用json5.load替代json.load
+            local_config = json5.load(f)
             
             # 只在环境变量未设置时使用配置文件的值
             if 'CAPCUT_ENV' not in os.environ and "is_capcut_env" in local_config:
@@ -100,8 +101,8 @@ if os.path.exists(CONFIG_FILE_PATH):
             if not MINIO_CONFIG["endpoint"] and "minio_config" in local_config:
                 MINIO_CONFIG = local_config["minio_config"]
 
-    except (json.JSONDecodeError, IOError):
-        # 配置文件加载失败，使用环境变量或默认配置
+    except Exception as e:
+        # 配置文件加载失败，使用默认配置
         pass
 
 # 导出所有配置变量

@@ -1,12 +1,13 @@
 from pyJianYingDraft import trange, Video_scene_effect_type, Video_character_effect_type, CapCut_Video_scene_effect_type, CapCut_Video_character_effect_type, exceptions
 import pyJianYingDraft as draft
-from typing import Optional, Dict, List, Union
+from typing import Optional, Dict, List, Union, Literal
 from create_draft import get_or_create_draft
 from util import generate_draft_url
 from settings import IS_CAPCUT_ENV
 
 def add_effect_impl(
     effect_type: str,  # Changed to string type
+    effect_category: Literal["scene", "character"],
     start: float = 0,
     end: float = 3.0,
     draft_id: Optional[str] = None,
@@ -18,6 +19,7 @@ def add_effect_impl(
     """
     Add an effect to the specified draft
     :param effect_type: Effect type name, will be matched from Video_scene_effect_type or Video_character_effect_type
+    :param effect_category: Effect category, "scene" or "character", default "scene"
     :param start: Start time (seconds), default 0
     :param end: End time (seconds), default 3 seconds
     :param draft_id: Draft ID, if None or corresponding zip file not found, a new draft will be created
@@ -38,29 +40,35 @@ def add_effect_impl(
     duration = end - start
     t_range = trange(f"{start}s", f"{duration}s")
 
-    # Dynamically get effect type object
+    # Select the corresponding effect type based on effect category and environment
     effect_enum = None
     if IS_CAPCUT_ENV:
         # If in CapCut environment, use CapCut effects
-        try:
-            effect_enum = CapCut_Video_scene_effect_type[effect_type]
-        except KeyError:
+        if effect_category == "scene":
+            try:
+                effect_enum = CapCut_Video_scene_effect_type[effect_type]
+            except:
+                effect_enum = None
+        elif effect_category == "character":
             try:
                 effect_enum = CapCut_Video_character_effect_type[effect_type]
-            except KeyError:
+            except:
                 effect_enum = None
     else:
         # Default to using JianYing effects
-        try:
-            effect_enum = Video_scene_effect_type[effect_type]
-        except KeyError:
+        if effect_category == "scene":
+            try:
+                effect_enum = Video_scene_effect_type[effect_type]
+            except:
+                effect_enum = None
+        elif effect_category == "character":
             try:
                 effect_enum = Video_character_effect_type[effect_type]
-            except KeyError:
+            except:
                 effect_enum = None
     
     if effect_enum is None:
-        raise ValueError(f"Unknown effect type: {effect_type}")
+        raise ValueError(f"Unknown {effect_category} effect type: {effect_type}")
 
     # Add effect track (only when track doesn't exist)
     if track_name is not None:

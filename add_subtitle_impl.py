@@ -80,7 +80,7 @@ def add_subtitle_impl(
             raise Exception(f"Failed to download subtitle file: {str(e)}")
     elif os.path.isfile(srt_path):  # Check if it's a file
         try:
-            with open(srt_path, 'r', encoding='utf-8') as f:
+            with open(srt_path, 'r', encoding='utf-8-sig') as f:
                 srt_content = f.read()
         except Exception as e:
             raise Exception(f"Failed to read local subtitle file: {str(e)}")
