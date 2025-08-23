@@ -66,6 +66,8 @@ Enjoy It!  😀😀😀
 
 ### 2\. Installation and Deployment
 
+#### Option 1: Traditional Installation
+
 ```bash
 # 1. Clone the project
 git clone https://github.com/sun-guannan/CapCutAPI.git
@@ -83,6 +85,25 @@ pip install -r requirements-mcp.txt  # MCP protocol support (optional)
 # 4. Configuration file
 cp config.json.example config.json
 # Edit config.json as needed
+```
+
+#### Option 2: Docker Installation (Recommended)
+
+This project provides Docker support for easier deployment. CapCut can be built separately, and MinIO can be configured to use an existing instance.
+
+```bash
+# 1. Clone the project
+git clone https://github.com/sun-guannan/CapCutAPI.git
+cd CapCutAPI
+
+# 2. Copy and configure environment variables
+cp .env.example .env
+# Edit .env as needed
+
+# 3. Build and start services
+docker-compose up -d
+
+# The API will be available at http://localhost:9002
 ```
 
 ### 3\. Start the service

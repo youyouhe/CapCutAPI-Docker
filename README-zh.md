@@ -67,6 +67,8 @@
 
 ### 2. 安装部署
 
+#### 方式一：传统安装
+
 ```bash
 # 1. 克隆项目
 git clone https://github.com/sun-guannan/CapCutAPI.git
@@ -84,6 +86,25 @@ pip install -r requirements-mcp.txt  # MCP 协议支持 (可选)
 # 4. 配置文件
 cp config.json.example config.json
 # 根据需要编辑 config.json
+```
+
+#### 方式二：Docker 安装（推荐）
+
+本项目提供 Docker 支持以便于部署。CapCut 可以单独构建，MinIO 可以配置为使用现有实例。
+
+```bash
+# 1. 克隆项目
+git clone https://github.com/sun-guannan/CapCutAPI.git
+cd CapCutAPI
+
+# 2. 复制并配置环境变量
+cp .env.example .env
+# 根据需要编辑 .env
+
+# 3. 构建并启动服务
+docker-compose up -d --build capcut-api
+
+# API 将在 http://localhost:9002 可用
 ```
 
 ### 3. 启动服务
