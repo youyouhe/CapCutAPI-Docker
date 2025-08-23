@@ -5,7 +5,7 @@ services:
     build: .
     container_name: capcut-api
     ports:
-      - "9000:9000"
+      - "9002:9000"
     volumes:
       - ./tmp:/app/tmp
       - ./template:/app/template
@@ -15,11 +15,11 @@ services:
       - .env
     environment:
       - FLASK_ENV=production
+      - FLASK_DEBUG=true
+      - IS_UPLOAD_DRAFT=true
       - PYTHONPATH=/app
       - PYTHONUNBUFFERED=1
     restart: unless-stopped
-    depends_on:
-      - minio
     networks:
       - capcut-network
     healthcheck:

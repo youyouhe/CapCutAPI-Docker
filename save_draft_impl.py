@@ -95,6 +95,16 @@ def save_draft_background(draft_id, draft_folder, task_id):
         template_dir = "template" if IS_CAPCUT_ENV else "template_jianying"
         draft_folder_for_duplicate.duplicate_as_template(template_dir, draft_id)
         
+        # Set correct permissions for the newly created draft folder
+        new_draft_path = os.path.join(current_dir, draft_id)
+        if os.path.exists(new_draft_path):
+            os.chmod(new_draft_path, 0o755)
+            for root, dirs, files in os.walk(new_draft_path):
+                for d in dirs:
+                    os.chmod(os.path.join(root, d), 0o755)
+                for f in files:
+                    os.chmod(os.path.join(root, f), 0o644)
+        
         # Update task status
         update_task_field(task_id, "message", "Updating media file metadata")
         update_task_field(task_id, "progress", 5)
@@ -233,6 +243,7 @@ def save_draft_background(draft_id, draft_folder, task_id):
             logger.info(f"Task {task_id} progress 90%: Uploading to cloud storage.")
             
             # Upload to OSS
+            logger.info(f"Starting upload of {zip_path} to OSS/MinIO")
             draft_url = upload_to_oss(zip_path)
             logger.info(f"Draft archive has been uploaded to OSS, URL: {draft_url}")
             update_task_field(task_id, "draft_url", draft_url)

@@ -29,6 +29,9 @@ def upload_to_oss(path):
 def upload_to_minio(path):
     """Upload file to MinIO storage"""
     try:
+        print(f"Starting MinIO upload for file: {path}")
+        print(f"MinIO config: {MINIO_CONFIG}")
+        
         # Create MinIO client
         client = Minio(
             MINIO_CONFIG['endpoint'].replace('http://', '').replace('https://', ''),
@@ -37,13 +40,18 @@ def upload_to_minio(path):
             secure=MINIO_CONFIG['endpoint'].startswith('https://')
         )
         
+        print(f"MinIO client created successfully")
+        
         # Upload file
         object_name = os.path.basename(path)
+        print(f"Uploading object: {object_name} from path: {path}")
         result = client.fput_object(
             MINIO_CONFIG['bucket_name'],
             object_name,
             path
         )
+        
+        print(f"File uploaded successfully. Result: {result}")
         
         # Generate presigned URL (valid for 24 hours)
         from datetime import timedelta
@@ -53,8 +61,11 @@ def upload_to_minio(path):
             expires=timedelta(hours=24)
         )
         
+        print(f"Presigned URL generated: {url}")
+        
         # Clean up temporary file
         os.remove(path)
+        print(f"Temporary file cleaned up: {path}")
         
         return url
     except Exception as e:
