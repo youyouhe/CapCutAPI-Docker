@@ -101,7 +101,7 @@ cp .env.example .env
 # Edit .env as needed
 
 # 3. Build and start services
-docker-compose up -d
+docker-compose up -d --build capcut-api
 
 # The API will be available at http://localhost:9002
 ```
