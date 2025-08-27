@@ -42,6 +42,15 @@ def upload_to_minio(path):
         
         print(f"MinIO client created successfully")
         
+        # Check if bucket exists, create if it doesn't
+        bucket_name = MINIO_CONFIG['bucket_name']
+        if not client.bucket_exists(bucket_name):
+            print(f"Bucket {bucket_name} does not exist, creating it...")
+            client.make_bucket(bucket_name)
+            print(f"Bucket {bucket_name} created successfully")
+        else:
+            print(f"Bucket {bucket_name} already exists")
+        
         # Upload file
         object_name = os.path.basename(path)
         print(f"Uploading object: {object_name} from path: {path}")

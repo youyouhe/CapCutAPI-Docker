@@ -11,12 +11,10 @@ services:
       - ./template:/app/template
       - ./template_jianying:/app/template_jianying
       - ./drafts:/app/drafts
-    env_file:
-      - .env
-    # --- 添加下面这部分 ---
-    volumes:
       # 将宿主机当前目录下的 .env 文件，映射到容器内的 /app/.env 文件
       - ./.env:/app/.env      
+    env_file:
+      - .env
     environment:
       - FLASK_ENV=production
       - FLASK_DEBUG=true
