@@ -5,6 +5,7 @@ import requests
 import shutil
 from requests.exceptions import RequestException, Timeout
 from urllib.parse import urlparse, unquote
+from util import timestamp_log
 
 def download_video(video_url, draft_name, material_name):
     """
@@ -23,7 +24,7 @@ def download_video(video_url, draft_name, material_name):
     
     # Check if file already exists
     if os.path.exists(local_path):
-        print(f"Video file already exists: {local_path}")
+        print(timestamp_log(f"Video file already exists: {local_path}"))
         return local_path
     
     try:
@@ -56,7 +57,7 @@ def download_image(image_url, draft_name, material_name):
     
     # Check if file already exists
     if os.path.exists(local_path):
-        print(f"Image file already exists: {local_path}")
+        print(timestamp_log(f"Image file already exists: {local_path}"))
         return local_path
     
     try:
@@ -92,7 +93,7 @@ def download_audio(audio_url, draft_name, material_name):
     
     # Check if file already exists
     if os.path.exists(local_path):
-        print(f"Audio file already exists: {local_path}")
+        print(timestamp_log(f"Audio file already exists: {local_path}"))
         return local_path
     
     try:
@@ -119,16 +120,16 @@ def download_file(url:str, local_filename, max_retries=3, timeout=180):
         # 创建目标目录（如果不存在）
         if directory and not os.path.exists(directory):
             os.makedirs(directory, exist_ok=True)
-            print(f"Created directory: {directory}")
-        
-        print(f"Copying local file: {url} to {local_filename}")
+            print(timestamp_log(f"Created directory: {directory}"))
+
+        print(timestamp_log(f"Copying local file: {url} to {local_filename}"))
         start_time = time.time()
-        
+
         # 复制文件
         shutil.copy2(url, local_filename)
-        
-        print(f"Copy completed in {time.time()-start_time:.2f} seconds")
-        print(f"File saved as: {os.path.abspath(local_filename)}")
+
+        print(timestamp_log(f"Copy completed in {time.time()-start_time:.2f} seconds"))
+        print(timestamp_log(f"File saved as: {os.path.abspath(local_filename)}"))
         return True
     
     # 原有的下载逻辑
@@ -140,16 +141,16 @@ def download_file(url:str, local_filename, max_retries=3, timeout=180):
         try:
             if retries > 0:
                 wait_time = 2 ** retries  # Exponential backoff strategy
-                print(f"Retrying in {wait_time} seconds... (Attempt {retries+1}/{max_retries})")
+                print(timestamp_log(f"Retrying in {wait_time} seconds... (Attempt {retries+1}/{max_retries})"))
                 time.sleep(wait_time)
-            
-            print(f"Downloading file: {local_filename}")
+
+            print(timestamp_log(f"Downloading file: {local_filename}"))
             start_time = time.time()
-            
+
             # Create directory (if it doesn't exist)
             if directory and not os.path.exists(directory):
                 os.makedirs(directory, exist_ok=True)
-                print(f"Created directory: {directory}")
+                print(timestamp_log(f"Created directory: {directory}"))
 
             # Add headers
             headers = {
@@ -182,19 +183,19 @@ def download_file(url:str, local_filename, max_retries=3, timeout=180):
                 if total_size > 0:
                     # print() # Original newline
                     pass
-                print(f"Download completed in {time.time()-start_time:.2f} seconds")
-                print(f"File saved as: {os.path.abspath(local_filename)}")
+                print(timestamp_log(f"Download completed in {time.time()-start_time:.2f} seconds"))
+                print(timestamp_log(f"File saved as: {os.path.abspath(local_filename)}"))
                 return True
                 
         except Timeout:
-            print(f"Download timed out after {timeout} seconds")
+            print(timestamp_log(f"Download timed out after {timeout} seconds"))
         except RequestException as e:
-            print(f"Request failed: {e}")
+            print(timestamp_log(f"Request failed: {e}"))
         except Exception as e:
-            print(f"Unexpected error during download: {e}")
+            print(timestamp_log(f"Unexpected error during download: {e}"))
         
         retries += 1
     
-    print(f"Download failed after {max_retries} attempts for URL: {url}")
+    print(timestamp_log(f"Download failed after {max_retries} attempts for URL: {url}"))
     return False
 

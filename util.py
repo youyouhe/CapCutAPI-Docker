@@ -81,3 +81,9 @@ def timing_decorator(func_name):
 
 def generate_draft_url(draft_id):
     return f"{DRAFT_DOMAIN}{PREVIEW_ROUTER}?draft_id={draft_id}&is_capcut={1 if IS_CAPCUT_ENV else 0}"
+
+def timestamp_log(message):
+    """Add timestamp to log messages"""
+    import datetime
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return f"[{timestamp}] {message}"

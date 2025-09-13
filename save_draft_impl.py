@@ -2,7 +2,7 @@ import os
 import re
 import pyJianYingDraft as draft
 import shutil
-from util import zip_draft, is_windows_path
+from util import zip_draft, is_windows_path, timestamp_log
 from oss import upload_to_oss
 from typing import Dict, Literal
 from draft_cache import DRAFT_CACHE

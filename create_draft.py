@@ -2,6 +2,7 @@ import uuid
 import pyJianYingDraft as draft
 import time
 from draft_cache import DRAFT_CACHE, update_cache
+from util import timestamp_log
 
 def create_draft(width=1080, height=1920):
     """
@@ -35,13 +36,13 @@ def get_or_create_draft(draft_id=None, width=1080, height=1920):
     
     if draft_id is not None and draft_id in DRAFT_CACHE:
         # Get existing draft information from cache
-        print(f"Getting draft from cache: {draft_id}")
+        print(timestamp_log(f"Getting draft from cache: {draft_id}"))
         # Update last access time
         update_cache(draft_id, DRAFT_CACHE[draft_id])
         return draft_id, DRAFT_CACHE[draft_id]
 
     # Create new draft logic
-    print("Creating new draft")
+    print(timestamp_log("Creating new draft"))
     script, generate_draft_id = create_draft(
         width=width,
         height=height,
