@@ -139,3 +139,7 @@ Settings are loaded from config.json and accessed through settings.local module.
 - PORT: Server port
 - DRAFT_DOMAIN/PREVIEW_ROUTER: URL generation for draft previews
 - IS_UPLOAD_DRAFT: Whether to upload drafts to cloud storage
+- SECRET_KEY: API authentication key for securing endpoints (optional)
+
+### API Authentication
+For security, all POST endpoints can be protected with a secret key. Configure `"secret_key"` in `config.json` or set the `SECRET_KEY` environment variable. When enabled, API requests must include the `X-API-KEY` header or `api_key` query parameter with the secret key value.

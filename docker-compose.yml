@@ -7,6 +7,8 @@ services:
     ports:
       - "9002:9000"
     volumes:
+      - ./capcut_server.py:/app/capcut_server.py
+      - ./settings:/app/settings
       - ./tmp:/app/tmp
       - ./template:/app/template
       - ./template_jianying:/app/template_jianying

@@ -31,12 +31,33 @@ from add_sticker_impl import add_sticker_impl
 from create_draft import create_draft
 from util import generate_draft_url as utilgenerate_draft_url, hex_to_rgb
 from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
+from functools import wraps
 
-from settings.local import IS_CAPCUT_ENV, DRAFT_DOMAIN, PREVIEW_ROUTER, PORT
+from settings.local import IS_CAPCUT_ENV, DRAFT_DOMAIN, PREVIEW_ROUTER, PORT, SECRET_KEY
 
 app = Flask(__name__)
+
+def require_api_key(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if SECRET_KEY and SECRET_KEY.strip():
+            # Check if X-API-KEY header is present
+            api_key = request.headers.get('X-API-KEY')
+            if not api_key:
+                # Also check for api_key in query parameters (for backward compatibility)
+                api_key = request.args.get('api_key')
+
+            if not api_key or api_key != SECRET_KEY:
+                return jsonify({
+                    "success": False,
+                    "error": "Invalid or missing API key. Please provide the X-API-KEY header or api_key query parameter.",
+                    "output": ""
+                }), 401
+        return func(*args, **kwargs)
+    return decorated_function
  
 @app.route('/add_video', methods=['POST'])
+@require_api_key
 def add_video():
     data = request.get_json()
     # Get required parameters
@@ -129,6 +150,7 @@ def add_video():
         return jsonify(result)
 
 @app.route('/add_audio', methods=['POST'])
+@require_api_key
 def add_audio():
     data = request.get_json()
     
@@ -194,6 +216,7 @@ def add_audio():
         return jsonify(result)
 
 @app.route('/create_draft', methods=['POST'])
+@require_api_key
 def create_draft_service():
     data = request.get_json()
     
@@ -224,6 +247,7 @@ def create_draft_service():
         return jsonify(result)
         
 @app.route('/add_subtitle', methods=['POST'])
+@require_api_key
 def add_subtitle():
     data = request.get_json()
     
@@ -315,6 +339,7 @@ def add_subtitle():
         return jsonify(result)
 
 @app.route('/add_text', methods=['POST'])
+@require_api_key
 def add_text():
     data = request.get_json()
     
@@ -489,6 +514,7 @@ def add_text():
         return jsonify(result)
 
 @app.route('/add_image', methods=['POST'])
+@require_api_key
 def add_image():
     data = request.get_json()
     
@@ -590,6 +616,7 @@ def add_image():
         return jsonify(result)
 
 @app.route('/add_video_keyframe', methods=['POST'])
+@require_api_key
 def add_video_keyframe():
     data = request.get_json()
     
@@ -636,6 +663,7 @@ def add_video_keyframe():
         return jsonify(result)
 
 @app.route('/add_effect', methods=['POST'])
+@require_api_key
 def add_effect():
     data = request.get_json()
     
@@ -686,6 +714,7 @@ def add_effect():
         return jsonify(result)
 
 @app.route('/query_script', methods=['POST'])
+@require_api_key
 def query_script():
     data = request.get_json()
 
@@ -727,6 +756,7 @@ def query_script():
         return jsonify(result)
 
 @app.route('/save_draft', methods=['POST'])
+@require_api_key
 def save_draft():
     data = request.get_json()
     
@@ -761,6 +791,7 @@ def save_draft():
 
 # Add new query status interface
 @app.route('/query_draft_status', methods=['POST'])
+@require_api_key
 def query_draft_status():
     data = request.get_json()
     
@@ -798,6 +829,7 @@ def query_draft_status():
         return jsonify(result)
 
 @app.route('/generate_draft_url', methods=['POST'])
+@require_api_key
 def generate_draft_url():
     data = request.get_json()
     
@@ -830,6 +862,7 @@ def generate_draft_url():
         return jsonify(result)
 
 @app.route('/add_sticker', methods=['POST'])
+@require_api_key
 def add_sticker():
     data = request.get_json()
     # Get required parameters
@@ -1449,6 +1482,17 @@ def health_check():
             "message": f"Health check failed: {str(e)}",
             "timestamp": str(datetime.now())
         }), 500
+
+# 调试端点 - 显示当前SECRET_KEY值
+@app.route('/debug', methods=['GET'])
+def debug_endpoint():
+    """调试端点，显示当前SECRET_KEY的实际值（不需要认证）"""
+    return jsonify({
+        "secret_key": SECRET_KEY,
+        "key_length": len(SECRET_KEY) if SECRET_KEY else 0,
+        "is_set": bool(SECRET_KEY and SECRET_KEY.strip()),
+        "timestamp": str(datetime.now())
+    })
 
 
 if __name__ == '__main__':

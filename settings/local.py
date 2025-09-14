@@ -15,6 +15,7 @@ DRAFT_DOMAIN = os.getenv('DRAFT_DOMAIN', 'https://www.install-ai-guider.top')
 PREVIEW_ROUTER = os.getenv('PREVIEW_ROUTER', '/draft/downloader')
 IS_UPLOAD_DRAFT = os.getenv('IS_UPLOAD_DRAFT', 'false').lower() == 'true'
 PORT = int(os.getenv('PORT', '9000'))
+SECRET_KEY = os.getenv('SECRET_KEY', '')
 
 # MinIO配置
 MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', '')
@@ -88,7 +89,10 @@ if os.path.exists(CONFIG_FILE_PATH):
             
             if 'IS_UPLOAD_DRAFT' not in os.environ and "is_upload_draft" in local_config:
                 IS_UPLOAD_DRAFT = local_config["is_upload_draft"]
-                
+
+            if 'SECRET_KEY' not in os.environ and "secret_key" in local_config:
+                SECRET_KEY = local_config["secret_key"]
+
             # 如果环境变量中没有OSS配置，则使用配置文件的值
             if not OSS_CONFIG and "oss_config" in local_config:
                 OSS_CONFIG = local_config["oss_config"]
@@ -108,10 +112,11 @@ if os.path.exists(CONFIG_FILE_PATH):
 # 导出所有配置变量
 __all__ = [
     'IS_CAPCUT_ENV',
-    'DRAFT_DOMAIN', 
+    'DRAFT_DOMAIN',
     'PREVIEW_ROUTER',
     'IS_UPLOAD_DRAFT',
     'PORT',
+    'SECRET_KEY',
     'OSS_CONFIG',
     'MP4_OSS_CONFIG',
     'MINIO_CONFIG'
