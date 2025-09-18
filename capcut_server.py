@@ -1483,18 +1483,6 @@ def health_check():
             "timestamp": str(datetime.now())
         }), 500
 
-# 调试端点 - 显示当前SECRET_KEY值
-@app.route('/debug', methods=['GET'])
-def debug_endpoint():
-    """调试端点，显示当前SECRET_KEY的实际值（不需要认证）"""
-    return jsonify({
-        "secret_key": SECRET_KEY,
-        "key_length": len(SECRET_KEY) if SECRET_KEY else 0,
-        "is_set": bool(SECRET_KEY and SECRET_KEY.strip()),
-        "timestamp": str(datetime.now())
-    })
-
-
 if __name__ == '__main__':
     import os
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
