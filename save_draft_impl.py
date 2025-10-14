@@ -283,33 +283,68 @@ def query_task_status(task_id: str):
     return get_task_status(task_id)
 
 def save_draft_impl(draft_id: str, draft_folder: str = None) -> Dict[str, str]:
-    """Start a background task to save the draft"""
+    """Submit save draft task to queue"""
     logger.info(f"Received save draft request: draft_id={draft_id}, draft_folder={draft_folder}")
-    try:
-        # Generate a unique task ID
-        task_id = draft_id
+
+    # Import request queue
+    from request_queue import request_queue
+
+    # Generate task ID
+    task_id = draft_id
+
+    # Submit task to queue
+    success = request_queue.submit_task(
+        task_id=task_id,
+        func=_queue_save_draft_wrapper,
+        draft_id=draft_id,
+        draft_folder=draft_folder
+    )
+
+    if success:
+        # Create task status for compatibility with existing code
         create_task(task_id)
-        logger.info(f"Task {task_id} has been created.")
-        
-        # Changed to synchronous execution
+        logger.info(f"Task {task_id} has been submitted to queue.")
+
         return {
             "success": True,
-            "draft_url": save_draft_background(draft_id, draft_folder, task_id)
+            "output": {
+                "task_id": task_id,
+                "message": "任务已提交到队列，请使用 query_draft_status 查询处理进度",
+                "queue_info": request_queue.get_queue_info()
+            }
+        }
+    else:
+        # Check if task already exists
+        existing_status = request_queue.get_task_status(task_id)
+        if existing_status:
+            logger.info(f"Task {task_id} already exists in queue")
+            return {
+                "success": True,
+                "output": {
+                    "task_id": task_id,
+                    "message": "任务已在队列中，请使用 query_draft_status 查询处理进度",
+                    "status": existing_status["status"],
+                    "queue_info": request_queue.get_queue_info()
+                }
+            }
+        else:
+            # Queue is full or other error
+            logger.error(f"Failed to submit task {task_id} to queue")
+            return {
+                "success": False,
+                "error": "队列已满，请稍后重试"
             }
 
-        # # Start a background thread to execute the task
-        # thread = threading.Thread(
-        #     target=save_draft_background,
-        #     args=(draft_id, draft_folder, task_id)
-        # )
-        # thread.start()
-        
-    except Exception as e:
-        logger.error(f"Failed to start save draft task {draft_id}: {str(e)}", exc_info=True)
-        return {
-            "success": False,
-            "error": str(e)
-        }
+def _queue_save_draft_wrapper(draft_id: str, draft_folder: str) -> str:
+    """
+    Queue wrapper for save_draft_background function
+    This function is executed by the queue worker threads
+    """
+    # Create task status for compatibility with existing code
+    create_task(draft_id)
+
+    # Call the original save_draft_background function
+    return save_draft_background(draft_id, draft_folder, draft_id)
 
 def get_media_info_with_fallback(remote_url, local_path=None, material_name="", command_func=None):
     """

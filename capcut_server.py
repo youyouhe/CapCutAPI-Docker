@@ -794,38 +794,96 @@ def save_draft():
 @require_api_key
 def query_draft_status():
     data = request.get_json()
-    
+
     # Get required parameters
     task_id = data.get('task_id')
-    
+
     result = {
         "success": False,
         "output": "",
         "error": ""
     }
-    
+
     # Validate required parameters
     if not task_id:
         error_message = "Hi, the required parameter 'task_id' is missing. Please add it and try again."
         result["error"] = error_message
         return jsonify(result)
-    
+
     try:
-        # Get task status
-        task_status = query_task_status(task_id)
-        
-        if task_status["status"] == "not_found":
-            error_message = f"Task with ID {task_id} not found. Please check if the task ID is correct."
-            result["error"] = error_message
+        # Import request queue
+        from request_queue import request_queue
+
+        # First check queue status
+        queue_status = request_queue.get_task_status(task_id)
+
+        if queue_status:
+            # Return queue status
+            result["success"] = True
+            result["output"] = {
+                "status": queue_status["status"],
+                "message": queue_status["message"],
+                "progress": _get_queue_progress(queue_status["status"]),
+                "draft_url": queue_status.get("result", {}).get("draft_url", "") if queue_status.get("result") else "",
+                "queue_info": request_queue.get_queue_info()
+            }
             return jsonify(result)
-        
-        result["success"] = True
-        result["output"] = task_status
-        return jsonify(result)
-        
+        else:
+            # Fall back to original task cache
+            task_status = query_task_status(task_id)
+
+            if task_status["status"] == "not_found":
+                error_message = f"Task with ID {task_id} not found. Please check if the task ID is correct."
+                result["error"] = error_message
+                return jsonify(result)
+
+            result["success"] = True
+            result["output"] = {
+                "status": task_status["status"],
+                "message": task_status["message"],
+                "progress": task_status["progress"],
+                "draft_url": task_status.get("draft_url", ""),
+                "queue_info": request_queue.get_queue_info()
+            }
+            return jsonify(result)
+
     except Exception as e:
         error_message = f"Error occurred while querying task status: {str(e)}."
         result["error"] = error_message
+        return jsonify(result)
+
+def _get_queue_progress(status: str) -> int:
+    """Convert queue status to progress percentage"""
+    if status == "queued":
+        return 0
+    elif status == "processing":
+        return 50
+    elif status == "completed":
+        return 100
+    else:  # failed
+        return 0
+
+@app.route('/queue_info', methods=['GET'])
+@require_api_key
+def get_queue_info():
+    """Get queue information"""
+    try:
+        from request_queue import request_queue
+
+        queue_info = request_queue.get_queue_info()
+
+        result = {
+            "success": True,
+            "output": queue_info
+        }
+        return jsonify(result)
+
+    except Exception as e:
+        error_message = f"Error occurred while getting queue info: {str(e)}."
+        result = {
+            "success": False,
+            "error": error_message
+        }
         return jsonify(result)
 
 @app.route('/generate_draft_url', methods=['POST'])
@@ -1485,5 +1543,35 @@ def health_check():
 
 if __name__ == '__main__':
     import os
+    import atexit
+    import signal
+    import logging
+
+    # Initialize logger
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger('flask_video_generator')
+
+    # Initialize request queue
+    from request_queue import request_queue
+
+    # Cleanup function
+    def cleanup():
+        logger.info("Cleaning up request queue...")
+        request_queue.stop_workers()
+        logger.info("Application shutdown complete")
+
+    # Register cleanup function
+    atexit.register(cleanup)
+
+    # Handle signals for graceful shutdown
+    def signal_handler(signum, frame):
+        logger.info(f"Received signal {signum}, shutting down gracefully...")
+        cleanup()
+        exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    logger.info("Starting CapCut API with request queue system")
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(host='0.0.0.0', port=PORT, debug=debug_mode)
