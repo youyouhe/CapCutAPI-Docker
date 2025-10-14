@@ -221,8 +221,18 @@ def save_draft_background(draft_id, draft_folder, task_id):
         update_task_field(task_id, "progress", 70)
         update_task_field(task_id, "message", "Saving draft information")
         logger.info(f"Task {task_id} progress 70%: Saving draft information.")
-        
-        script.dump(os.path.join(current_dir, f"{draft_id}/draft_info.json"))
+
+        # 确保草稿目录存在
+        draft_dir = os.path.join(current_dir, draft_id)
+        if not os.path.exists(draft_dir):
+            logger.warning(f"Draft directory {draft_dir} does not exist, recreating...")
+            # 重新创建目录结构
+            draft_folder_for_duplicate = draft.Draft_folder(current_dir)
+            template_dir = "template" if IS_CAPCUT_ENV else "template_jianying"
+            draft_folder_for_duplicate.duplicate_as_template(template_dir, draft_id)
+            logger.info(f"Recreated draft directory: {draft_dir}")
+
+        script.dump(os.path.join(draft_dir, "draft_info.json"))
         logger.info(f"Draft information has been saved to {os.path.join(current_dir, draft_id)}/draft_info.json.")
 
         draft_url = ""
