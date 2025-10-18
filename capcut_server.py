@@ -823,13 +823,29 @@ def query_draft_status():
                 logger.error(f"queue_status is not a dictionary: {type(queue_status)} - {queue_status}")
                 queue_status = {"status": "unknown", "message": "Invalid queue status"}
 
+            # Debug: Log the actual queue_status structure
+            logger.info(f"DEBUG queue_status: {queue_status}")
+            logger.info(f"DEBUG queue_status.get('result'): {queue_status.get('result')}")
+
+            # Extract draft_url from result if available
+            draft_url = ""
+            result_data = queue_status.get("result")
+            if result_data:
+                logger.info(f"DEBUG result_data type: {type(result_data)}")
+                if isinstance(result_data, dict):
+                    draft_url = result_data.get("draft_url", "")
+                    logger.info(f"DEBUG draft_url from result: {draft_url}")
+                elif hasattr(result_data, 'draft_url'):
+                    draft_url = getattr(result_data, 'draft_url', '')
+                    logger.info(f"DEBUG draft_url from object: {draft_url}")
+
             # Return queue status
             result["success"] = True
             result["output"] = {
                 "status": queue_status.get("status", "unknown"),
                 "message": queue_status.get("message", "Unknown status"),
                 "progress": _get_queue_progress(queue_status.get("status", "unknown")),
-                "draft_url": queue_status.get("result", {}).get("draft_url", "") if isinstance(queue_status.get("result"), dict) else "",
+                "draft_url": draft_url,
                 "queue_info": request_queue.get_queue_info()
             }
             return jsonify(result)
