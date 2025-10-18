@@ -4,7 +4,7 @@ import pyJianYingDraft as draft
 import shutil
 from util import zip_draft, is_windows_path, timestamp_log
 from oss import upload_to_oss
-from typing import Dict, Literal
+from typing import Dict, Literal, Any
 from draft_cache import DRAFT_CACHE
 from save_task_cache import DRAFT_TASKS, get_task_status, update_tasks_cache, update_task_field, increment_task_field, update_task_fields, create_task
 from downloader import download_audio, download_file, download_image, download_video
@@ -336,7 +336,7 @@ def save_draft_impl(draft_id: str, draft_folder: str = None) -> Dict[str, str]:
                 "error": "队列已满，请稍后重试"
             }
 
-def _queue_save_draft_wrapper(draft_id: str, draft_folder: str) -> str:
+def _queue_save_draft_wrapper(draft_id: str, draft_folder: str) -> Dict[str, Any]:
     """
     Queue wrapper for save_draft_background function
     This function is executed by the queue worker threads
@@ -345,7 +345,23 @@ def _queue_save_draft_wrapper(draft_id: str, draft_folder: str) -> str:
     create_task(draft_id)
 
     # Call the original save_draft_background function
-    return save_draft_background(draft_id, draft_folder, draft_id)
+    draft_url = save_draft_background(draft_id, draft_folder, draft_id)
+
+    # Get the complete task status from the cache system
+    task_status = get_task_status(draft_id)
+
+    # Ensure the draft_url is included in the result
+    if task_status and isinstance(task_status, dict):
+        task_status["draft_url"] = draft_url
+        return task_status
+    else:
+        # Fallback if task status is not available
+        return {
+            "status": "completed",
+            "message": "Draft creation completed",
+            "progress": 100,
+            "draft_url": draft_url
+        }
 
 def get_media_info_with_fallback(remote_url, local_path=None, material_name="", command_func=None):
     """
