@@ -832,10 +832,16 @@ def query_draft_status():
             result_data = queue_status.get("result")
             if result_data:
                 logger.info(f"DEBUG result_data type: {type(result_data)}")
-                if isinstance(result_data, dict):
+                if isinstance(result_data, str):
+                    # Result is directly the draft_url string
+                    draft_url = result_data
+                    logger.info(f"DEBUG draft_url from string: {draft_url}")
+                elif isinstance(result_data, dict):
+                    # Result is a dictionary containing draft_url
                     draft_url = result_data.get("draft_url", "")
-                    logger.info(f"DEBUG draft_url from result: {draft_url}")
+                    logger.info(f"DEBUG draft_url from dict: {draft_url}")
                 elif hasattr(result_data, 'draft_url'):
+                    # Result is an object with draft_url attribute
                     draft_url = getattr(result_data, 'draft_url', '')
                     logger.info(f"DEBUG draft_url from object: {draft_url}")
 
