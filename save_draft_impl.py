@@ -268,6 +268,7 @@ def save_draft_background(draft_id, draft_folder, task_id):
         update_task_field(task_id, "status", "completed")
         update_task_field(task_id, "progress", 100)
         update_task_field(task_id, "message", "Draft creation completed")
+        update_task_field(task_id, "draft_url", draft_url)  # Save draft_url to task status
         logger.info(f"Task {task_id} completed, draft URL: {draft_url}")
         return draft_url
 
