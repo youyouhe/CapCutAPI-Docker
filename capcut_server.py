@@ -779,9 +779,9 @@ def save_draft():
     try:
         # Call save_draft_impl method, start background task
         draft_result = save_draft_impl(draft_id, draft_folder)
-        
-        result["success"] = True
-        result["output"] = draft_result
+
+        result["success"] = draft_result.get("success", True)
+        result["output"] = draft_result.get("output", draft_result)
         return jsonify(result)
         
     except Exception as e:
