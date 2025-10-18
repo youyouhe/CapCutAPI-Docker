@@ -818,13 +818,18 @@ def query_draft_status():
         queue_status = request_queue.get_task_status(task_id)
 
         if queue_status:
+            # Ensure queue_status is a dictionary
+            if not isinstance(queue_status, dict):
+                logger.error(f"queue_status is not a dictionary: {type(queue_status)} - {queue_status}")
+                queue_status = {"status": "unknown", "message": "Invalid queue status"}
+
             # Return queue status
             result["success"] = True
             result["output"] = {
-                "status": queue_status["status"],
-                "message": queue_status["message"],
-                "progress": _get_queue_progress(queue_status["status"]),
-                "draft_url": queue_status.get("result", {}).get("draft_url", "") if queue_status.get("result") else "",
+                "status": queue_status.get("status", "unknown"),
+                "message": queue_status.get("message", "Unknown status"),
+                "progress": _get_queue_progress(queue_status.get("status", "unknown")),
+                "draft_url": queue_status.get("result", {}).get("draft_url", "") if isinstance(queue_status.get("result"), dict) else "",
                 "queue_info": request_queue.get_queue_info()
             }
             return jsonify(result)
@@ -832,16 +837,23 @@ def query_draft_status():
             # Fall back to original task cache
             task_status = query_task_status(task_id)
 
-            if task_status["status"] == "not_found":
+            # Ensure task_status is a dictionary
+            if not isinstance(task_status, dict):
+                logger.error(f"task_status is not a dictionary: {type(task_status)} - {task_status}")
+                error_message = f"Error occurred while querying task status: 'str' object has no attribute 'get'."
+                result["error"] = error_message
+                return jsonify(result)
+
+            if task_status.get("status") == "not_found":
                 error_message = f"Task with ID {task_id} not found. Please check if the task ID is correct."
                 result["error"] = error_message
                 return jsonify(result)
 
             result["success"] = True
             result["output"] = {
-                "status": task_status["status"],
-                "message": task_status["message"],
-                "progress": task_status["progress"],
+                "status": task_status.get("status", "unknown"),
+                "message": task_status.get("message", "Unknown status"),
+                "progress": task_status.get("progress", 0),
                 "draft_url": task_status.get("draft_url", ""),
                 "queue_info": request_queue.get_queue_info()
             }
