@@ -89,6 +89,44 @@ create_capcut_user() {
     log_success "用户 $username 创建完成"
 }
 
+# 设置 Python 默认版本
+setup_python_environment() {
+    local username="capcut"
+
+    log_info "为专用用户配置 Python 环境..."
+
+    # 检查是否安装了 Python 3.11
+    if command -v python3.11 &> /dev/null; then
+        log_info "检测到 Python 3.11，设置为默认版本"
+
+        # 创建用户的 bash 配置文件，设置 Python 别名
+        cat >> "/home/$username/.bashrc" << EOF
+
+# Python 3.11 环境配置
+if command -v python3.11 &> /dev/null; then
+    alias python3='python3.11'
+    alias pip3='pip3.11'
+    export PATH="/usr/bin/python3.11:\$PATH"
+fi
+EOF
+
+        # 为 root 用户也设置相同的配置（如果需要）
+        cat >> "/root/.bashrc" << EOF
+
+# Python 3.11 环境配置
+if command -v python3.11 &> /dev/null; then
+    alias python3='python3.11'
+    alias pip3='pip3.11'
+    export PATH="/usr/bin/python3.11:\$PATH"
+fi
+EOF
+
+        log_success "Python 3.11 环境配置完成"
+    else
+        log_info "使用系统默认 Python 版本"
+    fi
+}
+
 # 为专用用户设置环境
 setup_user_environment() {
     local username="capcut"
@@ -149,7 +187,11 @@ init_system() {
             lsof \
             htop \
             vim \
-            nano
+            nano \
+            python3 \
+            python3-pip \
+            python3-venv \
+            python3-dev
 
         log_success "Ubuntu/Debian 系统初始化完成"
 
@@ -175,7 +217,10 @@ init_system() {
                 htop \
                 vim \
                 nano \
-                epel-release
+                epel-release \
+                python3 \
+                python3-pip \
+                python3-devel
         else
             log_info "更新软件包列表..."
             $cmd_prefix yum update -y
@@ -196,7 +241,10 @@ init_system() {
                 htop \
                 vim \
                 nano \
-                epel-release
+                epel-release \
+                python3 \
+                python3-pip \
+                python3-devel
         fi
 
         log_success "CentOS/RHEL 系统初始化完成"
@@ -677,7 +725,7 @@ EOF
     chown "$username:$username" "$project_dir/deploy_as_user.sh"
 
     # 切换用户并运行应用部署
-    su - "$username" -c "cd $project_dir && ./deploy_as_user.sh"
+    su - "$username" -c "cd $project_dir && bash -c 'source ~/.bashrc && ./deploy_as_user.sh'"
 }
 
 # 主函数
@@ -716,6 +764,9 @@ main() {
 
         # 创建专用用户
         create_capcut_user
+
+        # 设置 Python 环境配置
+        setup_python_environment
 
         # 检查 Python 环境
         check_python
