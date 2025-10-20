@@ -394,6 +394,6 @@ main() {
 }
 
 # 脚本入口
-if [[ "${BASH_SOURCE[0]:-}" == "${0}" ]] || [[ ! "${BASH_SOURCE[0]:-}" ]]; then
+if [[ "${BASH_SOURCE[0]:-}" == "${0}" ]] || [[ -z "${BASH_SOURCE[0]:-}" ]]; then
     main "$@"
 fi
