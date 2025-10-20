@@ -3,7 +3,7 @@
 # CapCutAPI 主机部署一键启动脚本
 # 支持 Ubuntu/Debian 和 CentOS/RHEL 系统
 
-set -e
+set -euo pipefail  # 严格模式：遇到错误立即退出，未定义变量报错，管道中任意命令失败则退出
 
 # 颜色输出定义
 RED='\033[0;31m'
@@ -29,10 +29,166 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# 检查当前用户和权限
+check_user_and_sudo() {
+    log_info "检查用户权限和 sudo 配置..."
+
+    # 检查当前用户
+    CURRENT_USER=$(whoami)
+    log_info "当前用户: $CURRENT_USER"
+
+    # 如果是 root 用户，提示创建普通用户
+    if [[ $EUID -eq 0 ]]; then
+        log_warning "检测到使用 root 用户运行"
+        read -p "是否需要创建专用用户来运行 CapCutAPI? (y/n): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            create_capcut_user
+            log_info "请切换到新用户后重新运行此脚本"
+            log_info "命令: su - capcut"
+            exit 0
+        fi
+    else
+        # 检查是否有 sudo 权限
+        if ! sudo -n true 2>/dev/null; then
+            log_warning "需要 sudo 权限来安装系统依赖"
+            log_info "请输入 sudo 密码进行权限验证..."
+            sudo -v || {
+                log_error "sudo 权限验证失败，无法继续安装"
+                exit 1
+            }
+        fi
+    fi
+
+    log_success "权限验证通过"
+}
+
+# 创建 CapCutAPI 专用用户
+create_capcut_user() {
+    local username="capcut"
+
+    log_info "创建专用用户: $username"
+
+    # 检查用户是否已存在
+    if id "$username" &>/dev/null; then
+        log_warning "用户 $username 已存在"
+        return 0
+    fi
+
+    # 创建用户
+    sudo adduser --disabled-password --gecos "" "$username" || {
+        log_error "用户创建失败"
+        return 1
+    }
+
+    # 添加到 sudo 组 (Ubuntu/Debian)
+    if [[ "$OS" == *"Ubuntu"* ]] || [[ "$OS" == *"Debian"* ]]; then
+        sudo usermod -aG sudo "$username"
+    # 添加到 wheel 组 (CentOS/RHEL)
+    elif [[ "$OS" == *"CentOS"* ]] || [[ "$OS" == *"Red Hat"* ]]; then
+        sudo usermod -aG wheel "$username"
+    fi
+
+    # 设置 sudo 免密码
+    echo "$username ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/$username" >/dev/null
+
+    log_success "用户 $username 创建完成"
+}
+
+# 系统初始化和基础软件安装
+init_system() {
+    log_info "开始系统初始化..."
+
+    if [[ "$OS" == *"Ubuntu"* ]] || [[ "$OS" == *"Debian"* ]]; then
+        # Ubuntu/Debian 系统初始化
+        log_info "更新软件包列表..."
+        sudo apt update
+
+        log_info "升级系统软件包..."
+        sudo apt upgrade -y
+
+        log_info "安装基础工具..."
+        sudo apt install -y \
+            curl \
+            wget \
+            git \
+            unzip \
+            tar \
+            build-essential \
+            software-properties-common \
+            apt-transport-https \
+            ca-certificates \
+            gnupg \
+            lsb-release \
+            net-tools \
+            lsof \
+            htop \
+            vim \
+            nano
+
+        log_success "Ubuntu/Debian 系统初始化完成"
+
+    elif [[ "$OS" == *"CentOS"* ]] || [[ "$OS" == *"Red Hat"* ]]; then
+        # CentOS/RHEL 系统初始化
+        if command -v dnf &> /dev/null; then
+            log_info "更新软件包列表..."
+            sudo dnf update -y
+
+            log_info "升级系统软件包..."
+            sudo dnf upgrade -y
+
+            log_info "安装基础工具..."
+            sudo dnf groupinstall -y "Development Tools"
+            sudo dnf install -y \
+                curl \
+                wget \
+                git \
+                unzip \
+                tar \
+                net-tools \
+                lsof \
+                htop \
+                vim \
+                nano \
+                epel-release
+        else
+            log_info "更新软件包列表..."
+            sudo yum update -y
+
+            log_info "升级系统软件包..."
+            sudo yum upgrade -y
+
+            log_info "安装基础工具..."
+            sudo yum groupinstall -y "Development Tools"
+            sudo yum install -y \
+                curl \
+                wget \
+                git \
+                unzip \
+                tar \
+                net-tools \
+                lsof \
+                htop \
+                vim \
+                nano \
+                epel-release
+        fi
+
+        log_success "CentOS/RHEL 系统初始化完成"
+    fi
+}
+
 # 检查是否为 root 用户
 check_root() {
     if [[ $EUID -eq 0 ]]; then
         log_error "请不要使用 root 用户运行此脚本"
+        log_info "建议创建普通用户并使用 sudo 运行此脚本"
+        echo
+        log_info "创建新用户的示例命令："
+        echo "sudo adduser capcut"
+        echo "sudo usermod -aG sudo capcut"
+        echo "su - capcut"
+        echo
         exit 1
     fi
 }
@@ -78,17 +234,27 @@ install_python() {
 
     if [[ "$OS" == *"Ubuntu"* ]] || [[ "$OS" == *"Debian"* ]]; then
         # Ubuntu/Debian
-        sudo apt update
+        log_info "添加 deadsnakes PPA 源..."
         sudo apt install -y software-properties-common
         sudo add-apt-repository ppa:deadsnakes/ppa -y
         sudo apt update
-        sudo apt install -y python3.11 python3.11-pip python3.11-venv
+
+        log_info "安装 Python 3.11 及相关包..."
+        sudo apt install -y \
+            python3.11 \
+            python3.11-pip \
+            python3.11-venv \
+            python3.11-dev \
+            python3.11-distutils \
+            python3.11-lib2to3
+
     elif [[ "$OS" == *"CentOS"* ]] || [[ "$OS" == *"Red Hat"* ]]; then
         # CentOS/RHEL
+        log_info "从 EPEL 源安装 Python..."
         if command -v dnf &> /dev/null; then
-            sudo dnf install -y python3.11 python3.11-pip
+            sudo dnf install -y python3.11 python3.11-pip python3.11-devel
         else
-            sudo yum install -y python3.11 python3.11-pip
+            sudo yum install -y python3.11 python3.11-pip python3.11-devel
         fi
     fi
 
@@ -97,25 +263,70 @@ install_python() {
         sudo ln -sf /usr/bin/python3.11 /usr/bin/python3
     fi
 
+    # 创建 pip 软链接
+    if ! command -v pip3 &> /dev/null; then
+        sudo ln -sf /usr/bin/pip3.11 /usr/bin/pip3
+    fi
+
     log_success "Python 3.11 安装完成"
 }
 
-# 安装系统依赖
+# 安装项目特定系统依赖
 install_system_deps() {
-    log_info "正在安装系统依赖..."
+    log_info "正在安装 CapCutAPI 项目依赖..."
 
     if [[ "$OS" == *"Ubuntu"* ]] || [[ "$OS" == *"Debian"* ]]; then
-        sudo apt update
-        sudo apt install -y curl ffmpeg libsm6 libxext6 libxrender-dev libgomp1 libglib2.0-0
-    elif [[ "$OS" == *"CentOS"* ]] || [[ "$OS" == *"Red Hat"* ]]; then
-        if command -v dnf &> /dev/null; then
-            sudo dnf install -y curl ffmpeg libSM libXext libXrender gomp glib2
-        else
-            sudo yum install -y curl ffmpeg libSM libXext libXrender gomp glib2
-        fi
-    fi
+        log_info "安装视频处理和图像处理库..."
+        sudo apt install -y \
+            ffmpeg \
+            libsm6 \
+            libxext6 \
+            libxrender-dev \
+            libgomp1 \
+            libglib2.0-0 \
+            libgl1-mesa-glx \
+            libglib2.0-0 \
+            libgtk-3-0 \
+            libavcodec-dev \
+            libavformat-dev \
+            libswscale-dev
 
-    log_success "系统依赖安装完成"
+        log_success "Ubuntu/Debian 项目依赖安装完成"
+
+    elif [[ "$OS" == *"CentOS"* ]] || [[ "$OS" == *"Red Hat"* ]]; then
+        log_info "安装视频处理和图像处理库..."
+        if command -v dnf &> /dev/null; then
+            sudo dnf install -y \
+                ffmpeg \
+                ffmpeg-devel \
+                libSM \
+                libXext \
+                libXrender \
+                gomp \
+                glib2 \
+                mesa-libGL \
+                gtk3 \
+                avcodec-devel \
+                avformat-devel \
+                swscale-devel
+        else
+            sudo yum install -y \
+                ffmpeg \
+                ffmpeg-devel \
+                libSM \
+                libXext \
+                libXrender \
+                gomp \
+                glib2 \
+                mesa-libGL \
+                gtk3 \
+                avcodec-devel \
+                avformat-devel \
+                swscale-devel
+        fi
+
+        log_success "CentOS/RHEL 项目依赖安装完成"
+    fi
 }
 
 # 检查并安装 FFmpeg
@@ -157,6 +368,49 @@ install_python_deps() {
     pip install -r requirements.txt
 
     log_success "Python 依赖安装完成"
+}
+
+# 检查并下载项目源码
+check_project_source() {
+    log_info "检查项目源码..."
+
+    # 检查是否在项目目录中
+    if [[ -f "capcut_server.py" && -f "requirements.txt" && -d "pyJianYingDraft" ]]; then
+        log_success "项目源码已存在"
+        return 0
+    fi
+
+    log_info "未找到项目源码，开始下载..."
+
+    # GitHub 仓库配置
+    local repo_url="https://github.com/youyouhe/CapCutAPI-Docker.git"
+    local project_name="CapCutAPI-Docker"
+    local clone_dir="${HOME}/${project_name}"
+
+    # 如果目录已存在，先删除
+    if [[ -d "$clone_dir" ]]; then
+        log_warning "项目目录已存在，正在删除旧版本..."
+        rm -rf "$clone_dir"
+    fi
+
+    # 克隆项目
+    log_info "正在从 GitHub 克隆项目..."
+    git clone "$repo_url" "$clone_dir" || {
+        log_error "项目克隆失败，请检查网络连接"
+        exit 1
+    }
+
+    # 进入项目目录
+    cd "$clone_dir"
+    log_success "项目下载完成，当前目录: $(pwd)"
+
+    # 验证项目完整性
+    if [[ -f "capcut_server.py" && -f "requirements.txt" && -f "start_host.sh" ]]; then
+        log_success "项目文件验证通过"
+    else
+        log_error "项目文件不完整"
+        exit 1
+    fi
 }
 
 # 检查配置文件
@@ -262,17 +516,37 @@ main() {
     echo "    CapCutAPI 主机部署一键启动脚本"
     echo "========================================"
     echo
+    echo "此脚本将自动完成以下操作："
+    echo "  1. 系统更新和基础软件安装"
+    echo "  2. 创建专用用户（可选）"
+    echo "  3. 下载项目源码"
+    echo "  4. 安装 Python 环境和依赖"
+    echo "  5. 配置并启动 CapCutAPI 服务"
+    echo
 
-    # 检查 root 权限
-    check_root
+    read -p "是否继续? (y/n): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        log_info "安装已取消"
+        exit 0
+    fi
+
+    # 检查当前用户和 sudo 权限
+    check_user_and_sudo
 
     # 检测操作系统
     detect_os
 
+    # 系统初始化和基础软件安装
+    init_system
+
+    # 检查并下载项目源码
+    check_project_source
+
     # 检查 Python 环境
     check_python
 
-    # 安装系统依赖
+    # 安装项目特定系统依赖
     install_system_deps
 
     # 检查 FFmpeg
@@ -289,6 +563,17 @@ main() {
 
     # 创建必要目录
     create_directories
+
+    # 显示部署完成信息
+    echo
+    echo "========================================"
+    echo "          部署完成！"
+    echo "========================================"
+    echo "项目位置: $(pwd)"
+    echo "配置文件: config.json, .env"
+    echo "启动命令: python3 capcut_server.py"
+    echo "健康检查: curl http://localhost:9000/health"
+    echo
 
     # 启动服务
     start_service
