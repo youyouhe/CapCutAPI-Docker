@@ -328,12 +328,7 @@ install_python() {
         sudo add-apt-repository ppa:deadsnakes/ppa -y
         sudo apt update
 
-        log_info "检查 Python 3.11 是否可用..."
-        if ! apt-cache policy python3.11 | grep -q "Candidate:"; then
-            log_error "Python 3.11 在软件源中不可用，跳过安装"
-            return 1
-        fi
-
+        
         log_info "安装 Python 3.11 及相关包..."
         sudo apt install -y \
             python3.11 \
