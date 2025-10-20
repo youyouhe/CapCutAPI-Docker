@@ -137,18 +137,26 @@ setup_user_environment() {
     # 创建项目目录
     mkdir -p "$project_dir"
 
-    # 复制项目文件到用户目录（如果当前目录有项目文件）
-    if [[ -f "start_host.sh" ]]; then
-        log_info "复制项目文件到专用用户目录..."
-        cp -r . "$project_dir/" 2>/dev/null || {
-            log_warning "无法复制项目文件，将稍后下载"
-        }
+    # 克隆项目源码到专用用户目录
+    log_info "正在为专用用户下载项目源码..."
+    local repo_url="https://github.com/youyouhe/CapCutAPI-Docker.git"
+
+    # 如果目录已存在，先删除
+    if [[ -d "$project_dir" ]]; then
+        log_warning "项目目录已存在，正在删除旧版本..."
+        rm -rf "$project_dir"
     fi
+
+    # 克隆项目
+    git clone "$repo_url" "$project_dir" || {
+        log_error "项目克隆失败，请检查网络连接"
+        return 1
+    }
 
     # 设置目录权限
     chown -R "$username:$username" "$project_dir"
 
-    log_success "用户环境设置完成"
+    log_success "用户环境设置完成，项目源码已下载"
     echo "$project_dir"
 }
 
@@ -610,6 +618,13 @@ run_as_user() {
 
     log_info "切换到专用用户继续应用部署..."
 
+    # 验证项目源码是否已正确下载
+    if [[ ! -f "$project_dir/requirements.txt" ]]; then
+        log_error "项目源码未正确下载到 $project_dir"
+        log_info "当前目录内容: $(ls -la "$project_dir" 2>/dev/null || echo '目录不存在')"
+        return 1
+    fi
+
     # 清理可能存在的不完整虚拟环境
     if [[ -d "$project_dir/venv" ]]; then
         log_info "清理之前的虚拟环境..."
@@ -754,27 +769,15 @@ main() {
     echo "当前工作目录: $(pwd)"
     echo "当前用户: $(whoami)"
 
-    # 如果不在项目目录，尝试切换
+    # 确保在项目目录中
     if [[ ! -f "requirements.txt" ]]; then
-        echo "未找到 requirements.txt，尝试切换到项目目录..."
-        if [[ -d "/home/capcut/CapCutAPI-Docker" ]]; then
-            cd "/home/capcut/CapCutAPI-Docker"
-            echo "已切换到项目目录: $(pwd)"
-        else
-            echo "错误: 未找到项目目录 /home/capcut/CapCutAPI-Docker"
-            echo "当前目录内容:"
-            ls -la
-            exit 1
-        fi
-    fi
-
-    # 再次检查必要文件
-    if [[ ! -f "requirements.txt" ]]; then
-        echo "错误: 仍未找到 requirements.txt 文件"
+        echo "错误: 未找到 requirements.txt，项目源码可能不完整"
         echo "当前目录内容:"
         ls -la
         exit 1
     fi
+
+    echo "项目文件验证通过"
 
     detect_os
     check_python
