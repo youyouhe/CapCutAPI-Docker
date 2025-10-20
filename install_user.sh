@@ -311,7 +311,7 @@ main() {
 
     # 检查安装模式
     local install_mode="${1:-}"
-    check_install_mode "$install_mode"
+    check_install_mode "$install_mode" || true
 
     if [[ "$AUTO_INSTALL" != "true" ]]; then
         read -p "是否继续? (y/n): " -n 1 -r
