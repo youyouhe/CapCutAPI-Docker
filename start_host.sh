@@ -750,6 +750,32 @@ main() {
     echo "========================================"
     echo
 
+    # 确认当前目录
+    echo "当前工作目录: $(pwd)"
+    echo "当前用户: $(whoami)"
+
+    # 如果不在项目目录，尝试切换
+    if [[ ! -f "requirements.txt" ]]; then
+        echo "未找到 requirements.txt，尝试切换到项目目录..."
+        if [[ -d "/home/capcut/CapCutAPI-Docker" ]]; then
+            cd "/home/capcut/CapCutAPI-Docker"
+            echo "已切换到项目目录: $(pwd)"
+        else
+            echo "错误: 未找到项目目录 /home/capcut/CapCutAPI-Docker"
+            echo "当前目录内容:"
+            ls -la
+            exit 1
+        fi
+    fi
+
+    # 再次检查必要文件
+    if [[ ! -f "requirements.txt" ]]; then
+        echo "错误: 仍未找到 requirements.txt 文件"
+        echo "当前目录内容:"
+        ls -la
+        exit 1
+    fi
+
     detect_os
     check_python
     create_venv
@@ -775,8 +801,8 @@ EOF
     chmod +x "$project_dir/deploy_as_user.sh"
     chown "$username:$username" "$project_dir/deploy_as_user.sh"
 
-    # 切换用户并运行应用部署
-    su - "$username" -c "cd $project_dir && bash -c 'source ~/.bashrc && ./deploy_as_user.sh'"
+  # 切换用户并运行应用部署
+    su - "$username" -c "cd $project_dir && bash -lc 'source ~/.bashrc && ./deploy_as_user.sh'"
 }
 
 # 主函数
