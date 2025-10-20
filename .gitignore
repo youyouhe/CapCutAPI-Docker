@@ -25,3 +25,7 @@ tmp/
 # Draft files and settings
 drafts/
 settings/local.json
+
+# Security and system configuration scripts
+setup_ufw.sh
+*.sh

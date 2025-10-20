@@ -1,3 +1,4 @@
+# Core dependencies
 imageio
 psutil
 flask
@@ -5,3 +6,24 @@ requests
 oss2
 minio
 json5
+
+# Environment and configuration
+python-dotenv
+
+# Production WSGI server
+gunicorn
+gevent
+
+# Additional utilities
+Pillow
+numpy
+opencv-python
+
+# Logging and monitoring
+structlog
+
+# Development dependencies (optional)
+pytest
+pytest-flask
+black
+flake8
