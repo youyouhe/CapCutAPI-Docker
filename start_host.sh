@@ -424,22 +424,43 @@ check_ffmpeg() {
 create_venv() {
     log_info "创建 Python 虚拟环境..."
 
+    # 确定使用的 Python 版本
+    local python_cmd="python3"
+    if command -v python3.11 &> /dev/null; then
+        python_cmd="python3.11"
+        log_info "使用 Python 3.11 创建虚拟环境"
+    else
+        log_info "使用系统默认 Python 创建虚拟环境"
+    fi
+
+    # 显示将要使用的 Python 版本
+    local python_version=$($python_cmd -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
+    log_info "Python 版本: $python_version"
+
     # 检查虚拟环境是否完整
     if [[ -d "venv" && -f "venv/bin/activate" && -f "venv/bin/python" ]]; then
-        log_info "虚拟环境已存在且完整"
-    else
-        # 如果目录存在但不完整，先清理
-        if [[ -d "venv" ]]; then
-            log_warning "检测到不完整的虚拟环境，正在清理..."
+        # 检查现有虚拟环境的 Python 版本
+        local venv_python_version=$(venv/bin/python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')" 2>/dev/null || echo "未知")
+        log_info "现有虚拟环境 Python 版本: $venv_python_version"
+
+        if [[ "$venv_python_version" == "$python_version" ]]; then
+            log_info "虚拟环境已存在且版本匹配"
+        else
+            log_warning "虚拟环境 Python 版本 ($venv_python_version) 与系统 Python 版本 ($python_version) 不匹配"
+            log_info "正在重新创建虚拟环境..."
             rm -rf venv
         fi
+    fi
 
+    # 如果虚拟环境不存在或需要重新创建
+    if [[ ! -d "venv" ]]; then
         log_info "正在创建新的虚拟环境..."
-        python3 -m venv venv || {
+        $python_cmd -m venv venv || {
             log_error "虚拟环境创建失败"
             log_info "请检查以下问题："
-            log_info "1. python3-venv 包是否已安装"
+            log_info "1. python3-venv 包是否已安装 (对于 Python 3.11 可能需要 python3.11-venv)"
             log_info "2. 当前用户是否有创建目录的权限"
+            log_info "3. $python_cmd 命令是否可用"
             exit 1
         }
         log_success "虚拟环境创建完成"
@@ -451,6 +472,10 @@ create_venv() {
         log_error "虚拟环境激活失败"
         exit 1
     }
+
+    # 验证虚拟环境中的 Python 版本
+    local venv_python_version=$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
+    log_info "虚拟环境 Python 版本: $venv_python_version"
 
     # 升级 pip
     log_info "升级 pip..."
@@ -724,22 +749,43 @@ check_python() {
 create_venv() {
     log_info "创建 Python 虚拟环境..."
 
+    # 确定使用的 Python 版本
+    local python_cmd="python3"
+    if command -v python3.11 &> /dev/null; then
+        python_cmd="python3.11"
+        log_info "使用 Python 3.11 创建虚拟环境"
+    else
+        log_info "使用系统默认 Python 创建虚拟环境"
+    fi
+
+    # 显示将要使用的 Python 版本
+    local python_version=$($python_cmd -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
+    log_info "Python 版本: $python_version"
+
     # 检查虚拟环境是否完整
     if [[ -d "venv" && -f "venv/bin/activate" && -f "venv/bin/python" ]]; then
-        log_info "虚拟环境已存在且完整"
-    else
-        # 如果目录存在但不完整，先清理
-        if [[ -d "venv" ]]; then
-            log_warning "检测到不完整的虚拟环境，正在清理..."
+        # 检查现有虚拟环境的 Python 版本
+        local venv_python_version=$(venv/bin/python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')" 2>/dev/null || echo "未知")
+        log_info "现有虚拟环境 Python 版本: $venv_python_version"
+
+        if [[ "$venv_python_version" == "$python_version" ]]; then
+            log_info "虚拟环境已存在且版本匹配"
+        else
+            log_warning "虚拟环境 Python 版本 ($venv_python_version) 与系统 Python 版本 ($python_version) 不匹配"
+            log_info "正在重新创建虚拟环境..."
             rm -rf venv
         fi
+    fi
 
+    # 如果虚拟环境不存在或需要重新创建
+    if [[ ! -d "venv" ]]; then
         log_info "正在创建新的虚拟环境..."
-        python3 -m venv venv || {
+        $python_cmd -m venv venv || {
             log_error "虚拟环境创建失败"
             log_info "请检查以下问题："
-            log_info "1. python3-venv 包是否已安装"
+            log_info "1. python3-venv 包是否已安装 (对于 Python 3.11 可能需要 python3.11-venv)"
             log_info "2. 当前用户是否有创建目录的权限"
+            log_info "3. $python_cmd 命令是否可用"
             exit 1
         }
         log_success "虚拟环境创建完成"
@@ -751,6 +797,10 @@ create_venv() {
         log_error "虚拟环境激活失败"
         exit 1
     }
+
+    # 验证虚拟环境中的 Python 版本
+    local venv_python_version=$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
+    log_info "虚拟环境 Python 版本: $venv_python_version"
 
     # 升级 pip
     log_info "升级 pip..."
