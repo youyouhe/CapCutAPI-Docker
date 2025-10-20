@@ -171,19 +171,32 @@ install_python311() {
         # 安装 Python 3.11
         apt install -y \
             python3.11 \
-            python3.11-pip \
             python3.11-venv \
             python3.11-dev \
             python3.11-distutils \
-            python3.11-lib2to3
+            python3-lib2to3
+
+        # 为 Python 3.11 安装 pip
+        log_info "为 Python 3.11 安装 pip..."
+        python3.11 -m ensurepip --upgrade || {
+            log_warning "ensurepip 失败，尝试使用 get-pip.py..."
+            curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+        }
 
     elif [[ "$OS" == *"CentOS"* ]] || [[ "$OS" == *"Red Hat"* ]]; then
         # CentOS/RHEL 安装 Python 3.11
         if command -v dnf &> /dev/null; then
-            dnf install -y python3.11 python3.11-pip python3.11-devel
+            dnf install -y python3.11 python3.11-devel
         else
-            yum install -y python3.11 python3.11-pip python3.11-devel
+            yum install -y python3.11 python3.11-devel
         fi
+
+        # 为 Python 3.11 安装 pip
+        log_info "为 Python 3.11 安装 pip..."
+        python3.11 -m ensurepip --upgrade || {
+            log_warning "ensurepip 失败，尝试使用 get-pip.py..."
+            curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+        }
     fi
 
     # 验证安装
