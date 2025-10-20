@@ -320,29 +320,74 @@ check_python() {
 # 安装 Python (根据不同系统)
 install_python() {
     log_info "正在安装 Python 3.11..."
+    local max_retries=3
+    local retry_count=0
 
     if [[ "$OS" == *"Ubuntu"* ]] || [[ "$OS" == *"Debian"* ]]; then
         # Ubuntu/Debian
-        log_info "添加 deadsnakes PPA 源..."
-        sudo apt install -y software-properties-common
-        sudo add-apt-repository ppa:deadsnakes/ppa -y
-        sudo apt update
+        while [[ $retry_count -lt $max_retries ]]; do
+            log_info "尝试安装 Python 3.11 (第 $((retry_count + 1)) 次，最多 $max_retries 次)..."
 
-        
-        log_info "安装 Python 3.11 及相关包..."
-        sudo apt install -y \
-            python3.11 \
-            python3.11-pip \
-            python3.11-venv \
-            python3.11-dev \
-            python3.11-distutils \
-            python3.11-lib2to3
+            # 添加 PPA 源
+            log_info "添加 deadsnakes PPA 源..."
+            sudo apt install -y software-properties-common || {
+                log_error "software-properties-common 安装失败"
+                ((retry_count++))
+                sleep 2
+                continue
+            }
+
+            # 检查 PPA 是否已存在
+            if ! grep -q "deadsnakes" /etc/apt/sources.list.d/* 2>/dev/null; then
+                sudo add-apt-repository ppa:deadsnakes/ppa -y || {
+                    log_error "PPA 添加失败"
+                    ((retry_count++))
+                    sleep 2
+                    continue
+                }
+            fi
+
+            # 更新包列表
+            sudo apt update || {
+                log_error "apt update 失败"
+                ((retry_count++))
+                sleep 2
+                continue
+            }
+
+            # 检查 Python 3.11 是否可用
+            if ! apt-cache show python3.11 &> /dev/null; then
+                log_error "Python 3.11 在软件源中不可用"
+                ((retry_count++))
+                sleep 2
+                continue
+            fi
+
+            log_info "安装 Python 3.11 及相关包..."
+            if sudo apt install -y \
+                python3.11 \
+                python3.11-pip \
+                python3.11-venv \
+                python3.11-dev \
+                python3.11-distutils \
+                python3.11-lib2to3; then
+                log_success "Python 3.11 安装成功"
+                break
+            else
+                log_error "Python 3.11 安装失败"
+                ((retry_count++))
+                sleep 3
+            fi
+        done
 
         # 验证安装是否成功
         if command -v python3.11 &> /dev/null; then
             log_success "Python 3.11 安装成功"
+            PYTHON311_VERSION=$(python3.11 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
+            log_info "已安装版本: $PYTHON311_VERSION"
         else
-            log_error "Python 3.11 安装失败"
+            log_error "Python 3.11 安装失败，已达到最大重试次数"
+            log_warning "将使用系统默认 Python 版本继续安装"
             return 1
         fi
 
@@ -970,11 +1015,27 @@ EOF
     su - "$username" -c "cd $project_dir && bash -lc 'source ~/.bashrc && ./deploy_as_user.sh'"
 }
 
+# 检查是否为一键安装模式
+check_install_mode() {
+    if [[ "${1:-}" == "--auto" || "${1:-}" == "-y" ]]; then
+        export AUTO_INSTALL=true
+        log_info "启用一键安装模式"
+        return 0
+    else
+        export AUTO_INSTALL=false
+        return 1
+    fi
+}
+
 # 主函数
 main() {
     echo "========================================"
     echo "    CapCutAPI 主机部署一键启动脚本"
     echo "========================================"
+    echo
+    echo "使用方法:"
+    echo "  bash start_host.sh         # 交互式安装"
+    echo "  bash start_host.sh --auto  # 一键安装模式"
     echo
     echo "此脚本将自动完成以下操作："
     echo "  1. 系统更新和基础软件安装 (root)"
@@ -984,11 +1045,21 @@ main() {
     echo "  5. 启动 CapCutAPI 服务"
     echo
 
-    read -p "是否继续? (y/n): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_info "安装已取消"
-        exit 0
+    # 检查安装模式
+    check_install_mode "$1"
+
+    if [[ "$AUTO_INSTALL" != "true" ]]; then
+        read -p "是否继续? (y/n): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "安装已取消"
+            exit 0
+        fi
+    else
+        log_info "一键安装模式已启用，30秒后自动开始安装..."
+        log_info "按 Ctrl+C 可以取消安装"
+        sleep 30
+        log_info "开始自动安装..."
     fi
 
     # 检查当前用户和 sudo 权限
@@ -1058,13 +1129,36 @@ main() {
         # 显示部署完成信息
         echo
         echo "========================================"
-        echo "          部署完成！"
+        echo "          🎉 部署完成！"
         echo "========================================"
         echo "项目位置: $(pwd)"
         echo "配置文件: config.json, .env"
         echo "启动命令: python3 capcut_server.py"
-        echo "健康检查: curl http://localhost:9000/health"
         echo
+
+        # 获取服务器 IP 地址
+        local server_ip=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || echo "localhost")
+        local local_ip=$(hostname -I | awk '{print $1}')
+        local port=${PORT:-9000}
+
+        echo "🌐 访问地址:"
+        echo "  本地访问: http://localhost:$port"
+        echo "  局域网访问: http://$local_ip:$port"
+        echo "  外网访问: http://$server_ip:$port"
+        echo
+        echo "🔍 健康检查:"
+        echo "  curl http://localhost:$port/health"
+        echo
+        echo "📖 API 文档: 请参考项目 README"
+        echo "⚠️  防火墙设置: 如果外网无法访问，请检查防火墙设置"
+        echo "   sudo ufw allow $port"
+        echo
+
+        if [[ "$AUTO_INSTALL" == "true" ]]; then
+            echo "🚀 一键安装模式：服务将自动启动..."
+            echo "   使用 Ctrl+C 停止服务"
+            echo
+        fi
 
         # 启动服务
         start_service
