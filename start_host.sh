@@ -604,6 +604,50 @@ start_service() {
     export FLASK_ENV=production
     export PYTHONUNBUFFERED=1
 
+    # 输出环境变量信息
+    log_info "=== 环境变量配置 ==="
+    log_info "PYTHONPATH: $PYTHONPATH"
+    log_info "FLASK_APP: $FLASK_APP"
+    log_info "FLASK_ENV: $FLASK_ENV"
+    log_info "PYTHONUNBUFFERED: $PYTHONUNBUFFERED"
+    log_info "PORT: ${PORT:-9000}"
+
+    # 输出配置文件信息
+    if [[ -f "config.json" ]]; then
+        log_info "配置文件: config.json (已加载)"
+        # 提取并显示一些关键配置（如果有的话）
+        if command -v jq &> /dev/null; then
+            local server_port=$(jq -r '.port // "未配置"' config.json 2>/dev/null)
+            log_info "配置文件端口: $server_port"
+        fi
+    else
+        log_warning "配置文件: config.json (不存在)"
+    fi
+
+    # 输出 .env 文件信息
+    if [[ -f ".env" ]]; then
+        log_info "环境文件: .env (存在)"
+        # 安全地显示 .env 文件中的非敏感变量
+        if [[ -r ".env" ]]; then
+            log_info ".env 文件中的变量:"
+            while IFS='=' read -r key value; do
+                # 跳过注释和空行
+                [[ $key =~ ^[[:space:]]*# ]] && continue
+                [[ -z $key ]] && continue
+
+                # 只显示非敏感变量（不包含 password, secret, key, token 等词）
+                if [[ ! $key =~ (password|secret|key|token|auth) ]]; then
+                    log_info "  $key=${value:-空值}"
+                else
+                    log_info "  $key=*** (敏感信息已隐藏)"
+                fi
+            done < .env
+        fi
+    else
+        log_info "环境文件: .env (不存在)"
+    fi
+
+    log_info "======================="
     log_info "启动服务中... (端口: ${PORT:-9000})"
     log_info "按 Ctrl+C 停止服务"
 
@@ -754,6 +798,51 @@ start_service() {
     export FLASK_APP=capcut_server.py
     export FLASK_ENV=production
     export PYTHONUNBUFFERED=1
+
+    # 输出环境变量信息
+    log_info "=== 环境变量配置 ==="
+    log_info "PYTHONPATH: $PYTHONPATH"
+    log_info "FLASK_APP: $FLASK_APP"
+    log_info "FLASK_ENV: $FLASK_ENV"
+    log_info "PYTHONUNBUFFERED: $PYTHONUNBUFFERED"
+    log_info "PORT: $port"
+
+    # 输出配置文件信息
+    if [[ -f "config.json" ]]; then
+        log_info "配置文件: config.json (已加载)"
+        # 提取并显示一些关键配置（如果有的话）
+        if command -v jq &> /dev/null; then
+            local server_port=$(jq -r '.port // "未配置"' config.json 2>/dev/null)
+            log_info "配置文件端口: $server_port"
+        fi
+    else
+        log_warning "配置文件: config.json (不存在)"
+    fi
+
+    # 输出 .env 文件信息
+    if [[ -f ".env" ]]; then
+        log_info "环境文件: .env (存在)"
+        # 安全地显示 .env 文件中的非敏感变量
+        if [[ -r ".env" ]]; then
+            log_info ".env 文件中的变量:"
+            while IFS='=' read -r key value; do
+                # 跳过注释和空行
+                [[ $key =~ ^[[:space:]]*# ]] && continue
+                [[ -z $key ]] && continue
+
+                # 只显示非敏感变量（不包含 password, secret, key, token 等词）
+                if [[ ! $key =~ (password|secret|key|token|auth) ]]; then
+                    log_info "  $key=${value:-空值}"
+                else
+                    log_info "  $key=*** (敏感信息已隐藏)"
+                fi
+            done < .env
+        fi
+    else
+        log_info "环境文件: .env (不存在)"
+    fi
+
+    log_info "======================="
 
     python3 capcut_server.py
 }
