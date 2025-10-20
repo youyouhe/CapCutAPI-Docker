@@ -293,19 +293,27 @@ check_python() {
     log_info "检查 Python 环境..."
 
     if command -v python3 &> /dev/null; then
-        PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+        PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
         log_info "当前 Python 版本: $PYTHON_VERSION"
 
-        # 检查是否为 Python 3.8 或更高版本
-        if python3 -c "import sys; exit(0 if sys.version_info >= (3, 8) else 1)"; then
-            log_success "Python 版本符合要求 (>= 3.8)"
+        # 检查是否为 Python 3.11 或更高版本
+        if python3 -c "import sys; exit(0 if sys.version_info >= (3, 11) else 1)"; then
+            log_success "Python 版本符合要求 (>= 3.11)"
         else
-            log_error "Python 版本过低，需要 Python 3.8 或更高版本"
+            log_info "当前 Python 版本低于 3.11，尝试安装 Python 3.11..."
             install_python
         fi
     else
         log_warning "未找到 Python3，正在安装..."
         install_python
+    fi
+
+    # 安装完成后，验证 Python 3.11 是否可用
+    if command -v python3.11 &> /dev/null; then
+        PYTHON311_VERSION=$(python3.11 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')")
+        log_success "Python 3.11 已安装: $PYTHON311_VERSION"
+    else
+        log_warning "Python 3.11 安装失败，将使用系统默认 Python 版本"
     fi
 }
 
@@ -320,6 +328,12 @@ install_python() {
         sudo add-apt-repository ppa:deadsnakes/ppa -y
         sudo apt update
 
+        log_info "检查 Python 3.11 是否可用..."
+        if ! apt-cache policy python3.11 | grep -q "Candidate:"; then
+            log_error "Python 3.11 在软件源中不可用，跳过安装"
+            return 1
+        fi
+
         log_info "安装 Python 3.11 及相关包..."
         sudo apt install -y \
             python3.11 \
@@ -329,6 +343,14 @@ install_python() {
             python3.11-distutils \
             python3.11-lib2to3
 
+        # 验证安装是否成功
+        if command -v python3.11 &> /dev/null; then
+            log_success "Python 3.11 安装成功"
+        else
+            log_error "Python 3.11 安装失败"
+            return 1
+        fi
+
     elif [[ "$OS" == *"CentOS"* ]] || [[ "$OS" == *"Red Hat"* ]]; then
         # CentOS/RHEL
         log_info "从 EPEL 源安装 Python..."
@@ -337,19 +359,25 @@ install_python() {
         else
             sudo yum install -y python3.11 python3.11-pip python3.11-devel
         fi
+
+        # 验证安装是否成功
+        if command -v python3.11 &> /dev/null; then
+            log_success "Python 3.11 安装成功"
+        else
+            log_error "Python 3.11 安装失败"
+            return 1
+        fi
     fi
 
-    # 创建软链接
+    # 创建软链接（只有在系统中没有 python3 时才创建）
     if ! command -v python3 &> /dev/null; then
         sudo ln -sf /usr/bin/python3.11 /usr/bin/python3
     fi
 
-    # 创建 pip 软链接
+    # 创建 pip 软链接（只有在系统中没有 pip3 时才创建）
     if ! command -v pip3 &> /dev/null; then
         sudo ln -sf /usr/bin/pip3.11 /usr/bin/pip3
     fi
-
-    log_success "Python 3.11 安装完成"
 }
 
 # 安装项目特定系统依赖
@@ -984,11 +1012,11 @@ main() {
         # 创建专用用户
         create_capcut_user
 
-        # 设置 Python 环境配置
-        setup_python_environment
-
-        # 检查 Python 环境
+        # 检查 Python 环境（可能触发 Python 3.11 安装）
         check_python
+
+        # 设置 Python 环境配置（在 Python 3.11 安装后设置别名）
+        setup_python_environment
 
         # 安装项目特定系统依赖
         install_system_deps
