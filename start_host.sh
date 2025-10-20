@@ -679,6 +679,7 @@ start_service() {
     if ! check_port $port; then
         read -p "端口 $port 已被占用，是否使用其他端口? (y/n): " -n 1 -r
         echo
+        REPLY="${REPLY:-}"  # 确保REPLY变量已定义
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             read -p "请输入新端口号: " new_port
             export PORT=$new_port
@@ -1053,6 +1054,7 @@ main() {
     if [[ "$AUTO_INSTALL" != "true" ]]; then
         read -p "是否继续? (y/n): " -n 1 -r
         echo
+        REPLY="${REPLY:-}"  # 确保REPLY变量已定义
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             log_info "安装已取消"
             exit 0
