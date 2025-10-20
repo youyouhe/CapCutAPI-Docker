@@ -1017,7 +1017,8 @@ EOF
 
 # 检查是否为一键安装模式
 check_install_mode() {
-    if [[ "${1:-}" == "--auto" || "${1:-}" == "-y" ]]; then
+    local mode="${1:-}"
+    if [[ "$mode" == "--auto" || "$mode" == "-y" ]]; then
         export AUTO_INSTALL=true
         log_info "启用一键安装模式"
         return 0
@@ -1046,7 +1047,8 @@ main() {
     echo
 
     # 检查安装模式
-    check_install_mode "$1"
+    local install_mode="${1:-}"
+    check_install_mode "$install_mode"
 
     if [[ "$AUTO_INSTALL" != "true" ]]; then
         read -p "是否继续? (y/n): " -n 1 -r
