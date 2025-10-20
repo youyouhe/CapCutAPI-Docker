@@ -416,18 +416,38 @@ check_ffmpeg() {
 create_venv() {
     log_info "创建 Python 虚拟环境..."
 
-    if [[ ! -d "venv" ]]; then
-        python3 -m venv venv
-        log_success "虚拟环境创建完成"
+    # 检查虚拟环境是否完整
+    if [[ -d "venv" && -f "venv/bin/activate" && -f "venv/bin/python" ]]; then
+        log_info "虚拟环境已存在且完整"
     else
-        log_info "虚拟环境已存在"
+        # 如果目录存在但不完整，先清理
+        if [[ -d "venv" ]]; then
+            log_warning "检测到不完整的虚拟环境，正在清理..."
+            rm -rf venv
+        fi
+
+        log_info "正在创建新的虚拟环境..."
+        python3 -m venv venv || {
+            log_error "虚拟环境创建失败"
+            log_info "请检查以下问题："
+            log_info "1. python3-venv 包是否已安装"
+            log_info "2. 当前用户是否有创建目录的权限"
+            exit 1
+        }
+        log_success "虚拟环境创建完成"
     fi
 
     # 激活虚拟环境
-    source venv/bin/activate
+    log_info "激活虚拟环境..."
+    source venv/bin/activate || {
+        log_error "虚拟环境激活失败"
+        exit 1
+    }
 
     # 升级 pip
+    log_info "升级 pip..."
     pip install --upgrade pip
+    log_success "虚拟环境配置完成"
 }
 
 # 安装 Python 依赖
