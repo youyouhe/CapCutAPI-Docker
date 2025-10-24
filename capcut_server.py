@@ -158,6 +158,9 @@ def add_video():
         result["error"] = error_message
         return jsonify(result)
 
+    # Debug: Log all parameters
+    app.logger.info(f"DEBUG: add_video called with video_url={video_url}, draft_id={draft_id}, start={start}, end={end}")
+
     try:
         draft_result = add_video_track(
             draft_folder=draft_folder,
@@ -200,6 +203,7 @@ def add_video():
         error_message = f"Error occurred while processing video: {str(e)}."
         result["error"] = error_message
         app.logger.error(f"Video processing error: {str(e)}", exc_info=True)
+        app.logger.error(f"Video processing error details: video_url={video_url}, draft_id={draft_id}, start={start}, end={end}")
         return jsonify(result)
 
 @app.route('/add_audio', methods=['POST'])
