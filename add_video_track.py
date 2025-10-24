@@ -75,11 +75,13 @@ def add_video_track(
     :return: Updated draft information, including draft_id and draft_url
     """
     # Get or create draft
+    print(f"DEBUG: add_video_track calling get_or_create_draft with draft_id={draft_id}")
     draft_id, script = get_or_create_draft(
         draft_id=draft_id,
         width=width,
         height=height
     )
+    print(f"DEBUG: get_or_create_draft returned draft_id={draft_id}, script={script is not None}")
     
     # Check if video track exists, if not, add a default video track
     try:

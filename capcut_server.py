@@ -199,6 +199,7 @@ def add_video():
     except Exception as e:
         error_message = f"Error occurred while processing video: {str(e)}."
         result["error"] = error_message
+        app.logger.error(f"Video processing error: {str(e)}", exc_info=True)
         return jsonify(result)
 
 @app.route('/add_audio', methods=['POST'])
@@ -265,6 +266,7 @@ def add_audio():
     except Exception as e:
         error_message = f"Error occurred while processing audio: {str(e)}."
         result["error"] = error_message
+        app.logger.error(f"Audio processing error: {str(e)}", exc_info=True)
         return jsonify(result)
 
 @app.route('/create_draft', methods=['POST'])
