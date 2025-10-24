@@ -2,6 +2,8 @@ import os
 import uuid
 import subprocess
 import json
+import time
+import random
 from typing import Optional, Literal
 from typing import Dict, Any
 import imageio.v2 as imageio
@@ -116,7 +118,9 @@ class Video_material:
 
         # 设置素材名称
         self.material_name = material_name if material_name else os.path.basename(path)
-        self.material_id = uuid.uuid3(uuid.NAMESPACE_DNS, self.material_name).hex
+        # 生成唯一的material_id，包含时间戳和随机数避免重复
+        unique_suffix = f"{int(time.time() * 1000000)}_{random.randint(100000, 999999)}"
+        self.material_id = uuid.uuid3(uuid.NAMESPACE_DNS, f"{self.material_name}_{unique_suffix}").hex
         self.replace_path = replace_path
         self.crop_settings = crop_settings
         self.local_material_id = ""
@@ -314,7 +318,9 @@ class Audio_material:
             material_name = f"{name_without_ext}.mp3"  # 使用原始文件名+时间戳+固定mp3扩展名
         
         self.material_name = material_name if material_name else (os.path.basename(path) if path else "unknown")
-        self.material_id = uuid.uuid3(uuid.NAMESPACE_DNS, self.material_name).hex
+        # 生成唯一的material_id，包含时间戳和随机数避免重复
+        unique_suffix = f"{int(time.time() * 1000000)}_{random.randint(100000, 999999)}"
+        self.material_id = uuid.uuid3(uuid.NAMESPACE_DNS, f"{self.material_name}_{unique_suffix}").hex
         self.path = path if path else ""
         self.replace_path = replace_path
         self.remote_url = remote_url
