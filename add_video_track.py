@@ -75,21 +75,11 @@ def add_video_track(
     :return: Updated draft information, including draft_id and draft_url
     """
     # Get or create draft
-    print(f"DEBUG: add_video_track calling get_or_create_draft with draft_id={draft_id}")
     draft_id, script = get_or_create_draft(
         draft_id=draft_id,
         width=width,
         height=height
     )
-    print(f"DEBUG: get_or_create_draft returned draft_id={draft_id}, script={script is not None}")
-
-    # Create video clip
-    if draft_video_path:
-        video_material = draft.Video_material(material_type='video', replace_path=draft_video_path, remote_url=video_url, material_name=material_name, duration=video_duration, width=0, height=0)
-    else:
-        video_material = draft.Video_material(material_type='video', remote_url=video_url, material_name=material_name, duration=video_duration, width=0, height=0)
-
-    print(f"DEBUG: Created video_material with material_id={video_material.material_id}, material_name={material_name}, url={video_url}")
     
     # Check if video track exists, if not, add a default video track
     try:
@@ -162,7 +152,9 @@ def add_video_track(
     if draft_video_path:
         video_material = draft.Video_material(material_type='video', replace_path=draft_video_path, remote_url=video_url, material_name=material_name, duration=video_duration, width=0, height=0)
     else:
-        video_material = draft.Video_material(material_type='video', remote_url=video_url, material_name=material_name, duration = video_duration, width=0, height=0)
+        video_material = draft.Video_material(material_type='video', remote_url=video_url, material_name=material_name, duration=video_duration, width=0, height=0)
+
+    print(f"DEBUG: Created video_material with material_id={video_material.material_id}, material_name={material_name}, url={video_url}")
     
     # Create source_timerange and target_timerange
     source_timerange = trange(f"{start}s", f"{source_duration}s")
