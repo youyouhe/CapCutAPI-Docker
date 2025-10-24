@@ -48,6 +48,7 @@ def get_or_create_draft(draft_id=None, width=1080, height=1920):
         height=height,
     )
 
+    print(timestamp_log(f"About to add draft {generate_draft_id} to cache"))
     # Add the newly created draft to cache
     update_cache(generate_draft_id, script)
     print(timestamp_log(f"Added new draft to cache: {generate_draft_id}"))
