@@ -56,21 +56,23 @@ def save_draft_background(draft_id, draft_folder, task_id):
     try:
         # Get draft information from global cache with thread safety
         # Use get_or_create_draft to ensure consistency and proper caching
-        draft_id, script = get_or_create_draft(draft_id=draft_id)
+        retrieved_draft_id, script = get_or_create_draft(draft_id=draft_id)
 
-        if script is None:
+        # Check if we got the expected draft or a new one was created
+        if retrieved_draft_id != draft_id:
             task_status = {
                 "status": "failed",
-                "message": f"Draft {draft_id} does not exist in cache",
+                "message": f"Draft {draft_id} not found in cache, created new draft {retrieved_draft_id} instead. Cannot save requested draft.",
                 "progress": 0,
                 "completed_files": 0,
                 "total_files": 0,
                 "draft_url": ""
             }
             update_tasks_cache(task_id, task_status)  # Use new cache management function
-            logger.error(f"Draft {draft_id} does not exist in cache, task {task_id} failed.")
+            logger.error(f"CRITICAL ERROR: Requested draft {draft_id} not found, created new draft {retrieved_draft_id} instead. This indicates draft caching issues!")
             return
-        logger.info(f"Successfully retrieved draft {draft_id} from cache.")
+
+        logger.info(f"Successfully retrieved draft {retrieved_draft_id} from cache.")
         
         # Update task status to processing
         task_status = {
@@ -85,20 +87,20 @@ def save_draft_background(draft_id, draft_folder, task_id):
         logger.info(f"Task {task_id} status updated to 'processing': Preparing draft files.")
         
         # Delete possibly existing draft_id folder
-        if os.path.exists(draft_id):
-            logger.warning(f"Deleting existing draft folder (current working directory): {draft_id}")
-            shutil.rmtree(draft_id)
+        if os.path.exists(retrieved_draft_id):
+            logger.warning(f"Deleting existing draft folder (current working directory): {retrieved_draft_id}")
+            shutil.rmtree(retrieved_draft_id)
 
-        logger.info(f"Starting to save draft: {draft_id}")
+        logger.info(f"Starting to save draft: {retrieved_draft_id}")
         # Save draft
         current_dir = os.path.dirname(os.path.abspath(__file__))
         draft_folder_for_duplicate = draft.Draft_folder(current_dir)
         # Choose different template directory based on configuration
         template_dir = "template" if IS_CAPCUT_ENV else "template_jianying"
-        draft_folder_for_duplicate.duplicate_as_template(template_dir, draft_id)
+        draft_folder_for_duplicate.duplicate_as_template(template_dir, retrieved_draft_id)
         
         # Set correct permissions for the newly created draft folder
-        new_draft_path = os.path.join(current_dir, draft_id)
+        new_draft_path = os.path.join(current_dir, retrieved_draft_id)
         if os.path.exists(new_draft_path):
             os.chmod(new_draft_path, 0o755)
             for root, dirs, files in os.walk(new_draft_path):
@@ -254,7 +256,7 @@ def save_draft_background(draft_id, draft_folder, task_id):
             # 重新创建目录结构
             draft_folder_for_duplicate = draft.Draft_folder(current_dir)
             template_dir = "template" if IS_CAPCUT_ENV else "template_jianying"
-            draft_folder_for_duplicate.duplicate_as_template(template_dir, draft_id)
+            draft_folder_for_duplicate.duplicate_as_template(template_dir, retrieved_draft_id)
             logger.info(f"Recreated draft directory: {draft_dir}")
 
         script.dump(os.path.join(draft_dir, "draft_info.json"))
