@@ -54,7 +54,10 @@ def save_draft_background(draft_id, draft_folder, task_id):
     """Background save draft to OSS"""
     try:
         # Get draft information from global cache with thread safety
-        if not cache_contains(draft_id):
+        # Use get_or_create_draft to ensure consistency and proper caching
+        draft_id, script = get_or_create_draft(draft_id=draft_id)
+
+        if script is None:
             task_status = {
                 "status": "failed",
                 "message": f"Draft {draft_id} does not exist in cache",
@@ -66,8 +69,6 @@ def save_draft_background(draft_id, draft_folder, task_id):
             update_tasks_cache(task_id, task_status)  # Use new cache management function
             logger.error(f"Draft {draft_id} does not exist in cache, task {task_id} failed.")
             return
-
-        script = get_cache(draft_id)
         logger.info(f"Successfully retrieved draft {draft_id} from cache.")
         
         # Update task status to processing
