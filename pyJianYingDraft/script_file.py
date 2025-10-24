@@ -38,21 +38,27 @@ class Script_material:
     def add_audio_safe(self, audio_material: Audio_material) -> bool:
         """Thread-safe audio material addition"""
         with self._lock:
+            print(f"DEBUG: add_audio_safe called with material_id={audio_material.material_id}, current audios count={len(self.audios)}")
             # Check if material already exists
             for existing_audio in self.audios:
                 if existing_audio.material_id == audio_material.material_id:
+                    print(f"DEBUG: Audio material {audio_material.material_id} already exists, skipping")
                     return False  # Already exists
             self.audios.append(audio_material)
+            print(f"DEBUG: Audio material {audio_material.material_id} added successfully, new count={len(self.audios)}")
             return True  # Successfully added
 
     def add_video_safe(self, video_material: Video_material) -> bool:
         """Thread-safe video material addition"""
         with self._lock:
+            print(f"DEBUG: add_video_safe called with material_id={video_material.material_id}, current videos count={len(self.videos)}")
             # Check if material already exists
             for existing_video in self.videos:
                 if existing_video.material_id == video_material.material_id:
+                    print(f"DEBUG: Video material {video_material.material_id} already exists, skipping")
                     return False  # Already exists
             self.videos.append(video_material)
+            print(f"DEBUG: Video material {video_material.material_id} added successfully, new count={len(self.videos)}")
             return True  # Successfully added
     stickers: List[Dict[str, Any]]
     """贴纸素材列表"""
@@ -259,12 +265,14 @@ class Script_file:
 
     def add_material(self, material: Union[Video_material, Audio_material]) -> "Script_file":
         """向草稿文件中添加一个素材（线程安全版本）"""
+        print(f"DEBUG: add_material called with material_type={type(material).__name__}, material_id={getattr(material, 'material_id', 'N/A')}")
         if isinstance(material, Video_material):
             success = self.materials.add_video_safe(material)
         elif isinstance(material, Audio_material):
             success = self.materials.add_audio_safe(material)
         else:
             raise TypeError("错误的素材类型: '%s'" % type(material))
+        print(f"DEBUG: add_material result: success={success}")
         return self
 
     def add_track(self, track_type: Track_type, track_name: Optional[str] = None, *,
