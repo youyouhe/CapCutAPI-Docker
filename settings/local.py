@@ -5,6 +5,10 @@
 
 import os
 import json5  # 替换原来的json模块
+from dotenv import load_dotenv
+
+# 加载.env文件
+load_dotenv()
 
 # 配置文件路径
 CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
