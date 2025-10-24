@@ -113,8 +113,24 @@ def save_draft_background(draft_id, draft_folder, task_id):
         logger.info(f"Task {task_id} progress 5%: Preparing download tasks.")
         
         download_tasks = []
-        
+
+        # Debug: Log material counts
         audios = script.materials.audios
+        videos = script.materials.videos
+        logger.info(f"DEBUG: Found {len(audios)} audio materials and {len(videos)} video materials")
+
+        # Debug: Log audio material details
+        if audios:
+            logger.info("DEBUG: Audio materials details:")
+            for i, audio in enumerate(audios):
+                logger.info(f"  Audio {i+1}: material_id={audio.material_id}, material_name={audio.material_name}, remote_url={audio.remote_url}")
+
+        # Debug: Log video material details
+        if videos:
+            logger.info("DEBUG: Video materials details:")
+            for i, video in enumerate(videos):
+                logger.info(f"  Video {i+1}: material_id={video.material_id}, material_name={video.material_name}, remote_url={video.remote_url}")
+
         if audios:
             for audio in audios:
                 remote_url = audio.remote_url
