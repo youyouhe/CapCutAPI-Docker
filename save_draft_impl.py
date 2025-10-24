@@ -5,7 +5,7 @@ import shutil
 from util import zip_draft, is_windows_path, timestamp_log
 from oss import upload_to_oss
 from typing import Dict, Literal, Any
-from draft_cache import DRAFT_CACHE
+from draft_cache import DRAFT_CACHE, get_cache, cache_contains
 from save_task_cache import DRAFT_TASKS, get_task_status, update_tasks_cache, update_task_field, increment_task_field, update_task_fields, create_task
 from downloader import download_audio, download_file, download_image, download_video
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -53,8 +53,8 @@ def build_asset_path(draft_folder: str, draft_id: str, asset_type: str, material
 def save_draft_background(draft_id, draft_folder, task_id):
     """Background save draft to OSS"""
     try:
-        # Get draft information from global cache
-        if draft_id not in DRAFT_CACHE:
+        # Get draft information from global cache with thread safety
+        if not cache_contains(draft_id):
             task_status = {
                 "status": "failed",
                 "message": f"Draft {draft_id} does not exist in cache",
@@ -66,8 +66,8 @@ def save_draft_background(draft_id, draft_folder, task_id):
             update_tasks_cache(task_id, task_status)  # Use new cache management function
             logger.error(f"Draft {draft_id} does not exist in cache, task {task_id} failed.")
             return
-            
-        script = DRAFT_CACHE[draft_id]
+
+        script = get_cache(draft_id)
         logger.info(f"Successfully retrieved draft {draft_id} from cache.")
         
         # Update task status to processing
@@ -738,12 +738,12 @@ def query_script_impl(draft_id: str, force_update: bool = True):
     :param force_update: Whether to force refresh media metadata, default is True
     :return: Script object
     """
-    # Get draft information from global cache
-    if draft_id not in DRAFT_CACHE:
+    # Get draft information from global cache with thread safety
+    if not cache_contains(draft_id):
         logger.warning(f"Draft {draft_id} does not exist in cache.")
         return None
-        
-    script = DRAFT_CACHE[draft_id]
+
+    script = get_cache(draft_id)
     logger.info(f"Retrieved draft {draft_id} from cache.")
     
     # If force_update is True, force refresh media metadata

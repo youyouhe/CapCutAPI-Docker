@@ -1,7 +1,7 @@
 import uuid
 import pyJianYingDraft as draft
 import time
-from draft_cache import DRAFT_CACHE, update_cache
+from draft_cache import DRAFT_CACHE, update_cache, get_cache, cache_contains, cache_update_access
 from util import timestamp_log
 
 def create_draft(width=1080, height=1920):
@@ -34,12 +34,12 @@ def get_or_create_draft(draft_id=None, width=1080, height=1920):
     """
     global DRAFT_CACHE  # Declare use of global variable
     
-    if draft_id is not None and draft_id in DRAFT_CACHE:
+    if draft_id is not None and cache_contains(draft_id):
         # Get existing draft information from cache
         print(timestamp_log(f"Getting draft from cache: {draft_id}"))
         # Update last access time
-        update_cache(draft_id, DRAFT_CACHE[draft_id])
-        return draft_id, DRAFT_CACHE[draft_id]
+        cache_update_access(draft_id)
+        return draft_id, get_cache(draft_id)
 
     # Create new draft logic
     print(timestamp_log("Creating new draft"))

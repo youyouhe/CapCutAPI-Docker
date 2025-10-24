@@ -29,6 +29,31 @@ class Script_material:
     """音频素材列表"""
     videos: List[Video_material]
     """视频素材列表"""
+
+    def __init__(self):
+        self._lock = __import__('threading').RLock()  # Thread safety for material operations
+        self.audios = []
+        self.videos = []
+
+    def add_audio_safe(self, audio_material: Audio_material) -> bool:
+        """Thread-safe audio material addition"""
+        with self._lock:
+            # Check if material already exists
+            for existing_audio in self.audios:
+                if existing_audio.material_id == audio_material.material_id:
+                    return False  # Already exists
+            self.audios.append(audio_material)
+            return True  # Successfully added
+
+    def add_video_safe(self, video_material: Video_material) -> bool:
+        """Thread-safe video material addition"""
+        with self._lock:
+            # Check if material already exists
+            for existing_video in self.videos:
+                if existing_video.material_id == video_material.material_id:
+                    return False  # Already exists
+            self.videos.append(video_material)
+            return True  # Successfully added
     stickers: List[Dict[str, Any]]
     """贴纸素材列表"""
     texts: List[Dict[str, Any]]
@@ -233,20 +258,11 @@ class Script_file:
         return obj
 
     def add_material(self, material: Union[Video_material, Audio_material]) -> "Script_file":
-        """向草稿文件中添加一个素材"""
-        # 检查素材是否已存在 - 基于material_id进行精确比较
+        """向草稿文件中添加一个素材（线程安全版本）"""
         if isinstance(material, Video_material):
-            for existing_video in self.materials.videos:
-                if existing_video.material_id == material.material_id:
-                    # 素材已存在，直接返回
-                    return self
-            self.materials.videos.append(material)
+            success = self.materials.add_video_safe(material)
         elif isinstance(material, Audio_material):
-            for existing_audio in self.materials.audios:
-                if existing_audio.material_id == material.material_id:
-                    # 素材已存在，直接返回
-                    return self
-            self.materials.audios.append(material)
+            success = self.materials.add_audio_safe(material)
         else:
             raise TypeError("错误的素材类型: '%s'" % type(material))
         return self
