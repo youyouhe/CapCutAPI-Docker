@@ -34,7 +34,7 @@ from util import generate_draft_url as utilgenerate_draft_url, hex_to_rgb
 from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
 from functools import wraps
 
-from settings.local import IS_CAPCUT_ENV, DRAFT_DOMAIN, PREVIEW_ROUTER, PORT, SECRET_KEY
+from settings.local import IS_CAPCUT_ENV, DRAFT_DOMAIN, PREVIEW_ROUTER, PORT, SECRET_KEY, MINIO_CONFIG
 
 app = Flask(__name__)
 
@@ -54,6 +54,12 @@ app.logger.setLevel(logging.DEBUG)
 # Configure werkzeug (Flask's default logger)
 werkzeug_logger = logging.getLogger('werkzeug')
 werkzeug_logger.setLevel(logging.DEBUG)
+
+# Log startup configuration
+app.logger.info("=== CapCutAPI 启动配置 ===")
+app.logger.info(f"SECRET_KEY configured: {bool(SECRET_KEY and SECRET_KEY.strip())}")
+app.logger.info(f"MINIO_CONFIG: {MINIO_CONFIG}")
+app.logger.info("=== 配置检查完成 ===")
 
 # Request logging middleware
 @app.before_request
