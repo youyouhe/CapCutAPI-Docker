@@ -1,6 +1,7 @@
 import requests
 from flask import Flask, request, jsonify, Response
 from datetime import datetime
+import logging
 import pyJianYingDraft as draft
 from pyJianYingDraft.metadata.animation_meta import Intro_type, Outro_type, Group_animation_type
 from pyJianYingDraft.metadata.capcut_animation_meta import CapCut_Intro_type, CapCut_Outro_type, CapCut_Group_animation_type
@@ -37,22 +38,67 @@ from settings.local import IS_CAPCUT_ENV, DRAFT_DOMAIN, PREVIEW_ROUTER, PORT, SE
 
 app = Flask(__name__)
 
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    handlers=[
+        logging.FileHandler('/home/capcut/logs/capcut_api/debug.log'),
+        logging.StreamHandler()
+    ]
+)
+
+# Set Flask logger level
+app.logger.setLevel(logging.DEBUG)
+
+# Configure werkzeug (Flask's default logger)
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.setLevel(logging.DEBUG)
+
+# Request logging middleware
+@app.before_request
+def before_request():
+    app.logger.debug(f"Request: {request.method} {request.url}")
+    app.logger.debug(f"Headers: {dict(request.headers)}")
+    if request.is_json:
+        app.logger.debug(f"Request Body: {request.get_json()}")
+    elif request.form:
+        app.logger.debug(f"Form Data: {dict(request.form)}")
+    elif request.data:
+        app.logger.debug(f"Raw Data: {request.data}")
+
+@app.after_request
+def after_request(response):
+    app.logger.debug(f"Response: {response.status_code}")
+    return response
+
 def require_api_key(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
+        app.logger.debug(f"Authentication check for {request.method} {request.url}")
+        app.logger.debug(f"SECRET_KEY configured: {bool(SECRET_KEY and SECRET_KEY.strip())}")
+
         if SECRET_KEY and SECRET_KEY.strip():
             # Check if X-API-KEY header is present
             api_key = request.headers.get('X-API-KEY')
+            app.logger.debug(f"API key from header: {'***' + api_key[-4:] if api_key else 'None'}")
+
             if not api_key:
                 # Also check for api_key in query parameters (for backward compatibility)
                 api_key = request.args.get('api_key')
+                app.logger.debug(f"API key from query: {'***' + api_key[-4:] if api_key else 'None'}")
 
             if not api_key or api_key != SECRET_KEY:
+                app.logger.warning(f"Authentication failed for {request.method} {request.url}")
+                app.logger.debug(f"Expected: {'***' + SECRET_KEY[-4:] if SECRET_KEY else 'None'}, Got: {'***' + api_key[-4:] if api_key else 'None'}")
                 return jsonify({
                     "success": False,
                     "error": "Invalid or missing API key. Please provide the X-API-KEY header or api_key query parameter.",
                     "output": ""
                 }), 401
+
+        # Log successful authentication
+        app.logger.info(f"API key authenticated successfully for {request.method} {request.url}")
         return func(*args, **kwargs)
     return decorated_function
  
