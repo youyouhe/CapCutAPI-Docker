@@ -5,7 +5,7 @@ import shutil
 from util import zip_draft, is_windows_path, timestamp_log
 from oss import upload_to_oss
 from typing import Dict, Literal, Any
-from draft_cache import DRAFT_CACHE, get_cache, cache_contains
+from draft_cache import DRAFT_CACHE
 from create_draft import get_or_create_draft
 from save_task_cache import DRAFT_TASKS, get_task_status, update_tasks_cache, update_task_field, increment_task_field, update_task_fields, create_task
 from downloader import download_audio, download_file, download_image, download_video
@@ -735,18 +735,21 @@ def update_media_metadata(script, task_id=None):
 def query_script_impl(draft_id: str, force_update: bool = True):
     """
     Query draft script object, with option to force refresh media metadata
-    
+
     :param draft_id: Draft ID
     :param force_update: Whether to force refresh media metadata, default is True
     :return: Script object
     """
     # Get draft information from global cache with thread safety
-    if not cache_contains(draft_id):
-        logger.warning(f"Draft {draft_id} does not exist in cache.")
+    try:
+        retrieved_draft_id, script = get_or_create_draft(draft_id=draft_id)
+        if retrieved_draft_id != draft_id:
+            logger.warning(f"Requested draft {draft_id} not found, created new draft {retrieved_draft_id}")
+            return None
+        logger.info(f"Retrieved draft {draft_id} from cache.")
+    except Exception as e:
+        logger.error(f"Failed to retrieve draft {draft_id} from cache: {str(e)}")
         return None
-
-    script = get_cache(draft_id)
-    logger.info(f"Retrieved draft {draft_id} from cache.")
     
     # If force_update is True, force refresh media metadata
     if force_update:
