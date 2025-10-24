@@ -106,11 +106,11 @@ def save_draft_background(draft_id, draft_folder, task_id):
                     os.chmod(os.path.join(root, f), 0o644)
         
         # Update task status
-        update_task_field(task_id, "message", "Updating media file metadata")
+        # Note: update_media_metadata() moved to after download completion
+        # to ensure accurate media information from local files
+        update_task_field(task_id, "message", "Preparing download tasks")
         update_task_field(task_id, "progress", 5)
-        logger.info(f"Task {task_id} progress 5%: Updating media file metadata.")
-        
-        update_media_metadata(script, task_id)
+        logger.info(f"Task {task_id} progress 5%: Preparing download tasks.")
         
         download_tasks = []
         
@@ -216,7 +216,14 @@ def save_draft_background(draft_id, draft_folder, task_id):
                         # Continue processing other files, don't interrupt the entire process
             
             logger.info(f"Task {task_id}: Concurrent download completed, downloaded {len(downloaded_paths)} files in total.")
-        
+
+        # Update media metadata after all files are downloaded
+        # This ensures accurate duration and dimension information from local files
+        update_task_field(task_id, "message", "Updating media file metadata")
+        update_task_field(task_id, "progress", 65)
+        logger.info(f"Task {task_id} progress 65%: Updating media file metadata.")
+        update_media_metadata(script, task_id)
+
         # Update task status - Start saving draft information
         update_task_field(task_id, "progress", 70)
         update_task_field(task_id, "message", "Saving draft information")
