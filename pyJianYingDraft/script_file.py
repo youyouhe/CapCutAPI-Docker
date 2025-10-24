@@ -37,29 +37,47 @@ class Script_material:
 
     def add_audio_safe(self, audio_material: Audio_material) -> bool:
         """Thread-safe audio material addition"""
-        with self._lock:
-            print(f"DEBUG: add_audio_safe called with material_id={audio_material.material_id}, current audios count={len(self.audios)}")
-            # Check if material already exists
-            for existing_audio in self.audios:
-                if existing_audio.material_id == audio_material.material_id:
-                    print(f"DEBUG: Audio material {audio_material.material_id} already exists, skipping")
-                    return False  # Already exists
-            self.audios.append(audio_material)
-            print(f"DEBUG: Audio material {audio_material.material_id} added successfully, new count={len(self.audios)}")
-            return True  # Successfully added
+        # Use lock if available, otherwise proceed without it for backward compatibility
+        lock = getattr(self, '_lock', None)
+        if lock:
+            with lock:
+                return self._add_audio_internal(audio_material)
+        else:
+            return self._add_audio_internal(audio_material)
+
+    def _add_audio_internal(self, audio_material: Audio_material) -> bool:
+        """Internal audio addition logic"""
+        print(f"DEBUG: add_audio_safe called with material_id={audio_material.material_id}, current audios count={len(self.audios)}")
+        # Check if material already exists
+        for existing_audio in self.audios:
+            if existing_audio.material_id == audio_material.material_id:
+                print(f"DEBUG: Audio material {audio_material.material_id} already exists, skipping")
+                return False  # Already exists
+        self.audios.append(audio_material)
+        print(f"DEBUG: Audio material {audio_material.material_id} added successfully, new count={len(self.audios)}")
+        return True  # Successfully added
 
     def add_video_safe(self, video_material: Video_material) -> bool:
         """Thread-safe video material addition"""
-        with self._lock:
-            print(f"DEBUG: add_video_safe called with material_id={video_material.material_id}, current videos count={len(self.videos)}")
-            # Check if material already exists
-            for existing_video in self.videos:
-                if existing_video.material_id == video_material.material_id:
-                    print(f"DEBUG: Video material {video_material.material_id} already exists, skipping")
-                    return False  # Already exists
-            self.videos.append(video_material)
-            print(f"DEBUG: Video material {video_material.material_id} added successfully, new count={len(self.videos)}")
-            return True  # Successfully added
+        # Use lock if available, otherwise proceed without it for backward compatibility
+        lock = getattr(self, '_lock', None)
+        if lock:
+            with lock:
+                return self._add_video_internal(video_material)
+        else:
+            return self._add_video_internal(video_material)
+
+    def _add_video_internal(self, video_material: Video_material) -> bool:
+        """Internal video addition logic"""
+        print(f"DEBUG: add_video_safe called with material_id={video_material.material_id}, current videos count={len(self.videos)}")
+        # Check if material already exists
+        for existing_video in self.videos:
+            if existing_video.material_id == video_material.material_id:
+                print(f"DEBUG: Video material {video_material.material_id} already exists, skipping")
+                return False  # Already exists
+        self.videos.append(video_material)
+        print(f"DEBUG: Video material {video_material.material_id} added successfully, new count={len(self.videos)}")
+        return True  # Successfully added
     stickers: List[Dict[str, Any]]
     """贴纸素材列表"""
     texts: List[Dict[str, Any]]
