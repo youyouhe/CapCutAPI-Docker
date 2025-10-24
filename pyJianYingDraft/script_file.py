@@ -234,11 +234,18 @@ class Script_file:
 
     def add_material(self, material: Union[Video_material, Audio_material]) -> "Script_file":
         """向草稿文件中添加一个素材"""
-        if material in self.materials:  # 素材已存在
-            return self
+        # 检查素材是否已存在 - 基于material_id进行精确比较
         if isinstance(material, Video_material):
+            for existing_video in self.materials.videos:
+                if existing_video.material_id == material.material_id:
+                    # 素材已存在，直接返回
+                    return self
             self.materials.videos.append(material)
         elif isinstance(material, Audio_material):
+            for existing_audio in self.materials.audios:
+                if existing_audio.material_id == material.material_id:
+                    # 素材已存在，直接返回
+                    return self
             self.materials.audios.append(material)
         else:
             raise TypeError("错误的素材类型: '%s'" % type(material))
