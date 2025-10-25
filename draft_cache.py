@@ -1,47 +1,49 @@
-from collections import OrderedDict
+"""
+Draft缓存模块 - 使用文件系统缓存解决多进程环境下的一致性问题
+"""
 import pyJianYingDraft as draft
-from typing import Dict
-import threading
+from file_system_cache import (
+    update_cache as fs_update_cache,
+    get_cache as fs_get_cache,
+    cache_contains as fs_cache_contains,
+    cache_update_access as fs_cache_update_access,
+    cache_clear,
+    cache_cleanup_expired,
+    cache_size
+)
 
-# Modify global variable, use OrderedDict to implement LRU cache, limit the maximum number to 10000
-DRAFT_CACHE: Dict[str, 'draft.Script_file'] = OrderedDict()  # Use Dict for type hinting
-MAX_CACHE_SIZE = 10000
-
-# Add thread lock for cache operations
-_cache_lock = threading.RLock()  # Use RLock for nested lock support
-
+# 为了兼容性，保留原有接口但重定向到文件系统缓存
 def update_cache(key: str, value: draft.Script_file) -> None:
-    """Update LRU cache with thread safety"""
-    with _cache_lock:
-        print(f"DEBUG: update_cache({key}) - adding to cache, current size: {len(DRAFT_CACHE)}")
-        if key in DRAFT_CACHE:
-            # If the key exists, delete the old item
-            DRAFT_CACHE.pop(key)
-        elif len(DRAFT_CACHE) >= MAX_CACHE_SIZE:
-            print(f"{key}, Cache is full, deleting least recently used item")
-            # If the cache is full, delete the least recently used item (the first item)
-            DRAFT_CACHE.popitem(last=False)
-        # Add new item to the end (most recently used)
-        DRAFT_CACHE[key] = value
-        print(f"DEBUG: update_cache({key}) - successfully added, new size: {len(DRAFT_CACHE)}")
+    """更新缓存 - 现在使用文件系统缓存"""
+    print(f"DEBUG: update_cache({key}) - using filesystem cache")
+    fs_update_cache(key, value)
 
 def get_cache(key: str):
-    """Get cache item with thread safety"""
-    with _cache_lock:
-        result = DRAFT_CACHE.get(key)
-        print(f"DEBUG: get_cache({key}) -> {result is not None}")
-        return result
+    """获取缓存 - 现在使用文件系统缓存"""
+    result = fs_get_cache(key)
+    print(f"DEBUG: get_cache({key}) -> {result is not None}")
+    return result
 
 def cache_contains(key: str) -> bool:
-    """Check if cache contains key with thread safety"""
-    with _cache_lock:
-        result = key in DRAFT_CACHE
-        print(f"DEBUG: cache_contains({key}) -> {result}, total items: {len(DRAFT_CACHE)}")
-        return result
+    """检查缓存是否存在 - 现在使用文件系统缓存"""
+    result = fs_cache_contains(key)
+    print(f"DEBUG: cache_contains({key}) -> {result}")
+    return result
 
 def cache_update_access(key: str) -> None:
-    """Update cache access time (move to end) with thread safety"""
-    with _cache_lock:
-        if key in DRAFT_CACHE:
-            value = DRAFT_CACHE.pop(key)
-            DRAFT_CACHE[key] = value
+    """更新缓存访问时间 - 现在使用文件系统缓存"""
+    print(f"DEBUG: cache_update_access({key}) - using filesystem cache")
+    fs_cache_update_access(key)
+
+# 新增的缓存管理功能
+def clear_cache():
+    """清空所有缓存"""
+    return cache_clear()
+
+def cleanup_expired_cache():
+    """清理过期缓存"""
+    return cache_cleanup_expired()
+
+def get_cache_size():
+    """获取缓存大小"""
+    return cache_size()

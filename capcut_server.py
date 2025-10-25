@@ -1638,6 +1638,61 @@ def get_video_character_effect_types():
 
 
 # 健康检查端点
+@app.route('/cache_info', methods=['GET'])
+@require_api_key
+def get_cache_info():
+    """获取缓存信息端点，用于调试和监控"""
+    try:
+        from draft_cache import get_cache_size, cleanup_expired_cache
+
+        cache_size = get_cache_size()
+        cleaned_count = cleanup_expired_cache()
+
+        result = {
+            "success": True,
+            "output": {
+                "cache_type": "filesystem",
+                "cache_size": cache_size,
+                "cleaned_items": cleaned_count,
+                "timestamp": str(datetime.now())
+            }
+        }
+        return jsonify(result)
+
+    except Exception as e:
+        error_message = f"Error occurred while getting cache info: {str(e)}."
+        result = {
+            "success": False,
+            "error": error_message
+        }
+        return jsonify(result)
+
+@app.route('/clear_cache', methods=['POST'])
+@require_api_key
+def clear_cache():
+    """清空缓存端点，用于调试"""
+    try:
+        from draft_cache import clear_cache
+
+        success = clear_cache()
+
+        result = {
+            "success": success,
+            "output": {
+                "message": "Cache cleared successfully" if success else "Failed to clear cache",
+                "timestamp": str(datetime.now())
+            }
+        }
+        return jsonify(result)
+
+    except Exception as e:
+        error_message = f"Error occurred while clearing cache: {str(e)}."
+        result = {
+            "success": False,
+            "error": error_message
+        }
+        return jsonify(result)
+
 @app.route('/health', methods=['GET'])
 def health_check():
     """健康检查端点，用于Docker健康检查"""
