@@ -1571,6 +1571,9 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
+    logger.info("Starting CapCut API with request queue system")
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+
     # 输出环境配置信息供用户确认
     logger.info("=" * 60)
     logger.info("CapCutAPI 环境配置信息")
@@ -1609,6 +1612,4 @@ if __name__ == '__main__':
     logger.info(f"草稿上传: {'启用' if os.getenv('IS_UPLOAD_DRAFT', 'false').lower() == 'true' else '禁用'}")
     logger.info("=" * 60)
 
-    logger.info("Starting CapCut API with request queue system")
-    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(host='0.0.0.0', port=PORT, debug=debug_mode)
