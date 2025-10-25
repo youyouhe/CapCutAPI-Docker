@@ -5,7 +5,7 @@ import shutil
 from util import zip_draft, is_windows_path, timestamp_log
 from oss import upload_to_oss
 from typing import Dict, Literal, Any
-from draft_cache import DRAFT_CACHE
+# DRAFT_CACHE 已移除，现在使用文件系统缓存
 from create_draft import get_or_create_draft
 from save_task_cache import DRAFT_TASKS, get_task_status, update_tasks_cache, update_task_field, increment_task_field, update_task_fields, create_task
 from downloader import download_audio, download_file, download_image, download_video

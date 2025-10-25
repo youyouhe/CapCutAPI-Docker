@@ -1,7 +1,7 @@
 import uuid
 import pyJianYingDraft as draft
 import time
-from draft_cache import DRAFT_CACHE, update_cache, get_cache, cache_contains, cache_update_access
+from draft_cache import update_cache, get_cache, cache_contains, cache_update_access
 from util import timestamp_log
 
 def create_draft(width=1080, height=1920):
@@ -36,7 +36,7 @@ def get_or_create_draft(draft_id=None, width=1080, height=1920):
     :param height: Video height, default 1920
     :return: (draft_name, draft_path, draft_id, draft_dir, script)
     """
-    global DRAFT_CACHE  # Declare use of global variable
+    # 现在使用文件系统缓存，不需要global声明
 
     print(timestamp_log(f"get_or_create_draft called with draft_id={draft_id}"))
 
