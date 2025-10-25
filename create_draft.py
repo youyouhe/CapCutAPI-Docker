@@ -1,8 +1,37 @@
 import uuid
 import pyJianYingDraft as draft
 import time
-from draft_cache import update_cache, get_cache, cache_contains, cache_update_access
+from draft_cache import update_cache, get_cache, cache_contains, cache_update_access, save_script_changes
 from util import timestamp_log
+
+class AutoSaveScriptWrapper:
+    """Script对象的自动保存包装器
+
+    这个包装器会自动将所有对script对象的修改保存到缓存中
+    """
+
+    def __init__(self, script: draft.Script_file, draft_id: str):
+        self._script = script
+        self._draft_id = draft_id
+
+    def __getattr__(self, name):
+        """代理所有未定义的属性到原始script对象"""
+        attr = getattr(self._script, name)
+        if callable(attr):
+            # 如果是方法，返回一个包装后的方法
+            def wrapper(*args, **kwargs):
+                result = attr(*args, **kwargs)
+                # 方法调用后立即保存
+                save_script_changes(self._draft_id, self._script)
+                return result
+            return wrapper
+        else:
+            # 如果是属性，直接返回
+            return attr
+
+    def get_original_script(self):
+        """获取原始的script对象（用于调试）"""
+        return self._script
 
 def create_draft(width=1080, height=1920):
     """
@@ -47,7 +76,10 @@ def get_or_create_draft(draft_id=None, width=1080, height=1920):
             print(timestamp_log(f"✓ Found draft {draft_id} in cache, reusing it"))
             # Update last access time
             cache_update_access(draft_id)
-            return draft_id, get_cache(draft_id)
+            script = get_cache(draft_id)
+            # 包装为自动保存script对象
+            wrapped_script = AutoSaveScriptWrapper(script, draft_id)
+            return draft_id, wrapped_script
         else:
             print(timestamp_log(f"✗ DRAFT {draft_id} NOT FOUND IN CACHE!"))
             print(timestamp_log(f"CRITICAL ERROR: Requested draft {draft_id} not found, created new draft instead. This indicates draft caching issues!"))
@@ -64,5 +96,7 @@ def get_or_create_draft(draft_id=None, width=1080, height=1920):
     update_cache(generate_draft_id, script)
     print(timestamp_log(f"✓ Added new draft to cache: {generate_draft_id}"))
 
-    return generate_draft_id, script
+    # 包装为自动保存script对象
+    wrapped_script = AutoSaveScriptWrapper(script, generate_draft_id)
+    return generate_draft_id, wrapped_script
     
