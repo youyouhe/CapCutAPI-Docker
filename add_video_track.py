@@ -81,7 +81,7 @@ def add_video_track(
         width=width,
         height=height
     )
-    print(f"DEBUG: add_video_track returned with draft_id={draft_id}, script materials count: {len(script.materials) if hasattr(script, 'materials') else 'N/A'}")
+    print(f"DEBUG: add_video_track returned with draft_id={draft_id}, script materials count: {len(script.materials) if hasattr(script, 'materials') and hasattr(script.materials, '__len__') else 'N/A'}")
     
     # Check if video track exists, if not, add a default video track
     try:
@@ -238,7 +238,7 @@ def add_video_track(
     # else:
     print(f"DEBUG: About to add video segment to track_name={track_name}")
     script.add_segment(video_segment, track_name=track_name)
-    print(f"DEBUG: Successfully added video segment, script materials count: {len(script.materials) if hasattr(script, 'materials') else 'N/A'}")
+    print(f"DEBUG: Successfully added video segment, script materials count: {len(script.materials) if hasattr(script, 'materials') and hasattr(script.materials, '__len__') else 'N/A'}")
 
     return {
         "draft_id": draft_id,

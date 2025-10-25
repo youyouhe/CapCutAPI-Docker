@@ -15,13 +15,17 @@ def create_draft(width=1080, height=1920):
     unix_time = int(time.time())
     unique_id = uuid.uuid4().hex[:8]  # Take the first 8 digits of UUID
     draft_id = f"dfd_cat_{unix_time}_{unique_id}"  # Use Unix timestamp and UUID combination
-    
+
+    print(timestamp_log(f"CREATE_DRAFT: Creating new draft with draft_id={draft_id}"))
+
     # Create CapCut draft with specified resolution
     script = draft.Script_file(width, height)
-    
+
+    print(timestamp_log(f"CREATE_DRAFT: About to add draft {draft_id} to cache"))
     # Store in global cache
     update_cache(draft_id, script)
-    
+    print(timestamp_log(f"CREATE_DRAFT: Successfully created and cached draft {draft_id}"))
+
     return script, draft_id
 
 def get_or_create_draft(draft_id=None, width=1080, height=1920):

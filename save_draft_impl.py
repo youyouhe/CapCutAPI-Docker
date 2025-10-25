@@ -61,7 +61,7 @@ def save_draft_background(draft_id, draft_folder, task_id):
         # Use get_or_create_draft to ensure consistency and proper caching
         retrieved_draft_id, script = get_or_create_draft(draft_id=draft_id)
 
-        print(timestamp_log(f"SAVE_DRAFT BACKGROUND DEBUG: get_or_create_draft returned draft_id={retrieved_draft_id}, script materials count: {len(script.materials) if hasattr(script, 'materials') else 'N/A'}"))
+        print(timestamp_log(f"SAVE_DRAFT BACKGROUND DEBUG: get_or_create_draft returned draft_id={retrieved_draft_id}, script materials count: {len(script.materials) if hasattr(script, 'materials') and hasattr(script.materials, '__len__') else 'N/A'}"))
 
         # Check if we got the expected draft or a new one was created
         if retrieved_draft_id != draft_id:

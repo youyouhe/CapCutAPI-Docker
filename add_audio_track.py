@@ -45,7 +45,7 @@ def add_audio_track(
         width=width,
         height=height
     )
-    print(f"DEBUG: add_audio_track returned with draft_id={draft_id}, script materials count: {len(script.materials) if hasattr(script, 'materials') else 'N/A'}")
+    print(f"DEBUG: add_audio_track returned with draft_id={draft_id}, script materials count: {len(script.materials) if hasattr(script, 'materials') and hasattr(script.materials, '__len__') else 'N/A'}")
     
     # Add audio track (only when track doesn't exist)
     if track_name is not None:
