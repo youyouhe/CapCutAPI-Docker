@@ -29,7 +29,7 @@ from add_video_keyframe_impl import add_video_keyframe_impl
 from save_draft_impl import save_draft_impl, query_task_status, query_script_impl
 from add_effect_impl import add_effect_impl
 from add_sticker_impl import add_sticker_impl
-from create_draft import create_draft
+from create_draft import create_draft, get_or_create_draft
 from util import generate_draft_url as utilgenerate_draft_url, hex_to_rgb
 from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
 from functools import wraps
@@ -162,6 +162,10 @@ def add_video():
     app.logger.info(f"DEBUG: add_video called with video_url={video_url}, draft_id={draft_id}, start={start}, end={end}")
 
     try:
+        # 使用修复的get_or_create_draft函数确保缓存机制正常工作
+        resolved_draft_id, script = get_or_create_draft(draft_id=draft_id)
+        app.logger.info(f"DEBUG: get_or_create_draft returned draft_id={resolved_draft_id}")
+
         draft_result = add_video_track(
             draft_folder=draft_folder,
             video_url=video_url,
@@ -170,7 +174,7 @@ def add_video():
             start=start,
             end=end,
             target_start=target_start,
-            draft_id=draft_id,
+            draft_id=resolved_draft_id,
             transform_y=transform_y,
             scale_x=scale_x,
             scale_y=scale_y,
@@ -246,6 +250,10 @@ def add_audio():
         return jsonify(result)
 
     try:
+        # 使用修复的get_or_create_draft函数确保缓存机制正常工作
+        resolved_draft_id, script = get_or_create_draft(draft_id=draft_id)
+        app.logger.info(f"DEBUG: get_or_create_draft returned draft_id={resolved_draft_id}")
+
         # Call the modified add_audio_track method
         draft_result = add_audio_track(
             draft_folder=draft_folder,
@@ -253,7 +261,7 @@ def add_audio():
             start=start,
             end=end,
             target_start=target_start,
-            draft_id=draft_id,
+            draft_id=resolved_draft_id,
             volume=volume,
             track_name=track_name,
             speed=speed,
@@ -356,10 +364,14 @@ def add_subtitle():
         return jsonify(result)
 
     try:
+        # 使用修复的get_or_create_draft函数确保缓存机制正常工作
+        resolved_draft_id, script = get_or_create_draft(draft_id=draft_id)
+        app.logger.info(f"DEBUG: get_or_create_draft returned draft_id={resolved_draft_id}")
+
         # Call add_subtitle_impl method
         draft_result = add_subtitle_impl(
             srt_path=srt,
-            draft_id=draft_id,
+            draft_id=resolved_draft_id,
             track_name=track_name,
             time_offset=time_offset,
             # Font style parameters
@@ -516,13 +528,16 @@ def add_text():
         return jsonify(result)
 
     try:
-        
+        # 使用修复的get_or_create_draft函数确保缓存机制正常工作
+        resolved_draft_id, script = get_or_create_draft(draft_id=draft_id)
+        app.logger.info(f"DEBUG: get_or_create_draft returned draft_id={resolved_draft_id}")
+
         # Call add_text_impl method
         draft_result = add_text_impl(
             text=text,
             start=start,
             end=end,
-            draft_id=draft_id,
+            draft_id=resolved_draft_id,
             transform_y=transform_y,
             transform_x=transform_x,
             font=font,
@@ -627,6 +642,10 @@ def add_image():
         return jsonify(result)
 
     try:
+        # 使用修复的get_or_create_draft函数确保缓存机制正常工作
+        resolved_draft_id, script = get_or_create_draft(draft_id=draft_id)
+        app.logger.info(f"DEBUG: get_or_create_draft returned draft_id={resolved_draft_id}")
+
         draft_result = add_image_impl(
             draft_folder=draft_folder,
             image_url=image_url,
@@ -634,7 +653,7 @@ def add_image():
             height=height,
             start=start,
             end=end,
-            draft_id=draft_id,
+            draft_id=resolved_draft_id,
             transform_y=transform_y,
             scale_x=scale_x,
             scale_y=scale_y,
@@ -699,9 +718,13 @@ def add_video_keyframe():
     }
 
     try:
+        # 使用修复的get_or_create_draft函数确保缓存机制正常工作
+        resolved_draft_id, script = get_or_create_draft(draft_id=draft_id)
+        app.logger.info(f"DEBUG: get_or_create_draft returned draft_id={resolved_draft_id}")
+
         # Call add_video_keyframe_impl method
         draft_result = add_video_keyframe_impl(
-            draft_id=draft_id,
+            draft_id=resolved_draft_id,
             track_name=track_name,
             property_type=property_type,
             time=time,
@@ -749,13 +772,17 @@ def add_effect():
         return jsonify(result)
 
     try:
+        # 使用修复的get_or_create_draft函数确保缓存机制正常工作
+        resolved_draft_id, script = get_or_create_draft(draft_id=draft_id)
+        app.logger.info(f"DEBUG: get_or_create_draft returned draft_id={resolved_draft_id}")
+
         # Call add_effect_impl method
         draft_result = add_effect_impl(
             effect_type=effect_type,
             effect_category=effect_category,
             start=start,
             end=end,
-            draft_id=draft_id,
+            draft_id=resolved_draft_id,
             track_name=track_name,
             params=params,
             width=width,
@@ -1038,12 +1065,16 @@ def add_sticker():
         return jsonify(result)
 
     try:
+        # 使用修复的get_or_create_draft函数确保缓存机制正常工作
+        resolved_draft_id, script = get_or_create_draft(draft_id=draft_id)
+        app.logger.info(f"DEBUG: get_or_create_draft returned draft_id={resolved_draft_id}")
+
         # Call add_sticker_impl method
         draft_result = add_sticker_impl(
             resource_id=resource_id,
             start=start,
             end=end,
-            draft_id=draft_id,
+            draft_id=resolved_draft_id,
             transform_y=transform_y,
             transform_x=transform_x,
             alpha=alpha,
