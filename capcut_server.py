@@ -779,10 +779,9 @@ def save_draft():
     try:
         # Call save_draft_impl method, start background task
         draft_result = save_draft_impl(draft_id, draft_folder)
-        
-        result["success"] = True
-        result["output"] = draft_result
-        return jsonify(result)
+
+        # 直接返回draft_result，避免嵌套output
+        return jsonify(draft_result)
         
     except Exception as e:
         error_message = f"Error occurred while saving draft: {str(e)}. "

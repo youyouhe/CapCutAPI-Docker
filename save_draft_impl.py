@@ -346,6 +346,7 @@ def save_draft_impl(draft_id: str, draft_folder: str = None) -> Dict[str, str]:
 
         return {
             "success": True,
+            "error": "",
             "output": {
                 "task_id": task_id,
                 "message": "任务已提交到队列，请使用 query_draft_status 查询处理进度",
