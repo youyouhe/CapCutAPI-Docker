@@ -5,3 +5,4 @@ requests
 oss2
 minio
 json5
+python-dotenv

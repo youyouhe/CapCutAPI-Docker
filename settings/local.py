@@ -5,9 +5,21 @@
 
 import os
 import json5  # 替换原来的json模块
+from dotenv import load_dotenv
 
 # 配置文件路径
 CONFIG_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
+ENV_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env")
+
+# 自动加载 .env 文件（如果存在）
+try:
+    load_dotenv(ENV_FILE_PATH, override=False)
+except ImportError:
+    # 如果没有安装 python-dotenv，则跳过 .env 文件加载
+    pass
+except Exception:
+    # .env 文件加载失败时静默忽略
+    pass
 
 # 从环境变量加载配置（优先级最高）
 IS_CAPCUT_ENV = os.getenv('CAPCUT_ENV', 'true').lower() == 'true'
