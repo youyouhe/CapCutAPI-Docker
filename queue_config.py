@@ -4,8 +4,8 @@
 """
 
 # 队列配置
-QUEUE_MAX_SIZE = 50  # 队列最大长度
-QUEUE_MAX_WORKERS = 2  # 最大并发工作线程数
+QUEUE_MAX_SIZE = 100  # 队列最大长度 (从50增加到100)
+QUEUE_MAX_WORKERS = 4  # 最大并发工作线程数 (从2增加到4)
 QUEUE_TASK_TIMEOUT = 3600  # 单个任务超时时间（秒）
 QUEUE_CLEANUP_INTERVAL = 300  # 清理旧任务的间隔时间（秒）
 QUEUE_MAX_TASK_AGE = 3600  # 任务结果保留时间（秒）
