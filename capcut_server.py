@@ -822,11 +822,19 @@ def query_draft_status():
         if queue_status:
             # Return queue status
             result["success"] = True
+            # Handle result field - can be string (direct URL) or dict (with draft_url field)
+            result_field = queue_status.get("result", "")
+            draft_url = ""
+            if isinstance(result_field, str):
+                draft_url = result_field
+            elif isinstance(result_field, dict):
+                draft_url = result_field.get("draft_url", "")
+
             result["output"] = {
                 "status": queue_status["status"],
                 "message": queue_status["message"],
                 "progress": _get_queue_progress(queue_status["status"]),
-                "draft_url": queue_status.get("result", {}).get("draft_url", "") if queue_status.get("result") else "",
+                "draft_url": draft_url,
                 "queue_info": request_queue.get_queue_info()
             }
             logger.info(f"Returning queue status result: {result}")
