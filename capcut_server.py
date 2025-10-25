@@ -831,16 +831,27 @@ def query_draft_status():
             # Fall back to original task cache
             task_status = query_task_status(task_id)
 
-            if task_status["status"] == "not_found":
+            # Check if task_status is a string (error case) or dict (expected case)
+            if isinstance(task_status, str):
+                error_message = f"Error occurred while querying task status: {task_status}"
+                result["error"] = error_message
+                return jsonify(result)
+
+            if not isinstance(task_status, dict):
+                error_message = f"Invalid task status format: {type(task_status)}"
+                result["error"] = error_message
+                return jsonify(result)
+
+            if task_status.get("status") == "not_found":
                 error_message = f"Task with ID {task_id} not found. Please check if the task ID is correct."
                 result["error"] = error_message
                 return jsonify(result)
 
             result["success"] = True
             result["output"] = {
-                "status": task_status["status"],
-                "message": task_status["message"],
-                "progress": task_status["progress"],
+                "status": task_status.get("status", "unknown"),
+                "message": task_status.get("message", "No message available"),
+                "progress": task_status.get("progress", 0),
                 "draft_url": task_status.get("draft_url", ""),
                 "queue_info": request_queue.get_queue_info()
             }
