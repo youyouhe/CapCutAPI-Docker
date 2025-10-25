@@ -970,9 +970,63 @@ class Script_file:
         return json.dumps(self.content, ensure_ascii=False, indent=4)
 
     def dump(self, file_path: str) -> None:
-        """将草稿文件内容写入文件"""
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(self.dumps())
+        """将草稿文件内容写入文件（原子性写入）"""
+        import tempfile
+        import os
+
+        # 获取脚本级别的锁（如果存在）
+        script_lock = getattr(self, '_script_lock', None)
+
+        if script_lock:
+            with script_lock:
+                self._dump_atomic(file_path)
+        else:
+            self._dump_atomic(file_path)
+
+    def _dump_atomic(self, file_path: str) -> None:
+        """原子性地将草稿文件内容写入文件"""
+        import tempfile
+        import os
+        import shutil
+
+        # 创建临时文件
+        dir_name = os.path.dirname(file_path)
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name, exist_ok=True)
+
+        # 在同一目录下创建临时文件
+        temp_fd, temp_path = tempfile.mkstemp(
+            suffix='.tmp.json',
+            prefix=f'draft_info_',
+            dir=dir_name
+        )
+
+        try:
+            # 先写入临时文件
+            with os.fdopen(temp_fd, 'w', encoding='utf-8') as f:
+                f.write(self.dumps())
+                f.flush()  # 确保数据写入磁盘
+                os.fsync(f.fileno())  # 强制同步到磁盘
+
+            # 原子性地重命名临时文件到目标文件
+            # 在Unix系统上是原子的，在Windows系统上接近原子
+            if os.path.exists(file_path):
+                # 如果目标文件存在，先备份
+                backup_path = f"{file_path}.backup"
+                shutil.move(file_path, backup_path)
+
+            shutil.move(temp_path, file_path)
+
+            # 删除备份文件
+            backup_path = f"{file_path}.backup"
+            if os.path.exists(backup_path):
+                os.remove(backup_path)
+
+        except Exception as e:
+            # 清理临时文件
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            raise e
 
     def save(self) -> None:
         """保存草稿文件至打开时的路径, 仅在模板模式下可用

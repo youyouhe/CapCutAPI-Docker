@@ -78,7 +78,13 @@ def save_draft_background(draft_id, draft_folder, task_id):
             return
 
         logger.info(f"Successfully retrieved draft {retrieved_draft_id} from cache.")
-        
+
+        # Add script-level lock to ensure thread safety
+        script_lock = getattr(script, '_script_lock', None)
+        if not script_lock:
+            script._script_lock = threading.RLock()
+            script_lock = script._script_lock
+
         # Update task status to processing
         task_status = {
             "status": "processing",
@@ -264,8 +270,11 @@ def save_draft_background(draft_id, draft_folder, task_id):
             draft_folder_for_duplicate.duplicate_as_template(template_dir, retrieved_draft_id)
             logger.info(f"Recreated draft directory: {draft_dir}")
 
-        script.dump(os.path.join(draft_dir, "draft_info.json"))
-        logger.info(f"Draft information has been saved to {os.path.join(current_dir, draft_id)}/draft_info.json.")
+        logger.info(f"Acquiring script lock for draft {retrieved_draft_id} before writing draft_info.json")
+        with script_lock:
+            logger.info(f"Script lock acquired for draft {retrieved_draft_id}, writing draft_info.json")
+            script.dump(os.path.join(draft_dir, "draft_info.json"))
+            logger.info(f"Draft information has been saved to {os.path.join(current_dir, retrieved_draft_id)}/draft_info.json.")
 
         draft_url = ""
         # Only upload draft information when IS_UPLOAD_DRAFT is True
