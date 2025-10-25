@@ -33,25 +33,32 @@ def get_or_create_draft(draft_id=None, width=1080, height=1920):
     :return: (draft_name, draft_path, draft_id, draft_dir, script)
     """
     global DRAFT_CACHE  # Declare use of global variable
-    
-    if draft_id is not None and cache_contains(draft_id):
-        # Get existing draft information from cache
-        print(timestamp_log(f"Getting draft from cache: {draft_id}"))
-        # Update last access time
-        cache_update_access(draft_id)
-        return draft_id, get_cache(draft_id)
+
+    print(timestamp_log(f"get_or_create_draft called with draft_id={draft_id}"))
+
+    if draft_id is not None:
+        print(timestamp_log(f"Checking if draft {draft_id} exists in cache"))
+        if cache_contains(draft_id):
+            # Get existing draft information from cache
+            print(timestamp_log(f"✓ Found draft {draft_id} in cache, reusing it"))
+            # Update last access time
+            cache_update_access(draft_id)
+            return draft_id, get_cache(draft_id)
+        else:
+            print(timestamp_log(f"✗ DRAFT {draft_id} NOT FOUND IN CACHE!"))
+            print(timestamp_log(f"CRITICAL ERROR: Requested draft {draft_id} not found, created new draft instead. This indicates draft caching issues!"))
 
     # Create new draft logic
-    print(timestamp_log("Creating new draft"))
+    print(timestamp_log("Creating new draft because original was not found"))
     script, generate_draft_id = create_draft(
         width=width,
         height=height,
     )
 
-    print(timestamp_log(f"About to add draft {generate_draft_id} to cache"))
+    print(timestamp_log(f"About to add new draft {generate_draft_id} to cache"))
     # Add the newly created draft to cache
     update_cache(generate_draft_id, script)
-    print(timestamp_log(f"Added new draft to cache: {generate_draft_id}"))
+    print(timestamp_log(f"✓ Added new draft to cache: {generate_draft_id}"))
 
     return generate_draft_id, script
     

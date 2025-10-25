@@ -75,11 +75,13 @@ def add_video_track(
     :return: Updated draft information, including draft_id and draft_url
     """
     # Get or create draft
+    print(f"DEBUG: add_video_track calling get_or_create_draft with draft_id={draft_id}")
     draft_id, script = get_or_create_draft(
         draft_id=draft_id,
         width=width,
         height=height
     )
+    print(f"DEBUG: add_video_track returned with draft_id={draft_id}, script materials count: {len(script.materials) if hasattr(script, 'materials') else 'N/A'}")
     
     # Check if video track exists, if not, add a default video track
     try:
@@ -234,8 +236,10 @@ def add_video_track(
     # if imported_track is not None:
     #     imported_track.add_segment(video_segment)
     # else:
+    print(f"DEBUG: About to add video segment to track_name={track_name}")
     script.add_segment(video_segment, track_name=track_name)
-    
+    print(f"DEBUG: Successfully added video segment, script materials count: {len(script.materials) if hasattr(script, 'materials') else 'N/A'}")
+
     return {
         "draft_id": draft_id,
         "draft_url": generate_draft_url(draft_id)
