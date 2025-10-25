@@ -50,24 +50,47 @@ def build_asset_path(draft_folder: str, draft_id: str, asset_type: str, material
         draft_real_path = os.path.join(draft_folder, draft_id, "assets", asset_type, material_name)
     return draft_real_path
 
-def save_draft_background(draft_id, draft_folder, task_id):
-    """Background save draft to OSS"""
+def save_draft_background(draft_id, draft_folder, task_id, script_snapshot=None):
+    """Background save draft to OSS with optional script snapshot"""
     try:
-        # Get draft information from global cache
-        if draft_id not in DRAFT_CACHE:
-            task_status = {
-                "status": "failed",
-                "message": f"Draft {draft_id} does not exist in cache",
-                "progress": 0,
-                "completed_files": 0,
-                "total_files": 0,
-                "draft_url": ""
-            }
-            update_tasks_cache(task_id, task_status)  # Use new cache management function
-            logger.error(f"Draft {draft_id} does not exist in cache, task {task_id} failed.")
-            return
-            
-        script = DRAFT_CACHE[draft_id]
+        # Use script snapshot if provided, otherwise get from global cache
+        if script_snapshot:
+            try:
+                import pickle
+                script = pickle.loads(script_snapshot)
+                logger.info(f"Using script snapshot for draft {draft_id} with {len(script.materials) if hasattr(script, 'materials') else 0} materials")
+            except Exception as e:
+                logger.error(f"Failed to restore script snapshot: {e}")
+                # Fall back to global cache
+                if draft_id not in DRAFT_CACHE:
+                    task_status = {
+                        "status": "failed",
+                        "message": f"Draft {draft_id} does not exist in cache and snapshot restore failed",
+                        "progress": 0,
+                        "completed_files": 0,
+                        "total_files": 0,
+                        "draft_url": ""
+                    }
+                    update_tasks_cache(task_id, task_status)
+                    logger.error(f"Draft {draft_id} does not exist in cache, task {task_id} failed.")
+                    return
+                script = DRAFT_CACHE[draft_id]
+        else:
+            # Get draft information from global cache (original logic)
+            if draft_id not in DRAFT_CACHE:
+                task_status = {
+                    "status": "failed",
+                    "message": f"Draft {draft_id} does not exist in cache",
+                    "progress": 0,
+                    "completed_files": 0,
+                    "total_files": 0,
+                    "draft_url": ""
+                }
+                update_tasks_cache(task_id, task_status)  # Use new cache management function
+                logger.error(f"Draft {draft_id} does not exist in cache, task {task_id} failed.")
+                return
+
+            script = DRAFT_CACHE[draft_id]
         logger.info(f"Successfully retrieved draft {draft_id} from cache.")
         
         # Update task status to processing
@@ -283,7 +306,7 @@ def query_task_status(task_id: str):
     return get_task_status(task_id)
 
 def save_draft_impl(draft_id: str, draft_folder: str = None) -> Dict[str, str]:
-    """Submit save draft task to queue"""
+    """Submit save draft task to queue with snapshot protection"""
     logger.info(f"Received save draft request: draft_id={draft_id}, draft_folder={draft_folder}")
 
     # Import request queue
@@ -292,25 +315,42 @@ def save_draft_impl(draft_id: str, draft_folder: str = None) -> Dict[str, str]:
     # Generate task ID
     task_id = draft_id
 
-    # Submit task to queue
+    # Capture script snapshot to ensure data consistency
+    script_snapshot = None
+    if draft_id in DRAFT_CACHE:
+        try:
+            import pickle
+            script = DRAFT_CACHE[draft_id]
+            script_snapshot = pickle.dumps(script)
+            logger.info(f"Captured script snapshot for draft {draft_id} with {len(script.materials) if hasattr(script, 'materials') else 0} materials")
+        except Exception as e:
+            logger.error(f"Failed to capture script snapshot: {e}")
+            script_snapshot = None
+    else:
+        logger.warning(f"Draft {draft_id} not found in cache when creating snapshot")
+        script_snapshot = None
+
+    # Submit task to queue with snapshot
     success = request_queue.submit_task(
         task_id=task_id,
         func=_queue_save_draft_wrapper,
         draft_id=draft_id,
-        draft_folder=draft_folder
+        draft_folder=draft_folder,
+        script_snapshot=script_snapshot
     )
 
     if success:
         # Create task status for compatibility with existing code
         create_task(task_id)
-        logger.info(f"Task {task_id} has been submitted to queue.")
+        logger.info(f"Task {task_id} with script snapshot has been submitted to queue.")
 
         return {
             "success": True,
             "output": {
                 "task_id": task_id,
                 "message": "任务已提交到队列，请使用 query_draft_status 查询处理进度",
-                "queue_info": request_queue.get_queue_info()
+                "queue_info": request_queue.get_queue_info(),
+                "snapshot_captured": script_snapshot is not None
             }
         }
     else:
@@ -335,16 +375,33 @@ def save_draft_impl(draft_id: str, draft_folder: str = None) -> Dict[str, str]:
                 "error": "队列已满，请稍后重试"
             }
 
-def _queue_save_draft_wrapper(draft_id: str, draft_folder: str) -> str:
+def _queue_save_draft_wrapper(draft_id: str, draft_folder: str, script_snapshot=None) -> str:
     """
     Queue wrapper for save_draft_background function
     This function is executed by the queue worker threads
+
+    :param draft_id: Draft ID
+    :param draft_folder: Draft folder path
+    :param script_snapshot: Serialized script snapshot to ensure data consistency
     """
     # Create task status for compatibility with existing code
     create_task(draft_id)
 
-    # Call the original save_draft_background function
-    return save_draft_background(draft_id, draft_folder, draft_id)
+    # If script snapshot is provided, restore it to ensure consistency
+    if script_snapshot:
+        try:
+            import pickle
+            script = pickle.loads(script_snapshot)
+            logger.info(f"Restored script snapshot for draft {draft_id} with {len(script.materials) if hasattr(script, 'materials') else 0} materials")
+        except Exception as e:
+            logger.error(f"Failed to restore script snapshot: {e}")
+            # Fall back to getting from cache
+            script = None
+    else:
+        script = None
+
+    # Call the enhanced save_draft_background function with script snapshot
+    return save_draft_background(draft_id, draft_folder, draft_id, script_snapshot=script_snapshot)
 
 def get_media_info_with_fallback(remote_url, local_path=None, material_name="", command_func=None):
     """
