@@ -134,6 +134,18 @@ def save_draft_background(draft_id, draft_folder, task_id):
         videos = script.materials.videos
         logger.info(f"DEBUG: Found {len(audios)} audio materials and {len(videos)} video materials")
 
+        # Debug: Log all material types for comprehensive tracking
+        if hasattr(script.materials, '__dict__'):
+            materials_dict = script.materials.__dict__
+            total_materials = 0
+            for material_type, materials in materials_dict.items():
+                if materials is not None and hasattr(materials, '__len__'):
+                    count = len(materials)
+                    total_materials += count
+                    if count > 0 and material_type not in ['audios', 'videos']:  # Log non-downloaded materials
+                        logger.info(f"DEBUG: Found {count} {material_type} materials (no download needed)")
+            logger.info(f"DEBUG: Total materials in script: {total_materials}")
+
         # Debug: Log audio material details
         if audios:
             logger.info("DEBUG: Audio materials details:")
