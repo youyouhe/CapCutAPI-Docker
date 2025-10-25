@@ -816,6 +816,9 @@ def query_draft_status():
         # First check queue status
         queue_status = request_queue.get_task_status(task_id)
 
+        logger.info(f"Query draft status - task_id: {task_id}")
+        logger.info(f"Queue status type: {type(queue_status)}, value: {queue_status}")
+
         if queue_status:
             # Return queue status
             result["success"] = True
@@ -826,25 +829,30 @@ def query_draft_status():
                 "draft_url": queue_status.get("result", {}).get("draft_url", "") if queue_status.get("result") else "",
                 "queue_info": request_queue.get_queue_info()
             }
+            logger.info(f"Returning queue status result: {result}")
             return jsonify(result)
         else:
             # Fall back to original task cache
             task_status = query_task_status(task_id)
+            logger.info(f"Task cache status type: {type(task_status)}, value: {task_status}")
 
             # Check if task_status is a string (error case) or dict (expected case)
             if isinstance(task_status, str):
                 error_message = f"Error occurred while querying task status: {task_status}"
                 result["error"] = error_message
+                logger.info(f"Returning error result (string task_status): {result}")
                 return jsonify(result)
 
             if not isinstance(task_status, dict):
                 error_message = f"Invalid task status format: {type(task_status)}"
                 result["error"] = error_message
+                logger.info(f"Returning error result (invalid task_status type): {result}")
                 return jsonify(result)
 
             if task_status.get("status") == "not_found":
                 error_message = f"Task with ID {task_id} not found. Please check if the task ID is correct."
                 result["error"] = error_message
+                logger.info(f"Returning error result (task not found): {result}")
                 return jsonify(result)
 
             result["success"] = True
@@ -855,6 +863,7 @@ def query_draft_status():
                 "draft_url": task_status.get("draft_url", ""),
                 "queue_info": request_queue.get_queue_info()
             }
+            logger.info(f"Returning task cache result: {result}")
             return jsonify(result)
 
     except Exception as e:
