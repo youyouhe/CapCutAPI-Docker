@@ -1571,6 +1571,44 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
+    # 输出环境配置信息供用户确认
+    logger.info("=" * 60)
+    logger.info("CapCutAPI 环境配置信息")
+    logger.info("=" * 60)
+    logger.info(f"运行环境: {'CapCut环境' if IS_CAPCUT_ENV else '剪映环境'}")
+    logger.info(f"服务端口: {PORT}")
+    logger.info(f"草稿域名: {DRAFT_DOMAIN}")
+    logger.info(f"预览路由: {PREVIEW_ROUTER}")
+    logger.info(f"API密钥配置: {'已配置' if SECRET_KEY and SECRET_KEY.strip() else '未配置(无认证)'}")
+    logger.info(f"调试模式: {debug_mode}")
+
+    # 存储配置信息
+    logger.info("-" * 40)
+    logger.info("存储配置:")
+    logger.info(f"MINIO_ENDPOINT: {os.getenv('MINIO_ENDPOINT', 'NOT_SET')}")
+    if os.getenv('MINIO_ACCESS_KEY'):
+        logger.info(f"MINIO_ACCESS_KEY: {os.getenv('MINIO_ACCESS_KEY')[:10]}...")
+    else:
+        logger.info("MINIO_ACCESS_KEY: NOT_SET")
+    if os.getenv('MINIO_SECRET_KEY'):
+        logger.info(f"MINIO_SECRET_KEY: {os.getenv('MINIO_SECRET_KEY')[:10]}...")
+    else:
+        logger.info("MINIO_SECRET_KEY: NOT_SET")
+    logger.info(f"MINIO_BUCKET_NAME: {os.getenv('MINIO_BUCKET_NAME', 'NOT_SET')}")
+
+    # OSS配置信息
+    oss_endpoint = os.getenv('OSS_ENDPOINT')
+    if oss_endpoint:
+        logger.info(f"OSS_ENDPOINT: {oss_endpoint}")
+        logger.info(f"OSS_ACCESS_KEY_ID: {os.getenv('OSS_ACCESS_KEY_ID', 'NOT_SET')[:10]}...")
+        logger.info(f"OSS_ACCESS_KEY_SECRET: {os.getenv('OSS_ACCESS_KEY_SECRET', 'NOT_SET')[:10]}...")
+        logger.info(f"OSS_BUCKET_NAME: {os.getenv('OSS_BUCKET_NAME', 'NOT_SET')}")
+    else:
+        logger.info("OSS配置: 未配置")
+
+    logger.info(f"草稿上传: {'启用' if os.getenv('IS_UPLOAD_DRAFT', 'false').lower() == 'true' else '禁用'}")
+    logger.info("=" * 60)
+
     logger.info("Starting CapCut API with request queue system")
     debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(host='0.0.0.0', port=PORT, debug=debug_mode)
