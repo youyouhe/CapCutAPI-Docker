@@ -57,15 +57,23 @@ def test_minio_connection():
         return False
 
 def test_cleanup_dry_run():
-    """测试清理功能（试运行模式）"""
-    print("\n=== 测试清理功能（试运行模式） ===")
+    """测试清理功能"""
+    print("\n=== 测试清理功能 ===")
 
     try:
         from minio_cleanup import cleanup_old_drafts_safe
+        from settings.local import MINIO_CLEANUP_CONFIG
 
+        # 使用配置中的参数，但为了测试安全，强制使用试运行模式
+        use_dry_run = MINIO_CLEANUP_CONFIG.get('dry_run', True)
+        max_age = MINIO_CLEANUP_CONFIG.get('max_age_hours', 48)
+
+        print(f"当前配置: dry_run={use_dry_run}, max_age_hours={max_age}")
+
+        # 测试时强制使用试运行模式和较短的时间限制
         result = cleanup_old_drafts_safe(
-            max_age_hours=1,  # 测试时使用较短的时间
-            dry_run=True
+            max_age_hours=1,  # 测试时使用较短的时间限制
+            dry_run=True      # 测试始终使用试运行模式确保安全
         )
 
         print(f"清理结果: {json.dumps(result, indent=2, default=str)}")
