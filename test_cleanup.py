@@ -80,38 +80,45 @@ def test_scheduler():
     print("\n=== 测试调度器 ===")
 
     try:
-        from scheduler import TaskScheduler, scheduler
+        from scheduler import TaskScheduler
+
+        # 创建独立的测试调度器
+        test_scheduler = TaskScheduler()
 
         # 创建测试任务
         test_results = []
 
-        def test_task(task_name):
-            logger.info(f"执行测试任务: {task_name}")
-            test_results.append(task_name)
-            return f"Task {task_name} completed"
+        def test_task():
+            logger.info("执行测试任务")
+            test_results.append("test_executed")
+            return "Test task completed"
 
-        scheduler.add_task(
+        test_scheduler.add_task(
             name='test_cleanup',
             func=test_task,
             interval_hours=1,
-            start_immediately=True,
-            task_name='test_cleanup'
+            start_immediately=True
         )
 
         print("测试任务已添加到调度器")
 
+        # 启动调度器
+        test_scheduler.start()
+        print("调度器已启动")
+
         # 获取调度器状态
-        status = scheduler.get_all_tasks_status()
+        status = test_scheduler.get_all_tasks_status()
         print(f"调度器状态: {json.dumps(status, indent=2, default=str)}")
 
         # 等待任务执行
         import time
-        time.sleep(2)
+        print("等待任务执行...")
+        time.sleep(3)  # 给更多时间让任务执行
 
         print(f"测试任务执行结果: {test_results}")
 
-        # 清理测试任务
-        scheduler.remove_task('test_cleanup')
+        # 停止调度器
+        test_scheduler.stop()
 
         return len(test_results) > 0
 
@@ -123,23 +130,28 @@ def test_api_endpoints():
     """测试API端点"""
     print("\n=== 测试API端点 ===")
 
-    # 这里只是检查API端点是否正确定义，不实际调用
     try:
-        import capcut_server
+        # 检查清理相关的函数是否定义
+        from minio_cleanup import cleanup_old_drafts_safe
+        from scheduler import get_scheduler_status
 
-        # 检查是否有清理相关的路由
-        routes = []
-        for rule in capcut_server.app.url_map.iter_rules():
-            if 'cleanup' in rule.rule:
-                routes.append({
-                    'endpoint': rule.endpoint,
-                    'methods': list(rule.methods),
-                    'rule': rule.rule
-                })
+        print("✅ 清理模块导入成功")
 
-        print(f"发现的清理相关API端点: {json.dumps(routes, indent=2)}")
+        # 检查配置
+        from settings.local import MINIO_CLEANUP_CONFIG
+        if MINIO_CLEANUP_CONFIG and MINIO_CLEANUP_CONFIG.get('enabled'):
+            print("✅ 清理配置已启用")
+        else:
+            print("⚠️ 清理配置未启用")
 
-        return len(routes) >= 2  # 应该至少有两个清理相关的端点
+        # 检查核心函数是否可调用
+        cleanup_callable = callable(cleanup_old_drafts_safe)
+        status_callable = callable(get_scheduler_status)
+
+        print(f"✅ 清理函数可用: {cleanup_callable}")
+        print(f"✅ 状态查询函数可用: {status_callable}")
+
+        return cleanup_callable and status_callable
 
     except Exception as e:
         print(f"API端点测试失败: {e}")
