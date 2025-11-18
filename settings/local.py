@@ -35,6 +35,12 @@ MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', '')
 MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', '')
 MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME', '')
 
+# MinIO清理配置
+MINIO_CLEANUP_ENABLED = os.getenv('MINIO_CLEANUP_ENABLED', 'false').lower() == 'true'
+MINIO_CLEANUP_INTERVAL_HOURS = int(os.getenv('MINIO_CLEANUP_INTERVAL_HOURS', '24'))
+MINIO_CLEANUP_MAX_AGE_HOURS = int(os.getenv('MINIO_CLEANUP_MAX_AGE_HOURS', '48'))
+MINIO_CLEANUP_DRY_RUN = os.getenv('MINIO_CLEANUP_DRY_RUN', 'true').lower() == 'true'
+
 # OSS配置
 OSS_ENDPOINT = os.getenv('OSS_ENDPOINT', '')
 OSS_ACCESS_KEY_ID = os.getenv('OSS_ACCESS_KEY_ID', '')
@@ -58,6 +64,14 @@ MINIO_CONFIG = {
     "access_key": MINIO_ACCESS_KEY,
     "secret_key": MINIO_SECRET_KEY,
     "bucket_name": MINIO_BUCKET_NAME
+}
+
+# MinIO清理配置
+MINIO_CLEANUP_CONFIG = {
+    "enabled": MINIO_CLEANUP_ENABLED,
+    "interval_hours": MINIO_CLEANUP_INTERVAL_HOURS,
+    "max_age_hours": MINIO_CLEANUP_MAX_AGE_HOURS,
+    "dry_run": MINIO_CLEANUP_DRY_RUN
 }
 
 # 如果环境变量中有OSS配置，则使用环境变量
@@ -117,6 +131,10 @@ if os.path.exists(CONFIG_FILE_PATH):
             if not MINIO_CONFIG["endpoint"] and "minio_config" in local_config:
                 MINIO_CONFIG = local_config["minio_config"]
 
+            # 如果清理配置在配置文件中有值，则使用配置文件的值
+            if "minio_cleanup_config" in local_config:
+                MINIO_CLEANUP_CONFIG.update(local_config["minio_cleanup_config"])
+
     except Exception as e:
         # 配置文件加载失败，使用默认配置
         pass
@@ -131,5 +149,6 @@ __all__ = [
     'SECRET_KEY',
     'OSS_CONFIG',
     'MP4_OSS_CONFIG',
-    'MINIO_CONFIG'
+    'MINIO_CONFIG',
+    'MINIO_CLEANUP_CONFIG'
 ]

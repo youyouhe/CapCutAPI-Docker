@@ -33,7 +33,7 @@ from util import generate_draft_url as utilgenerate_draft_url, hex_to_rgb
 from pyJianYingDraft.text_segment import TextStyleRange, Text_style, Text_border
 from functools import wraps
 
-from settings.local import IS_CAPCUT_ENV, DRAFT_DOMAIN, PREVIEW_ROUTER, PORT, SECRET_KEY
+from settings.local import IS_CAPCUT_ENV, DRAFT_DOMAIN, PREVIEW_ROUTER, PORT, SECRET_KEY, MINIO_CLEANUP_CONFIG
 
 app = Flask(__name__)
 
@@ -1581,10 +1581,15 @@ if __name__ == '__main__':
     # Initialize request queue
     from request_queue import request_queue
 
+    # Initialize task scheduler
+    from scheduler import init_scheduler, scheduler as task_scheduler
+
     # Cleanup function
     def cleanup():
         logger.info("Cleaning up request queue...")
         request_queue.stop_workers()
+        logger.info("Stopping task scheduler...")
+        task_scheduler.stop()
         logger.info("Application shutdown complete")
 
     # Register cleanup function
@@ -1627,6 +1632,15 @@ if __name__ == '__main__':
         logger.info("MINIO_SECRET_KEY: NOT_SET")
     logger.info(f"MINIO_BUCKET_NAME: {os.getenv('MINIO_BUCKET_NAME', 'NOT_SET')}")
 
+    # MinIO清理配置信息
+    if MINIO_CLEANUP_CONFIG and MINIO_CLEANUP_CONFIG.get('enabled'):
+        logger.info("MinIO清理任务: 已启用")
+        logger.info(f"清理间隔: {MINIO_CLEANUP_CONFIG.get('interval_hours', 24)} 小时")
+        logger.info(f"文件保留时间: {MINIO_CLEANUP_CONFIG.get('max_age_hours', 48)} 小时")
+        logger.info(f"试运行模式: {'是' if MINIO_CLEANUP_CONFIG.get('dry_run', True) else '否'}")
+    else:
+        logger.info("MinIO清理任务: 未启用")
+
     # OSS配置信息
     oss_endpoint = os.getenv('OSS_ENDPOINT')
     if oss_endpoint:
@@ -1639,5 +1653,80 @@ if __name__ == '__main__':
 
     logger.info(f"草稿上传: {'启用' if os.getenv('IS_UPLOAD_DRAFT', 'false').lower() == 'true' else '禁用'}")
     logger.info("=" * 60)
+
+    # Initialize and start the task scheduler
+    try:
+        init_scheduler()
+        logger.info("Task scheduler initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize task scheduler: {e}")
+
+    # Add cleanup management API endpoints after app is created
+    @app.route('/cleanup/minio', methods=['POST'])
+    @require_api_key
+    def cleanup_minio():
+        """
+        手动触发MinIO清理任务
+        """
+        try:
+            data = request.get_json() or {}
+            dry_run = data.get('dry_run', MINIO_CLEANUP_CONFIG.get('dry_run', True))
+            max_age_hours = data.get('max_age_hours', MINIO_CLEANUP_CONFIG.get('max_age_hours', 48))
+
+            # Import here to avoid circular imports
+            from minio_cleanup import cleanup_old_drafts_safe
+
+            result = cleanup_old_drafts_safe(
+                max_age_hours=max_age_hours,
+                dry_run=dry_run
+            )
+
+            return jsonify({
+                "success": True,
+                "error": "",
+                "output": {
+                    "message": f"MinIO cleanup completed (dry_run={dry_run})",
+                    "result": result
+                }
+            })
+
+        except Exception as e:
+            logger.error(f"Manual MinIO cleanup failed: {e}")
+            return jsonify({
+                "success": False,
+                "error": str(e),
+                "output": {}
+            })
+
+    @app.route('/cleanup/status', methods=['GET'])
+    @require_api_key
+    def get_cleanup_status():
+        """
+        获取清理任务状态
+        """
+        try:
+            # Import here to avoid circular imports
+            from scheduler import get_scheduler_status
+
+            scheduler_status = get_scheduler_status()
+
+            return jsonify({
+                "success": True,
+                "error": "",
+                "output": {
+                    "config": MINIO_CLEANUP_CONFIG,
+                    "scheduler": scheduler_status
+                }
+            })
+
+        except Exception as e:
+            logger.error(f"Failed to get cleanup status: {e}")
+            return jsonify({
+                "success": False,
+                "error": str(e),
+                "output": {}
+            })
+
+    logger.info("Added cleanup management API endpoints")
 
     app.run(host='0.0.0.0', port=PORT, debug=debug_mode)

@@ -17,5 +17,11 @@
     "access_key_secret": "your-access-key-secret",  // Access key secret for MP4 OSS authentication
     "region": "your-region",  // Region for MP4 storage
     "endpoint": "http://your-custom-domain"  // Custom domain endpoint for MP4 access
+  },
+  "minio_cleanup_config": {  // MinIO cleanup configuration
+    "enabled": false,  // Whether to enable scheduled cleanup tasks
+    "interval_hours": 24,  // Cleanup task interval in hours
+    "max_age_hours": 48,  // Maximum file age in hours before cleanup
+    "dry_run": true  // Whether to run in dry-run mode (don't actually delete files)
   }
 }

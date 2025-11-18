@@ -18,8 +18,8 @@ def upload_to_oss(path):
         object_name = os.path.basename(path)
         bucket.put_object_from_file(object_name, path)
         
-        # Generate signed URL (valid for 24 hours)
-        url = bucket.sign_url('GET', object_name, 24 * 60 * 60)
+        # Generate signed URL (valid for 48 hours)
+        url = bucket.sign_url('GET', object_name, 48 * 60 * 60)
         
         # Clean up temporary file
         os.remove(path)
@@ -62,12 +62,12 @@ def upload_to_minio(path):
         
         print(f"File uploaded successfully. Result: {result}")
         
-        # Generate presigned URL (valid for 24 hours)
+        # Generate presigned URL (valid for 48 hours)
         from datetime import timedelta
         url = client.presigned_get_object(
             MINIO_CONFIG['bucket_name'],
             object_name,
-            expires=timedelta(hours=24)
+            expires=timedelta(hours=48)
         )
         
         print(f"Presigned URL generated: {url}")
@@ -102,8 +102,8 @@ def upload_mp4_to_oss(path):
     object_name = os.path.basename(path)
     bucket.put_object_from_file(object_name, path)
     
-    # Generate pre-signed URL (valid for 24 hours), set slash_safe to True to avoid path escaping
-    url = bucket.sign_url('GET', object_name, 24 * 60 * 60, slash_safe=True)
+    # Generate pre-signed URL (valid for 48 hours), set slash_safe to True to avoid path escaping
+    url = bucket.sign_url('GET', object_name, 48 * 60 * 60, slash_safe=True)
     
     # Clean up temporary file
     os.remove(path)
